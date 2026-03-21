@@ -1,154 +1,216 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import KpiCard from '@/components/ui/KpiCard'
-import { formatCurrency } from '@/lib/utils'
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import FilterBar, { FilterState, filterToParams, filterLabel } from '@/components/ui/FilterBar'
+import { formatCurrency, formatPercent } from '@/lib/utils'
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend
+} from 'recharts'
+
+const PIE_COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899']
+const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+
+function mesLabel(mes: string) {
+  const [y, m] = mes.split('-')
+  return `${MESES_LABEL[parseInt(m)-1]}/${y.slice(2)}`
+}
 
 export default function DashboardPage() {
-  const [vendas, setVendas] = useState<any>(null)
-  const [financeiro, setFinanceiro] = useState<any>(null)
+  const [data,    setData]    = useState<any>(null)
+  const [fin,     setFin]     = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [period, setPeriod] = useState('30d')
+  const [error,   setError]   = useState<string|null>(null)
+  const [syncing, setSyncing] = useState(false)
+  const [lastSync,setLastSync]= useState<string>('')
+  const [filter,  setFilter]  = useState<FilterState>({ type: 'year', year: 2026 })
+  const [view,    setView]    = useState<'mensal'|'diario'>('mensal')
 
-  useEffect(() => {
-    setLoading(true)
-    setError(null)
+  const load = useCallback((f: FilterState) => {
+    setLoading(true); setError(null)
+    const p = filterToParams(f)
+    const qs = new URLSearchParams(p as any).toString()
     Promise.all([
-      fetch(`/api/eduzz/vendas?period=${period}`).then(r => r.json()),
+      fetch(`/api/eduzz/vendas?${qs}`).then(r => r.json()),
       fetch('/api/eduzz/financeiro').then(r => r.json()),
-    ])
-      .then(([v, f]) => {
-        if (v.error) throw new Error(v.error)
-        setVendas(v)
-        setFinanceiro(f)
-      })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false))
-  }, [period])
+    ]).then(([v, fi]) => {
+      if (v.error) throw new Error(v.error)
+      setData(v); if (!fi.error) setFin(fi)
+    }).catch(e => setError(e.message)).finally(() => setLoading(false))
+  }, [])
 
-  const periods = [
-    { label: '7 dias', value: '7d' },
-    { label: '30 dias', value: '30d' },
-    { label: '90 dias', value: '90d' },
-    { label: '12 meses', value: '12m' },
-    { label: 'Histórico', value: 'all' },
-  ]
+  useEffect(() => { load(filter) }, [filter, load])
+
+  const handleSync = async () => {
+    setSyncing(true)
+    try {
+      await fetch('/api/sync')
+      setLastSync(new Date().toLocaleTimeString('pt-BR'))
+      load(filter)
+    } finally { setSyncing(false) }
+  }
+
+  const grafico = view === 'mensal'
+    ? (data?.graficoMensal ?? []).map((d: any) => ({ ...d, label: mesLabel(d.mes) }))
+    : data?.graficoDiario ?? []
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white">Visão Geral</h2>
-          <p className="text-gray-400 text-sm mt-1">Painel estratégico do seu negócio</p>
-        </div>
-        <div className="flex gap-2">
-          {periods.map(p => (
-            <button
-              key={p.value}
-              onClick={() => setPeriod(p.value)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                period === p.value ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
+          <p className="text-gray-400 text-sm mt-1">
+            {data ? `${data.totalRegistros} registros · ${data.quantidade} vendas pagas · ${filterLabel(filter)}` : 'Carregando...'}
+          </p>
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-950 border border-red-700 rounded-xl p-4 mb-6 text-red-300 text-sm">
-          Erro ao carregar dados: {error}
-        </div>
-      )}
+      <div className="mb-6">
+        <FilterBar value={filter} onChange={f => { setFilter(f); load(f) }} onSync={handleSync} syncing={syncing} lastSync={lastSync} />
+      </div>
+
+      {error && <div className="bg-red-950 border border-red-700 rounded-xl p-4 mb-6 text-red-300 text-sm">Erro: {error}</div>}
 
       {loading ? (
-        <div className="grid grid-cols-4 gap-4 mb-8">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-28 bg-gray-800 rounded-xl animate-pulse" />
-          ))}
-        </div>
+        <div className="grid grid-cols-4 gap-4 mb-8">{[...Array(8)].map((_,i) => <div key={i} className="h-28 bg-gray-800 rounded-xl animate-pulse"/>)}</div>
       ) : (
         <>
-          {/* KPIs principais */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <KpiCard
-              title="Faturamento"
-              value={formatCurrency(vendas?.totalFaturamento ?? 0)}
-              subtitle={`${period === '30d' ? 'Últimos 30 dias' : period === '7d' ? 'Últimos 7 dias' : 'Período selecionado'}`}
-              variation={financeiro?.crescimento}
-              color="green"
-            />
-            <KpiCard
-              title="Total de Vendas"
-              value={String(vendas?.totalVendas ?? 0)}
-              subtitle="transações no período"
-              color="blue"
-            />
-            <KpiCard
-              title="Ticket Médio"
-              value={formatCurrency(vendas?.ticketMedio ?? 0)}
-              subtitle="por venda"
-              color="purple"
-            />
-            <KpiCard
-              title="Saldo Disponível"
-              value={formatCurrency(financeiro?.saldo ?? 0)}
-              subtitle="na Eduzz agora"
-              color="yellow"
-            />
+          {/* KPIs financeiros */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <KpiCard title="Faturamento Bruto"    value={formatCurrency(data?.bruto ?? 0)}    color="green" variation={fin?.crescimentoBruto} />
+            <KpiCard title="Faturamento Líquido"  value={formatCurrency(data?.liquido ?? 0)}  color="blue" subtitle="após taxas da plataforma" />
+            <KpiCard title="Taxas Pagas"          value={formatCurrency(data?.totalTaxas ?? 0)} color="red"
+              subtitle={`Plat: ${formatCurrency(data?.taxaPlat ?? 0)} · COOP: ${formatCurrency(data?.taxaCoop ?? 0)}`} />
+            <KpiCard title="Saldo Disponível"     value={formatCurrency(fin?.saldo ?? 0)} color="yellow"
+              subtitle="disponível para saque agora"
+              extraLabel="⚡ Antecipável" extraValue={formatCurrency(fin?.saldoFuturo ?? 0)} extraColor="amber" />
           </div>
 
-          {/* Gráfico de faturamento */}
-          <div className="bg-gray-900 rounded-xl p-6 mb-8">
-            <h3 className="text-sm font-semibold text-gray-300 mb-4">Faturamento Diário</h3>
+          {/* KPIs operacionais */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <KpiCard title="Vendas Pagas"         value={String(data?.quantidade ?? 0)}        color="blue" subtitle="transações aprovadas" />
+            <KpiCard title="Ticket Médio"         value={formatCurrency(data?.ticketMedio ?? 0)} color="purple" />
+            <KpiCard title="Produtos com Venda"   value={String(data?.porProduto?.length ?? 0)} color="green" subtitle="no período" />
+            <KpiCard title="Margem Líquida"       value={`${data?.bruto > 0 ? ((data.liquido/data.bruto)*100).toFixed(1) : 0}%`} color="purple" />
+          </div>
+
+          {/* Reembolsos */}
+          {data?.reembolsos?.qtd > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <KpiCard title="Reembolsos (valor)"  value={formatCurrency(data.reembolsos.valor)} color="red" subtitle={`${data.reembolsos.qtd} transação(ões)`} />
+              <KpiCard title="% Reembolso / Bruto" value={`${data.reembolsos.pctBruto}%`}        color="red" />
+              <KpiCard title="% Reembolso / Líq."  value={`${data.reembolsos.pctLiq}%`}          color="red" />
+              <KpiCard title="Líq. após reembolsos" value={formatCurrency((data.liquido ?? 0) - (data.reembolsos.valor ?? 0))} color="blue" />
+            </div>
+          )}
+
+          {/* Gráfico */}
+          <div className="bg-gray-900 rounded-xl p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-gray-300">Evolução — {filterLabel(filter)}</h3>
+              <div className="flex gap-2">
+                {(['mensal','diario'] as const).map(v => (
+                  <button key={v} onClick={() => setView(v)}
+                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${view===v?'bg-gray-700 text-white':'text-gray-500 hover:text-gray-300'}`}>
+                    {v === 'mensal' ? 'Mensal' : 'Diário'}
+                  </button>
+                ))}
+              </div>
+            </div>
             <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={vendas?.graficoDiario ?? []}>
+              <AreaChart data={grafico}>
                 <defs>
-                  <linearGradient id="gradVendas" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="gL" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                <XAxis dataKey="data" tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => v.substring(5)} />
-                <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
-                <Tooltip
-                  contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8 }}
-                  labelStyle={{ color: '#9ca3af' }}
-                  formatter={(v: any) => [formatCurrency(v), 'Faturamento']}
-                />
-                <Area type="monotone" dataKey="valor" stroke="#3b82f6" fill="url(#gradVendas)" strokeWidth={2} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937"/>
+                <XAxis dataKey={view==='mensal'?'label':'data'} tick={{fill:'#6b7280',fontSize:11}}
+                  tickFormatter={v => view==='diario' ? v.substring(5) : v}/>
+                <YAxis tick={{fill:'#6b7280',fontSize:11}} tickFormatter={v=>`R$${(v/1000).toFixed(0)}k`}/>
+                <Tooltip contentStyle={{background:'#111827',border:'1px solid #374151',borderRadius:8}}
+                  formatter={(v:any,name:any) => [formatCurrency(v), name==='bruto'?'Bruto':'Líquido']}/>
+                <Legend formatter={v=>v==='bruto'?'Bruto':'Líquido'}/>
+                <Area type="monotone" dataKey="bruto"   stroke="#10b981" fill="url(#gB)" strokeWidth={2} name="bruto"/>
+                <Area type="monotone" dataKey="liquido" stroke="#3b82f6" fill="url(#gL)" strokeWidth={2} name="liquido"/>
               </AreaChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Top produtos */}
-          <div className="bg-gray-900 rounded-xl p-6">
-            <h3 className="text-sm font-semibold text-gray-300 mb-4">Top Produtos por Faturamento</h3>
-            <div className="space-y-3">
-              {(vendas?.porProduto ?? []).slice(0, 8).map((p: any, i: number) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500 w-4">{i + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{p.nome}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <div className="flex-1 bg-gray-800 rounded-full h-1.5">
-                        <div
-                          className="bg-blue-500 h-1.5 rounded-full"
-                          style={{ width: `${((p.faturamento / (vendas?.totalFaturamento || 1)) * 100).toFixed(0)}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-400">{p.vendas} vendas</span>
+          {/* Produtos + Métodos */}
+          <div className="grid grid-cols-3 gap-6 mb-6">
+            <div className="col-span-2 bg-gray-900 rounded-xl p-6">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4">Top 10 Produtos</h3>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={(data?.porProduto??[]).slice(0,10)} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" horizontal={false}/>
+                  <XAxis type="number" tick={{fill:'#6b7280',fontSize:11}}/>
+                  <YAxis type="category" dataKey="nome" tick={{fill:'#9ca3af',fontSize:10}} width={160}
+                    tickFormatter={(v:string)=>v.length>25?v.substring(0,25)+'…':v}/>
+                  <Tooltip contentStyle={{background:'#111827',border:'1px solid #374151',borderRadius:8}}
+                    formatter={(v:any)=>[v,'Vendas']}/>
+                  <Bar dataKey="vendas" fill="#3b82f6" radius={[0,4,4,0]}/>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-gray-900 rounded-xl p-6">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4">Forma de Pagamento</h3>
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart>
+                  <Pie data={data?.porMetodo??[]} dataKey="qtd" nameKey="metodo" cx="50%" cy="50%" outerRadius={65}
+                    label={({name,percent}:any)=>`${((percent??0)*100).toFixed(0)}%`}>
+                    {(data?.porMetodo??[]).map((_:any,i:number)=>(
+                      <Cell key={i} fill={PIE_COLORS[i%PIE_COLORS.length]}/>
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v:any)=>[v,'Vendas']}/>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-2 mt-1">
+                {(data?.porMetodo??[]).map((m:any,i:number)=>(
+                  <div key={i} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{background:PIE_COLORS[i%PIE_COLORS.length]}}/>
+                      <span className="text-gray-400">{m.metodo}</span>
                     </div>
+                    <span className="text-white font-medium">{m.qtd}</span>
                   </div>
-                  <span className="text-sm font-semibold text-green-400">{formatCurrency(p.faturamento)}</span>
-                </div>
-              ))}
-              {(!vendas?.porProduto || vendas.porProduto.length === 0) && (
-                <p className="text-sm text-gray-500">Nenhum dado no período</p>
-              )}
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Tabela produtos */}
+          <div className="bg-gray-900 rounded-xl p-6">
+            <h3 className="text-sm font-semibold text-gray-300 mb-4">Ranking Completo de Produtos</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs text-gray-500 border-b border-gray-800">
+                    <th className="pb-3">#</th><th className="pb-3">Produto</th>
+                    <th className="pb-3 text-right">Vendas</th><th className="pb-3 text-right">Bruto</th>
+                    <th className="pb-3 text-right">Líquido</th><th className="pb-3 text-right">Ticket</th>
+                    <th className="pb-3 text-right">% Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(data?.porProduto??[]).map((p:any,i:number)=>(
+                    <tr key={i} className="border-b border-gray-800 hover:bg-gray-800 transition-colors">
+                      <td className="py-2.5 text-gray-500 text-xs">{i+1}</td>
+                      <td className="py-2.5 text-white">{p.nome}</td>
+                      <td className="py-2.5 text-right font-semibold text-white">{p.vendas}</td>
+                      <td className="py-2.5 text-right text-green-400">{formatCurrency(p.bruto)}</td>
+                      <td className="py-2.5 text-right text-blue-400">{formatCurrency(p.liquido)}</td>
+                      <td className="py-2.5 text-right text-gray-300">{formatCurrency(p.bruto/p.vendas)}</td>
+                      <td className="py-2.5 text-right text-gray-400">{((p.vendas/(data?.quantidade||1))*100).toFixed(1)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </>

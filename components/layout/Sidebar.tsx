@@ -2,13 +2,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, TrendingUp, DollarSign, Package, Megaphone, ChevronRight
+  LayoutDashboard, TrendingUp, DollarSign, Package, Megaphone, ChevronRight, Wallet
 } from 'lucide-react'
 
 const nav = [
   { href: '/dashboard',          label: 'Visão Geral',  icon: LayoutDashboard },
   { href: '/dashboard/vendas',   label: 'Vendas',       icon: TrendingUp },
-  { href: '/dashboard/financeiro', label: 'Financeiro', icon: DollarSign },
+  { href: '/dashboard/financeiro', label: 'Financeiro Eduzz', icon: DollarSign },
   { href: '/dashboard/produtos', label: 'Produtos',     icon: Package },
   { href: '/dashboard/trafego',  label: 'Tráfego',      icon: Megaphone },
 ]
@@ -41,8 +41,12 @@ export default function Sidebar() {
           )
         })}
       </nav>
-      <div className="px-5 py-4 border-t border-gray-700">
-        <p className="text-xs text-gray-500">v1.0 • Eduzz + Meta Ads</p>
+      <div className="px-3 py-3 border-t border-gray-700">
+        <Link href="/financas"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-emerald-400 hover:bg-gray-800 hover:text-emerald-300 transition-colors">
+          <Wallet size={18} />
+          <span>Financeiro</span>
+        </Link>
       </div>
     </aside>
   )
