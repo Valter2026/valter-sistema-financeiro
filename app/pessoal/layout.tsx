@@ -1,8 +1,25 @@
+'use client'
+import { useEffect, useState } from 'react'
 import PfSidebar from '@/components/pf/PfSidebar'
 import PfBottomNav from '@/components/pf/PfBottomNav'
 import PfNotificationBell from '@/components/pf/PfNotificationBell'
 
 export default function PessoalLayout({ children }: { children: React.ReactNode }) {
+  const [collapsed, setCollapsed] = useState(false)
+
+  useEffect(() => {
+    const sync = () => {
+      const saved = localStorage.getItem('pf-sidebar-collapsed')
+      setCollapsed(saved === 'true')
+    }
+    sync()
+    // Sincroniza quando o sidebar muda (via storage event entre abas ou via toggle)
+    window.addEventListener('storage', sync)
+    // Poll simples para pegar mudanças na mesma aba
+    const iv = setInterval(sync, 300)
+    return () => { window.removeEventListener('storage', sync); clearInterval(iv) }
+  }, [])
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Sidebar — só desktop */}
@@ -19,13 +36,13 @@ export default function PessoalLayout({ children }: { children: React.ReactNode 
         <PfNotificationBell />
       </header>
 
-      {/* Sino desktop — dentro da sidebar via portal não é prático, usar fixed */}
+      {/* Sino desktop */}
       <div className="hidden md:block fixed top-3 right-4 z-30">
         <PfNotificationBell />
       </div>
 
-      {/* Conteúdo */}
-      <main className="md:ml-56 p-4 md:p-8 pb-24 md:pb-8 pt-16 md:pt-8">
+      {/* Conteúdo — margem esquerda acompanha o sidebar */}
+      <main className={`transition-all duration-200 p-4 md:p-8 pb-24 md:pb-8 pt-16 md:pt-8 ${collapsed ? 'md:ml-16' : 'md:ml-56'}`}>
         {children}
       </main>
 

@@ -1,10 +1,12 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, ArrowLeftRight, ArrowDownCircle, Target,
   CreditCard, Tag, PieChart, ChevronRight, ChevronLeft, Mic,
-  TrendingUp, Upload, Settings, BarChart2, Wallet, FolderOpen, Brain
+  TrendingUp, Upload, Settings, BarChart2, Wallet, FolderOpen,
+  Brain, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react'
 
 const nav = [
@@ -27,40 +29,81 @@ const nav = [
 
 export default function PfSidebar() {
   const path = usePathname()
+  const [collapsed, setCollapsed] = useState(false)
+
+  // Persiste o estado no localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('pf-sidebar-collapsed')
+    if (saved !== null) setCollapsed(saved === 'true')
+  }, [])
+
+  const toggle = () => {
+    setCollapsed(v => {
+      localStorage.setItem('pf-sidebar-collapsed', String(!v))
+      return !v
+    })
+  }
+
+  const w = collapsed ? 'w-16' : 'w-56'
+
   return (
-    <aside className="fixed left-0 top-0 h-screen w-56 bg-gray-900 border-r border-gray-800 flex flex-col z-10">
-      <div className="px-5 py-6 border-b border-gray-800">
-        <p className="text-xs text-emerald-400 font-semibold uppercase tracking-widest mb-1">Módulo</p>
-        <h1 className="text-lg font-bold text-white">Finanças Pessoais</h1>
+    <aside className={`fixed left-0 top-0 h-screen ${w} bg-gray-900 border-r border-gray-800 flex flex-col z-10 transition-all duration-200`}>
+
+      {/* Header */}
+      <div className={`flex items-center border-b border-gray-800 ${collapsed ? 'justify-center px-0 py-5' : 'justify-between px-4 py-5'}`}>
+        {!collapsed && (
+          <div>
+            <p className="text-xs text-emerald-400 font-semibold uppercase tracking-widest mb-0.5">Módulo</p>
+            <h1 className="text-base font-bold text-white leading-tight">Finanças Pessoais</h1>
+          </div>
+        )}
+        <button
+          onClick={toggle}
+          title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+          className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800 transition-colors flex-shrink-0">
+          {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+        </button>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      {/* Nav */}
+      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto overflow-x-hidden">
         {nav.map(({ href, label, icon: Icon }) => {
           const active = path === href || (href !== '/pessoal' && path.startsWith(href))
           return (
             <Link key={href} href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              title={collapsed ? label : undefined}
+              className={`flex items-center gap-3 rounded-lg font-medium transition-colors ${
+                collapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'
+              } ${
                 active
                   ? 'bg-emerald-600 text-white'
                   : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               }`}>
-              <Icon size={17} className={active ? 'text-white' : 'text-gray-500'} />
-              <span className="flex-1">{label}</span>
-              {active && <ChevronRight size={13} className="text-emerald-200" />}
+              <Icon size={17} className={`flex-shrink-0 ${active ? 'text-white' : 'text-gray-500'}`} />
+              {!collapsed && (
+                <>
+                  <span className="flex-1 text-sm truncate">{label}</span>
+                  {active && <ChevronRight size={13} className="text-emerald-200 flex-shrink-0" />}
+                </>
+              )}
             </Link>
           )
         })}
       </nav>
 
-      <div className="px-4 py-4 border-t border-gray-800 space-y-2">
+      {/* Footer */}
+      <div className={`border-t border-gray-800 py-3 space-y-2 ${collapsed ? 'px-2' : 'px-3'}`}>
         <Link href="/pessoal/lancamentos?voz=1"
-          className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors">
-          <Mic size={13} /> Lançar por Voz
+          title={collapsed ? 'Lançar por Voz' : undefined}
+          className={`flex items-center gap-2 w-full py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors ${collapsed ? 'justify-center px-0' : 'px-3'}`}>
+          <Mic size={13} className="flex-shrink-0" />
+          {!collapsed && 'Lançar por Voz'}
         </Link>
         <Link href="/dashboard"
-          className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors px-1">
-          <ChevronLeft size={13} />
-          Voltar ao CRM
+          title={collapsed ? 'Voltar ao CRM' : undefined}
+          className={`flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors ${collapsed ? 'justify-center' : 'px-1'}`}>
+          <ChevronLeft size={13} className="flex-shrink-0" />
+          {!collapsed && 'Voltar ao CRM'}
         </Link>
       </div>
     </aside>
