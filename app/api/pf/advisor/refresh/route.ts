@@ -42,6 +42,18 @@ async function autoGenerateScripts() {
 // POST — roda o consultor, salva no cache, gera notificações e auto-atualiza scripts
 export async function POST() {
   try {
+    // Verifica preferências do usuário
+    const { data: schedule } = await supabaseAdmin
+      .from('pf_advisor_schedule')
+      .select('enabled,receive_messages,receive_audio')
+      .eq('id', 1)
+      .single()
+
+    // Se o usuário desativou as orientações automáticas, não gera
+    if (schedule && schedule.enabled === false) {
+      return NextResponse.json({ ok: true, skipped: 'disabled by user' })
+    }
+
     const [advices] = await Promise.all([
       runAdvisor(),
       autoGenerateScripts(),
@@ -53,18 +65,20 @@ export async function POST() {
       generated_at: new Date().toISOString(),
     })
 
-    // Notificações apenas para alta prioridade (máx 3)
-    const urgent = advices.filter((a: any) => a.priority === 'high' || a.type === 'alert')
-    for (const advice of urgent.slice(0, 3)) {
-      await supabaseAdmin.from('pf_notifications').insert({
-        type:        advice.type,
-        title:       advice.title,
-        message:     advice.message,
-        action_text: advice.action,
-      })
+    // Notificações apenas se receive_messages ativo (padrão: true)
+    if (!schedule || schedule.receive_messages !== false) {
+      const urgent = advices.filter((a: any) => a.priority === 'high' || a.type === 'alert')
+      for (const advice of urgent.slice(0, 3)) {
+        await supabaseAdmin.from('pf_notifications').insert({
+          type:        advice.type,
+          title:       advice.title,
+          message:     advice.message,
+          action_text: advice.action,
+        })
+      }
     }
 
-    return NextResponse.json({ ok: true, count: advices.length, urgent: urgent.length })
+    return NextResponse.json({ ok: true, count: advices.length })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }

@@ -147,16 +147,36 @@ export default function ConsultorPage() {
     if (typeof window !== 'undefined') synthRef.current = window.speechSynthesis
   }, [])
 
-  const load = useCallback(async (q = '') => {
-    setLoading(true); setError(''); setAdvices([])
-    const url = q ? `/api/pf/advisor?q=${encodeURIComponent(q)}` : '/api/pf/advisor'
-    const res = await fetch(url).then(r => r.json())
-    if (res.error) { setError(res.error) }
-    else { setAdvices(res.advices ?? []); setContext(res.context ?? null); setGenAt(res.generatedAt ?? '') }
+  // Carrega do cache (instantâneo, sem chamar IA)
+  const loadCache = useCallback(async () => {
+    setLoading(true); setError('')
+    const res = await fetch('/api/pf/advisor/refresh').then(r => r.json())
+    if (Array.isArray(res.advices) && res.advices.length > 0) {
+      setAdvices(res.advices)
+      setGenAt(res.generated_at ?? '')
+    }
     setLoading(false)
   }, [])
 
-  useEffect(() => { load() }, [load])
+  // Atualização completa (chama IA — botão Atualizar ou pergunta livre)
+  const load = useCallback(async (q = '') => {
+    setLoading(true); setError(''); setAdvices([])
+    const url = q ? `/api/pf/advisor?q=${encodeURIComponent(q)}` : '/api/pf/advisor/refresh'
+    if (q) {
+      // Pergunta livre → chama IA diretamente
+      const res = await fetch(`/api/pf/advisor?q=${encodeURIComponent(q)}`).then(r => r.json())
+      if (res.error) { setError(res.error) }
+      else { setAdvices(res.advices ?? []); setContext(res.context ?? null); setGenAt(res.generatedAt ?? '') }
+    } else {
+      // Atualizar → dispara refresh (POST salva no cache) depois lê
+      const res = await fetch('/api/pf/advisor/refresh', { method: 'POST' }).then(r => r.json())
+      if (res.error) { setError(res.error) }
+      else { await loadCache() }
+    }
+    setLoading(false)
+  }, [loadCache])
+
+  useEffect(() => { loadCache() }, [loadCache])
 
   const handleAsk = async () => {
     if (!question.trim()) return
@@ -218,6 +238,13 @@ export default function ConsultorPage() {
     rec.onresult = (e: any) => { setQuestion(e.results[0][0].transcript) }
     rec.start()
   }
+
+  const [receiveAudio, setReceiveAudio] = useState(true)
+  useEffect(() => {
+    fetch('/api/pf/advisor/schedule').then(r => r.json()).then(d => {
+      if (d && d.receive_audio === false) setReceiveAudio(false)
+    })
+  }, [])
 
   const pitch        = voice === 'feminina' ? 1.2 : 0.85
   const highPriority = advices.filter(a => a.priority === 'high')
@@ -285,28 +312,30 @@ export default function ConsultorPage() {
       )}
 
       {/* Áudios — Semana e Mês */}
-      <div className="mb-6 space-y-3">
-        <div className="flex items-center gap-2 mb-1">
-          <Volume2 size={14} className="text-gray-400" />
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Orientações em Áudio · máx. 5 min · direto ao ponto</h3>
+      {receiveAudio && (
+        <div className="mb-6 space-y-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Volume2 size={14} className="text-gray-400" />
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Orientações em Áudio · máx. 5 min · direto ao ponto</h3>
+          </div>
+          <AudioCard
+            title="Orientação da Semana"
+            icon={Calendar}
+            iconColor="text-blue-400"
+            endpoint="/api/pf/advisor/weekly"
+            voice={voice}
+            pitch={pitch}
+          />
+          <AudioCard
+            title="Orientação do Mês"
+            icon={CalendarDays}
+            iconColor="text-purple-400"
+            endpoint="/api/pf/advisor/monthly"
+            voice={voice}
+            pitch={pitch}
+          />
         </div>
-        <AudioCard
-          title="Orientação da Semana"
-          icon={Calendar}
-          iconColor="text-blue-400"
-          endpoint="/api/pf/advisor/weekly"
-          voice={voice}
-          pitch={pitch}
-        />
-        <AudioCard
-          title="Orientação do Mês"
-          icon={CalendarDays}
-          iconColor="text-purple-400"
-          endpoint="/api/pf/advisor/monthly"
-          voice={voice}
-          pitch={pitch}
-        />
-      </div>
+      )}
 
       {/* Erro de config */}
       {error && error.includes('ANTHROPIC_API_KEY') && (
