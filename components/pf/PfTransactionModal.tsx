@@ -418,6 +418,14 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
               <option value="scheduled">Agendado (futuro)</option>
             </select>
           </div>
+          {/* Tags */}
+          <div>
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Tags</label>
+            <input type="text" placeholder="viagem, trabalho, fixo (separar por vírgula)"
+              value={Array.isArray(form.tags) ? form.tags.join(', ') : (form.tags ?? '')}
+              onChange={e => setForm({ ...form, tags: e.target.value.split(',').map((t: string) => t.trim()).filter(Boolean) })}
+              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors" />
+          </div>
         </div>
 
         <div className="flex gap-2 px-5 pb-5 sticky bottom-0 bg-gray-900 pt-2 border-t border-gray-800">

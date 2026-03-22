@@ -36,12 +36,13 @@ export default function PfRelatoriosPage() {
   const [txs,     setTxs]     = useState<any[]>([])
   const [chart,   setChart]   = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [regime,  setRegime]  = useState<'caixa'|'competencia'>('caixa')
 
   const load = useCallback(async () => {
     setLoading(true)
-    const m = String(mes).padStart(2, '0')
+    const statusParam = regime === 'caixa' ? '&status=confirmed' : ''
     const [t] = await Promise.all([
-      fetch(`/api/pf/transactions?month=${mes}&year=${ano}&status=confirmed`).then(r => r.json()),
+      fetch(`/api/pf/transactions?month=${mes}&year=${ano}${statusParam}`).then(r => r.json()),
     ])
     setTxs(Array.isArray(t) ? t : [])
 
@@ -57,7 +58,7 @@ export default function PfRelatoriosPage() {
     )
     setChart(chartData)
     setLoading(false)
-  }, [mes, ano])
+  }, [mes, ano, regime])
 
   useEffect(() => { load() }, [load])
 
@@ -90,6 +91,16 @@ export default function PfRelatoriosPage() {
             <span className="px-4 py-2 text-xs font-semibold text-gray-300 bg-gray-800 border border-gray-700 rounded-xl">{MONTHS[mes-1]}/{ano}</span>
             <button onClick={() => { const d = new Date(ano, mes, 1); setMes(d.getMonth()+1); setAno(d.getFullYear()) }}
               className="px-3 py-2 rounded-xl text-xs font-semibold bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700">›</button>
+          </div>
+          <div className="flex gap-1 bg-gray-800 border border-gray-700 rounded-xl p-1">
+            <button onClick={() => setRegime('caixa')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${regime === 'caixa' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white'}`}>
+              Caixa
+            </button>
+            <button onClick={() => setRegime('competencia')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${regime === 'competencia' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white'}`}>
+              Competência
+            </button>
           </div>
           <button onClick={() => exportCSV(txs, mes, ano)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">

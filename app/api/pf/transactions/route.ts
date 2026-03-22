@@ -3,12 +3,14 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const type   = searchParams.get('type')
-  const status = searchParams.get('status')
-  const start  = searchParams.get('start')
-  const end    = searchParams.get('end')
-  const month  = searchParams.get('month')
-  const year   = searchParams.get('year')
+  const type       = searchParams.get('type')
+  const status     = searchParams.get('status')
+  const start      = searchParams.get('start')
+  const end        = searchParams.get('end')
+  const month      = searchParams.get('month')
+  const year       = searchParams.get('year')
+  const tag        = searchParams.get('tag')
+  const project_id = searchParams.get('project_id')
 
   let q = supabaseAdmin
     .from('pf_transactions')
@@ -16,14 +18,15 @@ export async function GET(req: NextRequest) {
     .order('date', { ascending: false })
     .order('created_at', { ascending: false })
 
-  if (type)   q = q.eq('type', type)
-  if (status) q = q.eq('status', status)
-  if (start)  q = q.gte('date', start)
-  if (end)    q = q.lte('date', end)
+  if (type)       q = q.eq('type', type)
+  if (status)     q = q.eq('status', status)
+  if (start)      q = q.gte('date', start)
+  if (end)        q = q.lte('date', end)
+  if (tag)        q = q.contains('tags', [tag])
+  if (project_id) q = q.eq('project_id', project_id)
   if (month && year) {
-    const m   = String(month).padStart(2, '0')
-    const y   = year
-    q = q.gte('date', `${y}-${m}-01`).lte('date', `${y}-${m}-31`)
+    const m = String(month).padStart(2, '0')
+    q = q.gte('date', `${year}-${m}-01`).lte('date', `${year}-${m}-31`)
   }
 
   const { data, error } = await q

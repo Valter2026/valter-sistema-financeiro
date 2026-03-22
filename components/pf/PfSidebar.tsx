@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ArrowLeftRight, ArrowDownCircle, Target,
   CreditCard, Tag, PieChart, ChevronRight, ChevronLeft, Mic,
-  TrendingUp, Upload, Settings, BarChart2
+  TrendingUp, Upload, Settings, BarChart2, Wallet, FolderOpen
 } from 'lucide-react'
 
 const nav = [
@@ -16,6 +16,8 @@ const nav = [
   { href: '/pessoal/orcamento',      label: 'Orçamento',      icon: PieChart        },
   { href: '/pessoal/fluxo-caixa',    label: 'Fluxo de Caixa', icon: TrendingUp      },
   { href: '/pessoal/relatorios',     label: 'Relatórios',     icon: BarChart2       },
+  { href: '/pessoal/balanco',        label: 'Balanço',        icon: Wallet          },
+  { href: '/pessoal/projetos',       label: 'Projetos',       icon: FolderOpen      },
   { href: '/pessoal/importar',       label: 'Importar',       icon: Upload          },
   { href: '/pessoal/contas',         label: 'Contas',         icon: CreditCard      },
   { href: '/pessoal/categorias',     label: 'Categorias',     icon: Tag             },
