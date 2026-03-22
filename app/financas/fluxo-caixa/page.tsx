@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { formatCurrency } from '@/lib/utils'
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, Legend, AreaChart, Area, ReferenceLine
@@ -21,7 +21,7 @@ export default function FluxoCaixaPage() {
 
   useEffect(() => { load() }, [load])
 
-  const fluxo = data?.fluxo ?? []
+  const fluxo         = data?.fluxo ?? []
   const totalReceitas = fluxo.reduce((a: number, m: any) => a + m.receitas, 0)
   const totalDespesas = fluxo.reduce((a: number, m: any) => a + m.despesas, 0)
   const resultado     = totalReceitas - totalDespesas
@@ -31,14 +31,14 @@ export default function FluxoCaixaPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Fluxo de Caixa</h2>
+          <h2 className="text-2xl font-bold text-white">Fluxo de Caixa</h2>
           <p className="text-gray-400 text-sm mt-1">Realizado + projetado por mês</p>
         </div>
         <div className="flex gap-2">
           {[year - 1, year, year + 1].map(y => (
             <button key={y} onClick={() => setYear(y)}
               className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
-                year === y ? 'bg-blue-600 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-500 hover:border-blue-300'
+                year === y ? 'bg-blue-600 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white'
               }`}>{y}</button>
           ))}
         </div>
@@ -46,65 +46,71 @@ export default function FluxoCaixaPage() {
 
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        {[
-          { label: 'Total Receitas', value: totalReceitas, color: 'text-green-600', bg: 'bg-green-50 border-green-100', icon: TrendingUp, iconColor: 'text-green-600' },
-          { label: 'Total Despesas', value: totalDespesas, color: 'text-red-500',   bg: 'bg-red-50 border-red-100',    icon: TrendingDown, iconColor: 'text-red-500' },
-          { label: 'Resultado Anual', value: resultado,    color: resultado >= 0 ? 'text-blue-700' : 'text-red-600', bg: resultado >= 0 ? 'bg-blue-50 border-blue-100' : 'bg-red-50 border-red-100', icon: resultado >= 0 ? TrendingUp : TrendingDown, iconColor: resultado >= 0 ? 'text-blue-600' : 'text-red-600' },
-          { label: 'Saldo Final', value: saldoFinal, color: saldoFinal >= 0 ? 'text-gray-900' : 'text-red-600', bg: 'bg-white border-gray-100', icon: saldoFinal >= 0 ? TrendingUp : TrendingDown, iconColor: saldoFinal >= 0 ? 'text-gray-500' : 'text-red-500' },
-        ].map(({ label, value, color, bg, icon: Icon, iconColor }, i) => (
-          <div key={i} className={`rounded-2xl p-5 border shadow-sm ${bg}`}>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{label}</p>
-              <Icon size={16} className={iconColor} />
-            </div>
-            <p className={`text-xl font-bold ${color}`}>{formatCurrency(value)}</p>
-          </div>
-        ))}
+        <div className="rounded-xl border-l-4 border-green-500 bg-green-950 p-5">
+          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total Receitas</p>
+          <p className="text-2xl font-bold text-white">{formatCurrency(totalReceitas)}</p>
+          <p className="text-xs text-green-400 mt-1 flex items-center gap-1"><TrendingUp size={11} /> no ano</p>
+        </div>
+        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-5">
+          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total Despesas</p>
+          <p className="text-2xl font-bold text-white">{formatCurrency(totalDespesas)}</p>
+          <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><TrendingDown size={11} /> no ano</p>
+        </div>
+        <div className={`rounded-xl border-l-4 p-5 ${resultado >= 0 ? 'border-blue-500 bg-blue-950' : 'border-red-500 bg-red-950'}`}>
+          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Resultado Anual</p>
+          <p className={`text-2xl font-bold ${resultado >= 0 ? 'text-white' : 'text-red-400'}`}>{formatCurrency(resultado)}</p>
+          <p className={`text-xs mt-1 ${resultado >= 0 ? 'text-blue-400' : 'text-red-400'}`}>{resultado >= 0 ? '▲ superávit' : '▼ déficit'}</p>
+        </div>
+        <div className={`rounded-xl border-l-4 p-5 ${saldoFinal >= 0 ? 'border-yellow-500 bg-yellow-950' : 'border-red-500 bg-red-950'}`}>
+          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Saldo Final</p>
+          <p className={`text-2xl font-bold ${saldoFinal >= 0 ? 'text-white' : 'text-red-400'}`}>{formatCurrency(saldoFinal)}</p>
+          <p className="text-xs text-gray-400 mt-1">acumulado {year}</p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="space-y-4">{[...Array(2)].map((_,i) => <div key={i} className="h-64 bg-white rounded-2xl animate-pulse border border-gray-100" />)}</div>
+        <div className="space-y-4">{[...Array(3)].map((_,i) => <div key={i} className="h-64 bg-gray-900 rounded-xl animate-pulse border border-gray-800" />)}</div>
       ) : (
         <>
           {/* Gráfico receitas x despesas */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-            <h3 className="text-sm font-bold text-gray-700 mb-4">Receitas × Despesas por Mês — {year}</h3>
+          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
+            <h3 className="text-sm font-semibold text-gray-300 mb-4">Receitas × Despesas por Mês — {year}</h3>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={fluxo} barSize={18}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                <XAxis dataKey="label" tick={{ fill: '#9ca3af', fontSize: 11 }} />
-                <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 11 }} />
+                <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
                 <Tooltip
-                  contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, fontSize: 12 }}
+                  contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8, fontSize: 12 }}
                   formatter={(v: any, n: any) => [formatCurrency(v), n === 'receitas' ? 'Receitas' : 'Despesas']}
                 />
                 <Legend formatter={v => v === 'receitas' ? 'Receitas' : 'Despesas'} />
-                <Bar dataKey="receitas" fill="#22c55e" radius={[4, 4, 0, 0]} name="receitas" />
-                <Bar dataKey="despesas" fill="#f87171" radius={[4, 4, 0, 0]} name="despesas" />
+                <Bar dataKey="receitas" fill="#10b981" radius={[4,4,0,0]} name="receitas" />
+                <Bar dataKey="despesas" fill="#ef4444" radius={[4,4,0,0]} name="despesas" />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           {/* Gráfico saldo acumulado */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-            <h3 className="text-sm font-bold text-gray-700 mb-4">Evolução do Saldo — {year}</h3>
+          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
+            <h3 className="text-sm font-semibold text-gray-300 mb-4">Evolução do Saldo — {year}</h3>
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={fluxo}>
                 <defs>
                   <linearGradient id="gSaldoFC" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                <XAxis dataKey="label" tick={{ fill: '#9ca3af', fontSize: 11 }} />
-                <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
-                <ReferenceLine y={0} stroke="#e5e7eb" strokeDasharray="4 4" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 11 }} />
+                <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
+                <ReferenceLine y={0} stroke="#374151" strokeDasharray="4 4" />
                 <Tooltip
-                  contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, fontSize: 12 }}
+                  contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8, fontSize: 12 }}
                   formatter={(v: any) => [formatCurrency(v), 'Saldo']}
                 />
-                <Area type="monotone" dataKey="saldo" stroke="#3b82f6" fill="url(#gSaldoFC)" strokeWidth={2.5}
+                <Area type="monotone" dataKey="saldo" stroke="#3b82f6" fill="url(#gSaldoFC)" strokeWidth={2}
                   dot={(props: any) => {
                     const { cx, cy, payload } = props
                     return <circle key={cx} cx={cx} cy={cy} r={3} fill={payload.saldo >= 0 ? '#3b82f6' : '#ef4444'} />
@@ -115,55 +121,50 @@ export default function FluxoCaixaPage() {
           </div>
 
           {/* Tabela mensal */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h3 className="text-sm font-bold text-gray-700">Detalhamento Mensal</h3>
+          <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-800">
+              <h3 className="text-sm font-semibold text-gray-300">Detalhamento Mensal</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-gray-400 border-b border-gray-100 bg-gray-50">
-                    <th className="px-5 py-3 font-semibold">Mês</th>
-                    <th className="px-5 py-3 font-semibold text-right">Receitas</th>
-                    <th className="px-5 py-3 font-semibold text-right">Despesas</th>
-                    <th className="px-5 py-3 font-semibold text-right">Resultado</th>
-                    <th className="px-5 py-3 font-semibold text-right">Saldo Acum.</th>
+                  <tr className="text-left text-xs text-gray-500 border-b border-gray-800 bg-gray-800/50">
+                    <th className="px-5 py-3 font-semibold uppercase tracking-wide">Mês</th>
+                    <th className="px-5 py-3 font-semibold uppercase tracking-wide text-right">Receitas</th>
+                    <th className="px-5 py-3 font-semibold uppercase tracking-wide text-right">Despesas</th>
+                    <th className="px-5 py-3 font-semibold uppercase tracking-wide text-right">Resultado</th>
+                    <th className="px-5 py-3 font-semibold uppercase tracking-wide text-right">Saldo Acum.</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {fluxo.map((m: any, i: number) => {
-                    const res = m.resultado
-                    return (
-                      <tr key={i} className="border-b border-gray-50 hover:bg-blue-50/20 transition-colors">
-                        <td className="px-5 py-3 font-semibold text-gray-800">{m.label}/{year}</td>
-                        <td className="px-5 py-3 text-right text-green-600 font-medium">{formatCurrency(m.receitas)}</td>
-                        <td className="px-5 py-3 text-right text-red-500 font-medium">{formatCurrency(m.despesas)}</td>
-                        <td className="px-5 py-3 text-right">
-                          <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
-                            res >= 0 ? 'text-green-700 bg-green-50' : 'text-red-700 bg-red-50'
-                          }`}>
-                            {res >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                            {formatCurrency(Math.abs(res))}
-                          </span>
-                        </td>
-                        <td className={`px-5 py-3 text-right font-bold ${m.saldo >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
-                          {formatCurrency(m.saldo)}
-                        </td>
-                      </tr>
-                    )
-                  })}
+                  {fluxo.map((m: any, i: number) => (
+                    <tr key={i} className="border-b border-gray-800 hover:bg-gray-800 transition-colors">
+                      <td className="px-5 py-3 font-semibold text-gray-200">{m.label}/{year}</td>
+                      <td className="px-5 py-3 text-right text-green-400 font-medium">{formatCurrency(m.receitas)}</td>
+                      <td className="px-5 py-3 text-right text-red-400 font-medium">{formatCurrency(m.despesas)}</td>
+                      <td className="px-5 py-3 text-right">
+                        <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
+                          m.resultado >= 0 ? 'text-green-400 bg-green-950 border border-green-800' : 'text-red-400 bg-red-950 border border-red-800'
+                        }`}>
+                          {m.resultado >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                          {formatCurrency(Math.abs(m.resultado))}
+                        </span>
+                      </td>
+                      <td className={`px-5 py-3 text-right font-bold ${m.saldo >= 0 ? 'text-white' : 'text-red-400'}`}>
+                        {formatCurrency(m.saldo)}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
                 <tfoot>
-                  <tr className="border-t-2 border-gray-200 bg-gray-50">
-                    <td className="px-5 py-3 font-bold text-gray-900">TOTAL {year}</td>
-                    <td className="px-5 py-3 text-right font-bold text-green-600">{formatCurrency(totalReceitas)}</td>
-                    <td className="px-5 py-3 text-right font-bold text-red-500">{formatCurrency(totalDespesas)}</td>
+                  <tr className="border-t-2 border-gray-700 bg-gray-800/50">
+                    <td className="px-5 py-3 font-bold text-white">TOTAL {year}</td>
+                    <td className="px-5 py-3 text-right font-bold text-green-400">{formatCurrency(totalReceitas)}</td>
+                    <td className="px-5 py-3 text-right font-bold text-red-400">{formatCurrency(totalDespesas)}</td>
                     <td className="px-5 py-3 text-right font-bold">
-                      <span className={`text-sm ${resultado >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                        {formatCurrency(resultado)}
-                      </span>
+                      <span className={resultado >= 0 ? 'text-green-400' : 'text-red-400'}>{formatCurrency(resultado)}</span>
                     </td>
-                    <td className={`px-5 py-3 text-right font-bold ${saldoFinal >= 0 ? 'text-blue-700' : 'text-red-700'}`}>
+                    <td className={`px-5 py-3 text-right font-bold ${saldoFinal >= 0 ? 'text-blue-400' : 'text-red-400'}`}>
                       {formatCurrency(saldoFinal)}
                     </td>
                   </tr>
