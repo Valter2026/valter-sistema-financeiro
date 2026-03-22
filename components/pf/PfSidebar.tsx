@@ -4,11 +4,12 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ArrowLeftRight, ArrowDownCircle, Target,
   CreditCard, Tag, PieChart, ChevronRight, ChevronLeft, Mic,
-  TrendingUp, Upload, Settings, BarChart2, Wallet, FolderOpen
+  TrendingUp, Upload, Settings, BarChart2, Wallet, FolderOpen, Brain
 } from 'lucide-react'
 
 const nav = [
   { href: '/pessoal',                label: 'Dashboard',      icon: LayoutDashboard },
+  { href: '/pessoal/consultor',      label: 'Consultor IA',   icon: Brain           },
   { href: '/pessoal/lancamentos',    label: 'Lançamentos',    icon: ArrowLeftRight  },
   { href: '/pessoal/contas-pagar',   label: 'Contas a Pagar', icon: ArrowDownCircle },
   { href: '/pessoal/cartoes',        label: 'Cartões',        icon: CreditCard      },

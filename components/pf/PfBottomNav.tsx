@@ -12,16 +12,17 @@ const main = [
 ]
 
 const more = [
-  { href: '/pessoal/contas-pagar',   label: 'Contas a Pagar'  },
-  { href: '/pessoal/cartoes',        label: 'Cartões'          },
-  { href: '/pessoal/orcamento',      label: 'Orçamento'        },
-  { href: '/pessoal/fluxo-caixa',   label: 'Fluxo de Caixa'   },
+  { href: '/pessoal/consultor',      label: 'Consultor IA'        },
+  { href: '/pessoal/contas-pagar',   label: 'Contas a Pagar'      },
+  { href: '/pessoal/cartoes',        label: 'Cartões'             },
+  { href: '/pessoal/orcamento',      label: 'Orçamento'           },
+  { href: '/pessoal/fluxo-caixa',    label: 'Fluxo de Caixa'      },
   { href: '/pessoal/balanco',        label: 'Balanço Patrimonial' },
   { href: '/pessoal/projetos',       label: 'Projetos'            },
-  { href: '/pessoal/importar',      label: 'Importar Extrato'    },
-  { href: '/pessoal/contas',         label: 'Contas'             },
-  { href: '/pessoal/categorias',     label: 'Categorias'       },
-  { href: '/pessoal/configuracoes',  label: 'Configurações'    },
+  { href: '/pessoal/importar',       label: 'Importar Extrato'    },
+  { href: '/pessoal/contas',         label: 'Contas'              },
+  { href: '/pessoal/categorias',     label: 'Categorias'          },
+  { href: '/pessoal/configuracoes',  label: 'Configurações'       },
 ]
 
 export default function PfBottomNav() {
