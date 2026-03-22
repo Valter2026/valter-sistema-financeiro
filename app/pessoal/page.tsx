@@ -3,15 +3,27 @@ import { useEffect, useState, useCallback } from 'react'
 import { formatCurrency } from '@/lib/utils'
 import {
   TrendingUp, TrendingDown, AlertTriangle, Wallet, Plus,
-  ArrowDownCircle, Target, Mic
+  ArrowDownCircle, Target, Mic, Brain, AlertCircle, Lightbulb,
+  CheckCircle, ChevronRight, RefreshCw
 } from 'lucide-react'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, CartesianGrid, Legend
+  ResponsiveContainer, CartesianGrid
 } from 'recharts'
 import PfTransactionModal from '@/components/pf/PfTransactionModal'
+import Link from 'next/link'
 
 const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+
+const ADVICE_CONFIG: Record<string, { icon: any; color: string; bg: string; border: string }> = {
+  alert:   { icon: AlertCircle,  color: 'text-red-400',     bg: 'bg-red-950',     border: 'border-red-800'     },
+  warning: { icon: AlertTriangle,color: 'text-yellow-400',  bg: 'bg-yellow-950',  border: 'border-yellow-800'  },
+  tip:     { icon: Lightbulb,    color: 'text-emerald-400', bg: 'bg-emerald-950', border: 'border-emerald-800' },
+  goal:    { icon: Target,       color: 'text-blue-400',    bg: 'bg-blue-950',    border: 'border-blue-800'    },
+  success: { icon: CheckCircle,  color: 'text-emerald-300', bg: 'bg-emerald-950', border: 'border-emerald-700' },
+}
+
+const CACHE_TTL_MS = 30 * 60 * 1000 // 30 minutos
 
 export default function PessoalDashboard() {
   const [summary,      setSummary]      = useState<any>(null)
@@ -22,8 +34,36 @@ export default function PessoalDashboard() {
   const [patrimChart,  setPatrimChart]  = useState<any[]>([])
   const [loading,      setLoading]      = useState(true)
   const [modal,        setModal]        = useState(false)
+  const [advices,      setAdvices]      = useState<any[]>([])
+  const [adviceAge,    setAdviceAge]    = useState<string>('')
+  const [refreshing,   setRefreshing]   = useState(false)
   const year  = new Date().getFullYear()
   const month = new Date().getMonth() + 1
+
+  const loadAdvisorCache = useCallback(async () => {
+    try {
+      const data = await fetch('/api/pf/advisor/refresh').then(r => r.json())
+      setAdvices(Array.isArray(data.advices) ? data.advices.slice(0, 3) : [])
+      if (data.generated_at) {
+        const age = new Date(data.generated_at)
+        setAdviceAge(age.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
+        // Se cache tiver mais de 30min, atualiza em background
+        if (Date.now() - age.getTime() > CACHE_TTL_MS) {
+          fetch('/api/pf/advisor/refresh', { method: 'POST' }).then(() => loadAdvisorCache())
+        }
+      }
+    } catch { /* silencioso */ }
+  }, [])
+
+  const triggerAdvisorRefresh = useCallback(async () => {
+    setRefreshing(true)
+    try {
+      await fetch('/api/pf/advisor/refresh', { method: 'POST' })
+      await loadAdvisorCache()
+    } finally {
+      setRefreshing(false)
+    }
+  }, [loadAdvisorCache])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -64,7 +104,7 @@ export default function PessoalDashboard() {
     setLoading(false)
   }, [year, month])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { load(); loadAdvisorCache() }, [load, loadAdvisorCache])
 
   const resultado = summary?.resultado ?? 0
   const positivo  = resultado >= 0
@@ -122,6 +162,55 @@ export default function PessoalDashboard() {
               <p className="text-[10px] text-yellow-400 mt-0.5 flex items-center gap-1"><Wallet size={9} /> em contas</p>
             </div>
           </div>
+
+          {/* Widget Consultor IA */}
+          {(advices.length > 0 || refreshing) && (
+            <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden mb-4">
+              <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Brain size={14} className="text-emerald-400" />
+                  <span className="text-xs font-semibold text-gray-300 uppercase tracking-wide">Consultor IA</span>
+                  {adviceAge && <span className="text-[10px] text-gray-600">· atualizado às {adviceAge}</span>}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={triggerAdvisorRefresh} disabled={refreshing}
+                    className="p-1 rounded hover:bg-gray-700 text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-40">
+                    <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
+                  </button>
+                  <Link href="/pessoal/consultor"
+                    className="text-[10px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5">
+                    Ver tudo <ChevronRight size={10} />
+                  </Link>
+                </div>
+              </div>
+              {refreshing && advices.length === 0 ? (
+                <div className="px-4 py-4 flex items-center gap-2 text-gray-400 text-xs">
+                  <RefreshCw size={12} className="animate-spin" /> Consultando sua IA financeira...
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-800">
+                  {advices.map((adv: any, i: number) => {
+                    const cfg = ADVICE_CONFIG[adv.type] ?? ADVICE_CONFIG.tip
+                    const Icon = cfg.icon
+                    return (
+                      <div key={i} className="flex items-start gap-3 px-4 py-3">
+                        <div className={`mt-0.5 p-1.5 rounded-lg flex-shrink-0 ${cfg.bg}`}>
+                          <Icon size={12} className={cfg.color} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-gray-200">{adv.title}</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5 line-clamp-2">{adv.message}</p>
+                          {adv.action && (
+                            <p className="text-[10px] text-emerald-400 mt-1">→ {adv.action}</p>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Alertas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -299,7 +388,7 @@ export default function PessoalDashboard() {
         </>
       )}
 
-      <PfTransactionModal open={modal} onClose={() => setModal(false)} onSaved={load} accounts={accounts} categories={cats} />
+      <PfTransactionModal open={modal} onClose={() => setModal(false)} onSaved={() => { load(); triggerAdvisorRefresh() }} accounts={accounts} categories={cats} />
     </div>
   )
 }
