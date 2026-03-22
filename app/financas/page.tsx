@@ -8,19 +8,21 @@ import {
   ResponsiveContainer, CartesianGrid, Legend
 } from 'recharts'
 
-const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const currentMonth = () => {
   const d = new Date()
-  return { start: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`, end: d.toISOString().split('T')[0] }
+  return {
+    start: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`,
+    end: d.toISOString().split('T')[0],
+  }
 }
 
 export default function FinancasDashboard() {
-  const [summary,   setSummary]   = useState<any>(null)
-  const [cashflow,  setCashflow]  = useState<any>(null)
-  const [accounts,  setAccounts]  = useState<any[]>([])
-  const [categories,setCategories]= useState<any[]>([])
-  const [loading,   setLoading]   = useState(true)
-  const [modal,     setModal]     = useState(false)
+  const [summary,    setSummary]    = useState<any>(null)
+  const [cashflow,   setCashflow]   = useState<any>(null)
+  const [accounts,   setAccounts]   = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [loading,    setLoading]    = useState(true)
+  const [modal,      setModal]      = useState(false)
   const year = new Date().getFullYear()
 
   const load = useCallback(async () => {
@@ -48,103 +50,87 @@ export default function FinancasDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Dashboard Financeiro</h2>
-          <p className="text-gray-400 text-sm mt-1">Visão geral do mês atual</p>
+          <h2 className="text-2xl font-bold text-white">Dashboard Financeiro</h2>
+          <p className="text-gray-400 text-sm mt-1">Visão geral · {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
         </div>
         <button onClick={() => setModal(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm">
+          className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shadow-lg">
           <Plus size={16} /> Novo Lançamento
         </button>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-4 gap-4">{[...Array(8)].map((_,i)=>(
-          <div key={i} className="h-28 bg-white rounded-2xl animate-pulse border border-gray-100" />
-        ))}</div>
+        <div className="grid grid-cols-4 gap-4">
+          {[...Array(8)].map((_,i) => <div key={i} className="h-28 bg-gray-800 rounded-xl animate-pulse" />)}
+        </div>
       ) : (
         <>
-          {/* KPIs */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Receitas</p>
-                <div className="p-2 bg-green-50 rounded-lg"><TrendingUp size={16} className="text-green-600" /></div>
-              </div>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(summary?.receitas ?? 0)}</p>
-              <p className="text-xs text-gray-400 mt-1">mês atual</p>
+          {/* KPIs linha 1 */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div className="rounded-xl border-l-4 border-green-500 bg-green-950 p-5">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Receitas do Mês</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(summary?.receitas ?? 0)}</p>
+              <p className="text-xs text-green-400 mt-1 flex items-center gap-1"><TrendingUp size={11} /> confirmadas</p>
             </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Despesas</p>
-                <div className="p-2 bg-red-50 rounded-lg"><TrendingDown size={16} className="text-red-500" /></div>
-              </div>
-              <p className="text-2xl font-bold text-red-500">{formatCurrency(summary?.despesas ?? 0)}</p>
-              <p className="text-xs text-gray-400 mt-1">mês atual</p>
+            <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-5">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Despesas do Mês</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(summary?.despesas ?? 0)}</p>
+              <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><TrendingDown size={11} /> confirmadas</p>
             </div>
-
-            <div className={`rounded-2xl p-5 border shadow-sm ${positivo ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Resultado</p>
-                <div className={`p-2 rounded-lg ${positivo ? 'bg-green-100' : 'bg-red-100'}`}>
-                  {positivo ? <TrendingUp size={16} className="text-green-600" /> : <TrendingDown size={16} className="text-red-600" />}
-                </div>
-              </div>
-              <p className={`text-2xl font-bold ${positivo ? 'text-green-700' : 'text-red-600'}`}>{formatCurrency(resultado)}</p>
-              <p className="text-xs text-gray-400 mt-1">{positivo ? 'superávit' : 'déficit'}</p>
+            <div className={`rounded-xl border-l-4 p-5 ${positivo ? 'border-blue-500 bg-blue-950' : 'border-red-500 bg-red-950'}`}>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Resultado</p>
+              <p className={`text-2xl font-bold ${positivo ? 'text-white' : 'text-red-400'}`}>{formatCurrency(resultado)}</p>
+              <p className={`text-xs mt-1 ${positivo ? 'text-blue-400' : 'text-red-400'}`}>{positivo ? '▲ superávit' : '▼ déficit'}</p>
             </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Patrimônio</p>
-                <div className="p-2 bg-blue-50 rounded-lg"><Wallet size={16} className="text-blue-600" /></div>
-              </div>
-              <p className={`text-2xl font-bold ${(summary?.totalAtivo ?? 0) >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+            <div className="rounded-xl border-l-4 border-yellow-500 bg-yellow-950 p-5">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Patrimônio Total</p>
+              <p className={`text-2xl font-bold ${(summary?.totalAtivo ?? 0) >= 0 ? 'text-white' : 'text-red-400'}`}>
                 {formatCurrency(summary?.totalAtivo ?? 0)}
               </p>
-              <p className="text-xs text-gray-400 mt-1">saldo total contas</p>
+              <p className="text-xs text-yellow-400 mt-1 flex items-center gap-1"><Wallet size={11} /> saldo em contas</p>
             </div>
           </div>
 
-          {/* A pagar / Receber */}
+          {/* KPIs linha 2 */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <ArrowDownCircle size={15} className="text-orange-500" />
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">A Pagar</p>
-              </div>
-              <p className="text-xl font-bold text-orange-600">{formatCurrency(summary?.aPagar ?? 0)}</p>
+            <div className="rounded-xl border-l-4 border-orange-500 bg-orange-950 p-5">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">A Pagar</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(summary?.aPagar ?? 0)}</p>
+              <p className="text-xs text-orange-400 mt-1 flex items-center gap-1"><ArrowDownCircle size={11} /> em aberto</p>
             </div>
-            <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <ArrowUpCircle size={15} className="text-blue-500" />
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">A Receber</p>
-              </div>
-              <p className="text-xl font-bold text-blue-600">{formatCurrency(summary?.aReceber ?? 0)}</p>
+            <div className="rounded-xl border-l-4 border-blue-500 bg-blue-950 p-5">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">A Receber</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(summary?.aReceber ?? 0)}</p>
+              <p className="text-xs text-blue-400 mt-1 flex items-center gap-1"><ArrowUpCircle size={11} /> em aberto</p>
             </div>
-            {(summary?.qtdVencidos ?? 0) > 0 && (
-              <div className="col-span-2 bg-red-50 rounded-2xl p-5 border border-red-100 flex items-center gap-3">
-                <AlertTriangle size={22} className="text-red-500 flex-shrink-0" />
+            {(summary?.qtdVencidos ?? 0) > 0 ? (
+              <div className="col-span-2 rounded-xl border border-red-800 bg-red-950 p-5 flex items-center gap-4">
+                <AlertTriangle size={24} className="text-red-400 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-bold text-red-700">{summary.qtdVencidos} conta(s) vencida(s)</p>
-                  <p className="text-xs text-red-500">{formatCurrency(summary.totalVencido)} em atraso</p>
+                  <p className="text-sm font-bold text-red-300">{summary.qtdVencidos} conta(s) vencida(s)</p>
+                  <p className="text-xs text-red-400 mt-0.5">{formatCurrency(summary.totalVencido)} em atraso — atenção imediata</p>
                 </div>
+              </div>
+            ) : (
+              <div className="col-span-2 rounded-xl border border-green-800 bg-green-950 p-5 flex items-center gap-3">
+                <TrendingUp size={20} className="text-green-400" />
+                <p className="text-sm text-green-300 font-medium">Nenhuma conta vencida em aberto</p>
               </div>
             )}
           </div>
 
-          {/* Contas */}
-          {accounts.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-              <h3 className="text-sm font-bold text-gray-700 mb-4">Saldo por Conta</h3>
+          {/* Saldo por conta */}
+          {(summary?.accounts ?? []).filter((a:any) => a.active).length > 0 && (
+            <div className="bg-gray-900 rounded-xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4">Saldo por Conta</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {(summary?.accounts ?? []).filter((a:any) => a.active).map((acc: any) => (
-                  <div key={acc.id} className="rounded-xl p-4 border border-gray-100 hover:border-blue-200 transition-colors">
+                  <div key={acc.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: acc.color ?? '#3b82f6' }} />
-                      <span className="text-xs text-gray-500 font-medium truncate">{acc.name}</span>
+                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: acc.color ?? '#3b82f6' }} />
+                      <span className="text-xs text-gray-400 font-medium truncate">{acc.name}</span>
                     </div>
-                    <p className={`text-lg font-bold ${acc.balance >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
+                    <p className={`text-lg font-bold ${acc.balance >= 0 ? 'text-white' : 'text-red-400'}`}>
                       {formatCurrency(acc.balance)}
                     </p>
                   </div>
@@ -153,47 +139,47 @@ export default function FinancasDashboard() {
             </div>
           )}
 
-          {/* Gráfico fluxo de caixa */}
-          {cashflow?.fluxo && (
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-              <h3 className="text-sm font-bold text-gray-700 mb-4">Fluxo de Caixa {year}</h3>
+          {/* Gráfico receitas x despesas */}
+          {(cashflow?.fluxo ?? []).length > 0 && (
+            <div className="bg-gray-900 rounded-xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4">Receitas × Despesas — {year}</h3>
               <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={cashflow.fluxo} barSize={20}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                  <XAxis dataKey="label" tick={{ fill: '#9ca3af', fontSize: 11 }} />
-                  <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
+                <BarChart data={cashflow.fluxo} barSize={18}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                  <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 11 }} />
+                  <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
                   <Tooltip
-                    contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, fontSize: 12 }}
+                    contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8, fontSize: 12 }}
                     formatter={(v: any, n: any) => [formatCurrency(v), n === 'receitas' ? 'Receitas' : 'Despesas']}
                   />
                   <Legend formatter={v => v === 'receitas' ? 'Receitas' : 'Despesas'} />
-                  <Bar dataKey="receitas" fill="#22c55e" radius={[4, 4, 0, 0]} name="receitas" />
-                  <Bar dataKey="despesas" fill="#f87171" radius={[4, 4, 0, 0]} name="despesas" />
+                  <Bar dataKey="receitas" fill="#10b981" radius={[4,4,0,0]} name="receitas" />
+                  <Bar dataKey="despesas" fill="#ef4444" radius={[4,4,0,0]} name="despesas" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
 
           {/* Evolução do saldo */}
-          {cashflow?.fluxo && (
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <h3 className="text-sm font-bold text-gray-700 mb-4">Evolução do Saldo {year}</h3>
+          {(cashflow?.fluxo ?? []).length > 0 && (
+            <div className="bg-gray-900 rounded-xl p-6">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4">Evolução do Saldo — {year}</h3>
               <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={cashflow.fluxo}>
                   <defs>
                     <linearGradient id="gSaldo" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                  <XAxis dataKey="label" tick={{ fill: '#9ca3af', fontSize: 11 }} />
-                  <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                  <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 11 }} />
+                  <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
                   <Tooltip
-                    contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, fontSize: 12 }}
+                    contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8, fontSize: 12 }}
                     formatter={(v: any) => [formatCurrency(v), 'Saldo']}
                   />
-                  <Area type="monotone" dataKey="saldo" stroke="#3b82f6" fill="url(#gSaldo)" strokeWidth={2} dot={{ fill: '#3b82f6', r: 3 }} />
+                  <Area type="monotone" dataKey="saldo" stroke="#3b82f6" fill="url(#gSaldo)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
