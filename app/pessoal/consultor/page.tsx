@@ -340,9 +340,18 @@ export default function ConsultorPage() {
       {/* Erro de config */}
       {error && error.includes('ANTHROPIC_API_KEY') && (
         <div className="bg-yellow-950 border border-yellow-800 rounded-xl p-5 mb-6">
-          <p className="text-yellow-300 font-bold mb-2 flex items-center gap-2"><AlertTriangle size={16}/> Configuração necessária</p>
-          <p className="text-yellow-400 text-sm mb-3">Adicione no Vercel Dashboard → Settings → Environment Variables:</p>
-          <code className="block bg-gray-900 rounded-lg px-4 py-2 text-xs text-emerald-300 font-mono">ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx</code>
+          <p className="text-yellow-300 font-bold mb-2 flex items-center gap-2">
+            <AlertTriangle size={16}/> Chave de IA não encontrada neste deploy
+          </p>
+          <p className="text-yellow-400 text-sm mb-3">
+            A variável <code className="text-yellow-200 font-mono">ANTHROPIC_API_KEY</code> foi adicionada no Vercel mas o deploy atual ainda não a possui.
+          </p>
+          <p className="text-yellow-400 text-sm font-semibold">Como resolver:</p>
+          <ol className="text-yellow-400 text-sm mt-1 space-y-1 list-decimal list-inside">
+            <li>Acesse <strong className="text-yellow-300">vercel.com</strong> → seu projeto</li>
+            <li>Vá em <strong className="text-yellow-300">Deployments</strong></li>
+            <li>Clique nos 3 pontinhos do último deploy → <strong className="text-yellow-300">Redeploy</strong></li>
+          </ol>
         </div>
       )}
       {error && !error.includes('ANTHROPIC_API_KEY') && (
