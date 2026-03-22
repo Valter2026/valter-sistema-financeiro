@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, TrendingUp, DollarSign, Package, Megaphone, ChevronRight, Wallet
+  LayoutDashboard, TrendingUp, DollarSign, Package, Megaphone, ChevronRight, Wallet, Heart
 } from 'lucide-react'
 
 const nav = [
@@ -41,11 +41,16 @@ export default function Sidebar() {
           )
         })}
       </nav>
-      <div className="px-3 py-3 border-t border-gray-700">
+      <div className="px-3 py-3 border-t border-gray-700 space-y-1">
         <Link href="/financas"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-emerald-400 hover:bg-gray-800 hover:text-emerald-300 transition-colors">
           <Wallet size={18} />
-          <span>Financeiro</span>
+          <span>Financeiro Empresa</span>
+        </Link>
+        <Link href="/pessoal"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-pink-400 hover:bg-gray-800 hover:text-pink-300 transition-colors">
+          <Heart size={18} />
+          <span>Finanças Pessoais</span>
         </Link>
       </div>
     </aside>
