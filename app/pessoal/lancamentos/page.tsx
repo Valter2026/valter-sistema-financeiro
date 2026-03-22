@@ -10,24 +10,19 @@ const STATUS_LABEL: Record<string, { label: string; class: string }> = {
   scheduled: { label: 'Agendado',   class: 'bg-blue-950 text-blue-400 border-blue-800'         },
 }
 
-const TYPE_ICON: Record<string, any> = {
-  income:   { icon: TrendingUp,       color: 'text-emerald-400' },
-  expense:  { icon: TrendingDown,     color: 'text-red-400'     },
-  transfer: { icon: ArrowLeftRight,   color: 'text-blue-400'    },
-}
+const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 
 export default function PfLancamentosPage() {
-  const [txs,      setTxs]      = useState<any[]>([])
-  const [accounts, setAccounts] = useState<any[]>([])
-  const [cats,     setCats]     = useState<any[]>([])
-  const [loading,  setLoading]  = useState(true)
-  const [modal,    setModal]    = useState(false)
-  const [editing,  setEditing]  = useState<any>(null)
-  const [tipo,     setTipo]     = useState<'todos'|'income'|'expense'>('todos')
-  const [busca,    setBusca]    = useState('')
-  const [listening,setListening]= useState(false)
-  const [voiceText,setVoiceText]= useState('')
-  const [voiceForm,setVoiceForm]= useState<any>(null)
+  const [txs,       setTxs]       = useState<any[]>([])
+  const [accounts,  setAccounts]  = useState<any[]>([])
+  const [cats,      setCats]      = useState<any[]>([])
+  const [loading,   setLoading]   = useState(true)
+  const [modal,     setModal]     = useState(false)
+  const [editing,   setEditing]   = useState<any>(null)
+  const [tipo,      setTipo]      = useState<'todos'|'income'|'expense'>('todos')
+  const [busca,     setBusca]     = useState('')
+  const [listening, setListening] = useState(false)
+  const [voiceText, setVoiceText] = useState('')
   const recogRef = useRef<any>(null)
 
   const now = new Date()
@@ -50,7 +45,7 @@ export default function PfLancamentosPage() {
   useEffect(() => { load() }, [load])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Excluir este lançamento?')) return
+    if (!confirm('Excluir?')) return
     await fetch('/api/pf/transactions', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
     load()
   }
@@ -73,7 +68,6 @@ export default function PfLancamentosPage() {
       const text = e.results[0][0].transcript
       setVoiceText(text)
       const res = await fetch('/api/pf/voice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) }).then(r => r.json())
-      setVoiceForm({ ...res, voice_input: text, status: 'confirmed', recurrence: 'single' })
       setEditing({ ...res, voice_input: text, status: 'confirmed', recurrence: 'single' })
       setModal(true)
     }
@@ -84,159 +78,137 @@ export default function PfLancamentosPage() {
     .filter(t => tipo === 'todos' || t.type === tipo)
     .filter(t => !busca || (t.description ?? '').toLowerCase().includes(busca.toLowerCase()))
 
-  const totalReceitas = txs.filter(t => t.type === 'income'   && t.status === 'confirmed').reduce((a, t) => a + Number(t.amount), 0)
-  const totalGastos   = txs.filter(t => t.type === 'expense'  && t.status === 'confirmed').reduce((a, t) => a + Number(t.amount), 0)
+  const totalReceitas = txs.filter(t => t.type === 'income'  && t.status === 'confirmed').reduce((a, t) => a + Number(t.amount), 0)
+  const totalGastos   = txs.filter(t => t.type === 'expense' && t.status === 'confirmed').reduce((a, t) => a + Number(t.amount), 0)
   const resultado     = totalReceitas - totalGastos
-
-  const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">Lançamentos</h2>
-          <p className="text-gray-400 text-sm mt-1">{MONTHS[mes-1]}/{ano} · {txs.length} lançamento(s)</p>
+          <h2 className="text-xl font-bold text-white">Lançamentos</h2>
+          <p className="text-gray-400 text-xs mt-0.5">{MONTHS[mes-1]}/{ano} · {txs.length} lançamento(s)</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={startVoice}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${listening ? 'bg-emerald-600 text-white animate-pulse' : 'bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white'}`}>
-            {listening ? <MicOff size={15} /> : <Mic size={15} />}
-            {listening ? 'Ouvindo...' : 'Voz'}
+          <button onClick={listening ? () => recogRef.current?.stop() : startVoice}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+              listening ? 'bg-emerald-600 text-white animate-pulse' : 'bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700'
+            }`}>
+            {listening ? <MicOff size={13} /> : <Mic size={13} />}
+            {listening ? 'Ouvindo' : 'Voz'}
           </button>
           <button onClick={() => { setEditing(null); setModal(true) }}
-            className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors">
-            <Plus size={16} /> Novo
+            className="flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-semibold hover:bg-emerald-700 transition-colors">
+            <Plus size={14} /> Novo
           </button>
         </div>
       </div>
 
       {voiceText && (
-        <div className="bg-emerald-950 border border-emerald-800 rounded-xl px-4 py-3 mb-4 text-sm text-emerald-300">
+        <div className="bg-emerald-950 border border-emerald-800 rounded-xl px-3 py-2 mb-3 text-xs text-emerald-300">
           🎤 "{voiceText}"
         </div>
       )}
 
-      {/* KPIs */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="rounded-xl border-l-4 border-emerald-500 bg-emerald-950 p-4">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Receitas</p>
-          <p className="text-xl font-bold text-white">{formatCurrency(totalReceitas)}</p>
+      {/* KPIs compactos */}
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="rounded-xl border-l-4 border-emerald-500 bg-emerald-950 p-3">
+          <p className="text-[10px] text-gray-400 uppercase mb-0.5">Receitas</p>
+          <p className="text-sm font-bold text-white">{formatCurrency(totalReceitas)}</p>
         </div>
-        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-4">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Gastos</p>
-          <p className="text-xl font-bold text-white">{formatCurrency(totalGastos)}</p>
+        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-3">
+          <p className="text-[10px] text-gray-400 uppercase mb-0.5">Gastos</p>
+          <p className="text-sm font-bold text-white">{formatCurrency(totalGastos)}</p>
         </div>
-        <div className={`rounded-xl border-l-4 p-4 ${resultado >= 0 ? 'border-blue-500 bg-blue-950' : 'border-red-500 bg-red-950'}`}>
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Resultado</p>
-          <p className={`text-xl font-bold ${resultado >= 0 ? 'text-white' : 'text-red-400'}`}>{formatCurrency(resultado)}</p>
+        <div className={`rounded-xl border-l-4 p-3 ${resultado >= 0 ? 'border-blue-500 bg-blue-950' : 'border-red-500 bg-red-950'}`}>
+          <p className="text-[10px] text-gray-400 uppercase mb-0.5">Resultado</p>
+          <p className={`text-sm font-bold ${resultado >= 0 ? 'text-white' : 'text-red-400'}`}>{formatCurrency(resultado)}</p>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-3 mb-4">
-        <div className="flex gap-1">
+      <div className="space-y-2 mb-4">
+        <div className="flex gap-1.5">
           {([['todos','Todos'],['income','Receitas'],['expense','Gastos']] as const).map(([k,l]) => (
             <button key={k} onClick={() => setTipo(k)}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-                tipo === k ? 'bg-emerald-600 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white'
+              className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                tipo === k ? 'bg-emerald-600 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400'
               }`}>{l}</button>
           ))}
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           <button onClick={() => { const d = new Date(ano, mes-2, 1); setMes(d.getMonth()+1); setAno(d.getFullYear()) }}
-            className="px-3 py-2 rounded-xl text-xs font-semibold bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white">‹</button>
-          <span className="px-3 py-2 text-xs font-semibold text-gray-300 bg-gray-800 border border-gray-700 rounded-xl">{MONTHS[mes-1]}/{ano}</span>
+            className="px-3 py-2 rounded-xl text-xs bg-gray-800 border border-gray-700 text-gray-400">‹</button>
+          <span className="flex-1 text-center py-2 text-xs font-semibold text-gray-300 bg-gray-800 border border-gray-700 rounded-xl">{MONTHS[mes-1]}/{ano}</span>
           <button onClick={() => { const d = new Date(ano, mes, 1); setMes(d.getMonth()+1); setAno(d.getFullYear()) }}
-            className="px-3 py-2 rounded-xl text-xs font-semibold bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white">›</button>
+            className="px-3 py-2 rounded-xl text-xs bg-gray-800 border border-gray-700 text-gray-400">›</button>
         </div>
-        <input type="text" placeholder="Buscar..." value={busca} onChange={e => setBusca(e.target.value)}
-          className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500" />
+        <input type="text" placeholder="Buscar lançamento..." value={busca} onChange={e => setBusca(e.target.value)}
+          className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500" />
       </div>
 
-      {/* Lista */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
-        {loading ? (
-          <div>{[...Array(6)].map((_,i) => <div key={i} className="h-14 bg-gray-800 animate-pulse border-b border-gray-700" />)}</div>
-        ) : lista.length === 0 ? (
-          <div className="py-16 text-center">
-            <p className="text-gray-500 text-sm">Nenhum lançamento encontrado.</p>
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs text-gray-500 border-b border-gray-800 bg-gray-800/50">
-                <th className="px-5 py-3 font-semibold uppercase tracking-wide">Data</th>
-                <th className="px-5 py-3 font-semibold uppercase tracking-wide">Descrição</th>
-                <th className="px-5 py-3 font-semibold uppercase tracking-wide">Categoria</th>
-                <th className="px-5 py-3 font-semibold uppercase tracking-wide">Conta</th>
-                <th className="px-5 py-3 font-semibold uppercase tracking-wide text-right">Valor</th>
-                <th className="px-5 py-3 font-semibold uppercase tracking-wide">Status</th>
-                <th className="px-5 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map((tx, i) => {
-                const cfg  = TYPE_ICON[tx.type] ?? TYPE_ICON.expense
-                const Icon = cfg.icon
-                const st   = STATUS_LABEL[tx.status] ?? STATUS_LABEL.confirmed
-                return (
-                  <tr key={tx.id ?? i} className="border-b border-gray-800 hover:bg-gray-800 transition-colors">
-                    <td className="px-5 py-3.5 text-gray-400 text-xs whitespace-nowrap">
-                      {new Date(tx.date + 'T12:00:00').toLocaleDateString('pt-BR')}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <Icon size={13} className={cfg.color} />
-                        <span className="text-gray-200 font-medium">{tx.description || '—'}</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      {tx.category ? (
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                          <span className="w-2 h-2 rounded-full inline-block" style={{ background: tx.category.color ?? '#6b7280' }} />
-                          {tx.category.icon} {tx.category.name}
-                        </span>
-                      ) : <span className="text-gray-600 text-xs">—</span>}
-                    </td>
-                    <td className="px-5 py-3.5 text-xs text-gray-500">{tx.account?.name ?? '—'}</td>
-                    <td className={`px-5 py-3.5 text-right font-bold ${tx.type === 'income' ? 'text-emerald-400' : tx.type === 'expense' ? 'text-red-400' : 'text-blue-400'}`}>
-                      {tx.type === 'expense' ? '- ' : '+ '}{formatCurrency(Number(tx.amount))}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${st.class}`}>
-                        {tx.status === 'confirmed' ? <Check size={9} /> : <Clock size={9} />}
-                        {st.label}
+      {/* Lista — cards no mobile */}
+      {loading ? (
+        <div className="space-y-2">{[...Array(5)].map((_,i) => <div key={i} className="h-16 bg-gray-800 rounded-xl animate-pulse" />)}</div>
+      ) : lista.length === 0 ? (
+        <div className="bg-gray-900 rounded-xl border border-gray-800 py-12 text-center">
+          <p className="text-gray-500 text-sm">Nenhum lançamento encontrado.</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {lista.map((tx, i) => {
+            const st = STATUS_LABEL[tx.status] ?? STATUS_LABEL.confirmed
+            const isIncome = tx.type === 'income'
+            const isTransfer = tx.type === 'transfer'
+            return (
+              <div key={tx.id ?? i} className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
+                {/* Ícone tipo */}
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  isIncome ? 'bg-emerald-950' : isTransfer ? 'bg-blue-950' : 'bg-red-950'
+                }`}>
+                  {isIncome ? <TrendingUp size={16} className="text-emerald-400" /> :
+                   isTransfer ? <ArrowLeftRight size={16} className="text-blue-400" /> :
+                   <TrendingDown size={16} className="text-red-400" />}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-200 truncate">{tx.description || '—'}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {tx.category && (
+                      <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                        {tx.category.icon} {tx.category.name}
                       </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex gap-1">
-                        {tx.status !== 'confirmed' && (
-                          <button onClick={() => handleConfirm(tx)} title="Confirmar"
-                            className="p-1.5 rounded-lg text-gray-500 hover:bg-emerald-950 hover:text-emerald-400 transition-colors">
-                            <Check size={13} />
-                          </button>
-                        )}
-                        <button onClick={() => { setEditing(tx); setModal(true) }}
-                          className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-700 hover:text-gray-200 transition-colors">
-                          <Pencil size={13} />
-                        </button>
-                        <button onClick={() => handleDelete(tx.id)}
-                          className="p-1.5 rounded-lg text-gray-500 hover:bg-red-950 hover:text-red-400 transition-colors">
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+                    )}
+                    <span className="text-[10px] text-gray-600">
+                      {new Date(tx.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Valor + ações */}
+                <div className="flex flex-col items-end gap-1.5">
+                  <p className={`text-sm font-bold ${isIncome ? 'text-emerald-400' : isTransfer ? 'text-blue-400' : 'text-red-400'}`}>
+                    {isIncome ? '+' : '−'}{formatCurrency(Number(tx.amount))}
+                  </p>
+                  <div className="flex gap-1">
+                    {tx.status !== 'confirmed' && (
+                      <button onClick={() => handleConfirm(tx)} className="p-1 rounded text-gray-500 hover:text-emerald-400"><Check size={12} /></button>
+                    )}
+                    <button onClick={() => { setEditing(tx); setModal(true) }} className="p-1 rounded text-gray-500 hover:text-gray-300"><Pencil size={12} /></button>
+                    <button onClick={() => handleDelete(tx.id)} className="p-1 rounded text-gray-500 hover:text-red-400"><Trash2 size={12} /></button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <PfTransactionModal
         open={modal}
-        onClose={() => { setModal(false); setEditing(null); setVoiceText(''); setVoiceForm(null) }}
+        onClose={() => { setModal(false); setEditing(null); setVoiceText('') }}
         onSaved={load}
         accounts={accounts}
         categories={cats}

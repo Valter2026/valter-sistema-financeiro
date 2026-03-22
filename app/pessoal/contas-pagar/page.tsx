@@ -63,7 +63,7 @@ export default function PfContasPagarPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-5">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle size={14} className="text-red-400" />

@@ -95,7 +95,7 @@ export default function PfRelatoriosPage() {
         <div className="space-y-4">{[...Array(3)].map((_,i) => <div key={i} className="h-64 bg-gray-900 rounded-xl animate-pulse border border-gray-800" />)}</div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {/* Pizza de gastos por categoria */}
             <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
               <h3 className="text-sm font-semibold text-gray-300 mb-4">Gastos por Categoria</h3>
