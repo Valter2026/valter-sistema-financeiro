@@ -7,7 +7,7 @@ import {
   Lightbulb, Target, CheckCircle
 } from 'lucide-react'
 import Link from 'next/link'
-import TransactionModal from '@/components/fin/TransactionModal'
+import FinTransactionModal from '@/components/fin/FinTransactionModal'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid, Legend
@@ -264,7 +264,7 @@ export default function FinancasDashboard() {
         </>
       )}
 
-      <TransactionModal
+      <FinTransactionModal
         open={modal}
         onClose={() => setModal(false)}
         onSaved={() => { load(); triggerAdvisorRefresh() }}

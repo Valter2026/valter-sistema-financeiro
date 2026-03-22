@@ -1,8 +1,8 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { formatCurrency } from '@/lib/utils'
-import { Plus, Search, Check, Clock, Pencil, Trash2, TrendingUp, TrendingDown, ArrowLeftRight } from 'lucide-react'
-import TransactionModal from '@/components/fin/TransactionModal'
+import { Plus, Search, Check, Pencil, Trash2, TrendingUp, TrendingDown, ArrowLeftRight, Mic, MicOff, X, Download } from 'lucide-react'
+import FinTransactionModal from '@/components/fin/FinTransactionModal'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   confirmed:  { label: 'Confirmado', color: 'text-green-400 bg-green-950 border border-green-800' },
@@ -13,6 +13,26 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 
 const today = new Date()
 const fmt = (d: Date) => d.toISOString().split('T')[0]
+
+function exportCSV(lista: any[]) {
+  const header = 'Data,Tipo,Descrição,Categoria,Conta,Valor,Status'
+  const rows = lista.map(t => {
+    const dt   = new Date(t.date + 'T12:00:00').toLocaleDateString('pt-BR')
+    const tipo = t.type === 'income' ? 'Receita' : t.type === 'expense' ? 'Despesa' : 'Transferência'
+    const cat  = (t.category?.name ?? '').replace(/,/g,' ')
+    const acc  = (t.account?.name  ?? '').replace(/,/g,' ')
+    const desc = (t.description    ?? '').replace(/,/g,' ')
+    const val  = Number(t.amount).toFixed(2)
+    const st   = STATUS_CONFIG[t.status]?.label ?? t.status
+    return `${dt},${tipo},"${desc}","${cat}","${acc}",${val},${st}`
+  })
+  const csv  = [header, ...rows].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href = url; a.download = `lancamentos-empresarial.csv`
+  a.click(); URL.revokeObjectURL(url)
+}
 
 export default function LancamentosPage() {
   const [txs,          setTxs]          = useState<any[]>([])
@@ -26,6 +46,9 @@ export default function LancamentosPage() {
   const [filterStatus, setFilterStatus] = useState('')
   const [start,        setStart]        = useState(`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`)
   const [end,          setEnd]          = useState(fmt(today))
+  const [listening,    setListening]    = useState(false)
+  const [voiceText,    setVoiceText]    = useState('')
+  const recogRef = useRef<any>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -56,6 +79,24 @@ export default function LancamentosPage() {
     load()
   }
 
+  const startVoice = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SR) { alert('Navegador não suporta voz'); return }
+    const rec = new SR()
+    rec.lang = 'pt-BR'; rec.continuous = false; rec.interimResults = false
+    recogRef.current = rec
+    rec.onstart  = () => setListening(true)
+    rec.onend    = () => setListening(false)
+    rec.onerror  = () => setListening(false)
+    rec.onresult = (e: any) => {
+      const text = e.results[0][0].transcript
+      setVoiceText(text)
+      setEditing({ voice_input: text, status: 'confirmed' })
+      setModal(true)
+    }
+    rec.start()
+  }
+
   const filtered = txs.filter(t =>
     !busca || t.description?.toLowerCase().includes(busca.toLowerCase()) ||
     t.category?.name?.toLowerCase().includes(busca.toLowerCase())
@@ -69,13 +110,28 @@ export default function LancamentosPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white">Lançamentos</h2>
-          <p className="text-gray-400 text-sm mt-1">{filtered.length} registros no período</p>
+          <p className="text-gray-400 text-sm mt-1">{filtered.length} registro(s) no período</p>
         </div>
-        <button onClick={() => { setEditing(null); setModal(true) }}
-          className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">
-          <Plus size={16} /> Novo Lançamento
-        </button>
+        <div className="flex gap-2">
+          <button onClick={listening ? () => recogRef.current?.stop() : startVoice}
+            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+              listening ? 'bg-blue-600 text-white animate-pulse' : 'bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700'
+            }`}>
+            {listening ? <MicOff size={15} /> : <Mic size={15} />}
+          </button>
+          <button onClick={() => { setEditing(null); setModal(true) }}
+            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">
+            <Plus size={16} /> Novo Lançamento
+          </button>
+        </div>
       </div>
+
+      {voiceText && (
+        <div className="bg-blue-950 border border-blue-800 rounded-xl px-3 py-2 mb-3 text-xs text-blue-300 flex items-center justify-between">
+          <span>🎤 "{voiceText}"</span>
+          <button onClick={() => setVoiceText('')}><X size={12} /></button>
+        </div>
+      )}
 
       {/* Filtros */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
@@ -122,6 +178,14 @@ export default function LancamentosPage() {
             {formatCurrency(totalReceitas - totalDespesas)}
           </p>
         </div>
+      </div>
+
+      {/* Export */}
+      <div className="flex justify-end mb-3">
+        <button onClick={() => exportCSV(filtered)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
+          <Download size={12} /> Exportar CSV
+        </button>
       </div>
 
       {/* Tabela */}
@@ -181,7 +245,7 @@ export default function LancamentosPage() {
                       <td className={`px-5 py-3.5 text-right font-bold ${
                         tx.type === 'income' ? 'text-green-400' : tx.type === 'expense' ? 'text-red-400' : 'text-blue-400'
                       }`}>
-                        {tx.type === 'expense' ? '- ' : ''}{formatCurrency(Number(tx.amount))}
+                        {tx.type === 'expense' ? '− ' : ''}{formatCurrency(Number(tx.amount))}
                       </td>
                       <td className="px-5 py-3.5">
                         <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${st.color}`}>
@@ -215,9 +279,9 @@ export default function LancamentosPage() {
         )}
       </div>
 
-      <TransactionModal
+      <FinTransactionModal
         open={modal}
-        onClose={() => { setModal(false); setEditing(null) }}
+        onClose={() => { setModal(false); setEditing(null); setVoiceText('') }}
         onSaved={load}
         accounts={accounts}
         categories={categories}
