@@ -1,7 +1,12 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { formatCurrency } from '@/lib/utils'
-import { TrendingUp, TrendingDown, AlertTriangle, Wallet, Plus, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
+import {
+  TrendingUp, TrendingDown, AlertTriangle, Wallet, Plus,
+  ArrowUpCircle, ArrowDownCircle, Brain, ChevronRight,
+  Lightbulb, Target, CheckCircle
+} from 'lucide-react'
+import Link from 'next/link'
 import TransactionModal from '@/components/fin/TransactionModal'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -16,6 +21,23 @@ const currentMonth = () => {
   }
 }
 
+const ADVICE_ICON: Record<string, any> = {
+  alert:   AlertTriangle,
+  warning: AlertTriangle,
+  tip:     Lightbulb,
+  goal:    Target,
+  success: CheckCircle,
+}
+const ADVICE_COLOR: Record<string, string> = {
+  alert:   'text-red-400 bg-red-950 border-red-800',
+  warning: 'text-yellow-400 bg-yellow-950 border-yellow-800',
+  tip:     'text-blue-400 bg-gray-900 border-blue-800',
+  goal:    'text-blue-400 bg-blue-950 border-blue-800',
+  success: 'text-emerald-400 bg-emerald-950 border-emerald-800',
+}
+
+const CACHE_MAX_AGE_MS = 30 * 60 * 1000 // 30 min
+
 export default function FinancasDashboard() {
   const [summary,    setSummary]    = useState<any>(null)
   const [cashflow,   setCashflow]   = useState<any>(null)
@@ -23,6 +45,7 @@ export default function FinancasDashboard() {
   const [categories, setCategories] = useState<any[]>([])
   const [loading,    setLoading]    = useState(true)
   const [modal,      setModal]      = useState(false)
+  const [advices,    setAdvices]    = useState<any[]>([])
   const year = new Date().getFullYear()
 
   const load = useCallback(async () => {
@@ -40,7 +63,25 @@ export default function FinancasDashboard() {
     setLoading(false)
   }, [year])
 
-  useEffect(() => { load() }, [load])
+  const loadAdvisor = useCallback(async () => {
+    const res = await fetch('/api/fin/advisor/refresh').then(r => r.json())
+    if (Array.isArray(res.advices) && res.advices.length > 0) {
+      setAdvices(res.advices.slice(0, 3))
+      // Se cache muito antigo, dispara refresh em background
+      if (res.generated_at) {
+        const age = Date.now() - new Date(res.generated_at).getTime()
+        if (age > CACHE_MAX_AGE_MS) {
+          fetch('/api/fin/advisor/refresh', { method: 'POST' })
+        }
+      }
+    }
+  }, [])
+
+  const triggerAdvisorRefresh = () => {
+    setTimeout(() => fetch('/api/fin/advisor/refresh', { method: 'POST' }), 2000)
+  }
+
+  useEffect(() => { load(); loadAdvisor() }, [load, loadAdvisor])
 
   const resultado = summary?.resultado ?? 0
   const positivo  = resultado >= 0
@@ -119,6 +160,42 @@ export default function FinancasDashboard() {
             )}
           </div>
 
+          {/* Widget Consultor IA */}
+          {advices.length > 0 && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                    <Brain size={14} className="text-white" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-white">Consultor Empresarial IA</h3>
+                </div>
+                <Link href="/financas/consultor"
+                  className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                  Ver tudo <ChevronRight size={12} />
+                </Link>
+              </div>
+              <div className="space-y-3">
+                {advices.map((a: any, i: number) => {
+                  const Icon  = ADVICE_ICON[a.type]  ?? Lightbulb
+                  const color = ADVICE_COLOR[a.type] ?? ADVICE_COLOR.tip
+                  return (
+                    <div key={i} className={`rounded-xl border p-4 ${color}`}>
+                      <div className="flex items-start gap-3">
+                        <Icon size={16} className="flex-shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-white mb-1">{a.title}</p>
+                          <p className="text-xs text-gray-300 leading-relaxed line-clamp-2">{a.message}</p>
+                          {a.action && <p className="text-xs text-gray-400 mt-1.5 font-medium">→ {a.action}</p>}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Saldo por conta */}
           {(summary?.accounts ?? []).filter((a:any) => a.active).length > 0 && (
             <div className="bg-gray-900 rounded-xl p-6 mb-6">
@@ -190,7 +267,7 @@ export default function FinancasDashboard() {
       <TransactionModal
         open={modal}
         onClose={() => setModal(false)}
-        onSaved={load}
+        onSaved={() => { load(); triggerAdvisorRefresh() }}
         accounts={accounts}
         categories={categories}
       />
