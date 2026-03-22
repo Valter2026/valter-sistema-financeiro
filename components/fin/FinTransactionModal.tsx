@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Edit3, Loader2 } from 'lucide-react'
+import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Loader2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 interface Props {
@@ -21,7 +21,6 @@ export default function FinTransactionModal({ open, onClose, onSaved, accounts, 
   const [saving,    setSaving]    = useState(false)
   const [listening, setListening] = useState(false)
   const [voiceText, setVoiceText] = useState('')
-  const [voiceData, setVoiceData] = useState<any>(null)
   const [toastMsg,  setToastMsg]  = useState<{ type: 'expense'|'income'; amount: number; desc: string } | null>(null)
   const recogRef = useRef<any>(null)
 
@@ -34,8 +33,7 @@ export default function FinTransactionModal({ open, onClose, onSaved, accounts, 
       } else if (initial && initial.amount) {
         setTab(initial.type ?? 'expense')
         setForm({ ...initial, date: initial.date ?? today(), status: 'confirmed' })
-        setVoiceData(initial)
-        setStep('confirm')
+        setStep('form')
       } else {
         setTab(initial?.type ?? 'expense')
         setForm({ date: today(), status: 'confirmed', ...(initial ?? {}) })
@@ -92,47 +90,33 @@ export default function FinTransactionModal({ open, onClose, onSaved, accounts, 
     rec.onresult = async (e: any) => {
       const text = e.results[0][0].transcript
       setVoiceText(text)
+      setStep('saving')
 
-      const res = await fetch('/api/fin/voice', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+      // Tenta salvar direto — sem tela de confirmação
+      const saved = await fetch('/api/fin/voice', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       }).then(r => r.json())
 
-      if (res.amount > 0) {
-        setStep('saving')
-        const saved = await fetch('/api/fin/voice', {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text }),
-        }).then(r => r.json())
-
-        if (saved.ok) {
-          setToastMsg({ type: res.type, amount: res.amount, desc: res.description })
-          setStep('success')
-          onSaved()
-          setTimeout(() => { onClose() }, 2200)
-        } else {
-          const cat     = resolveCategory(res.suggestedCategoryName)
-          const account = resolveAccount(res.suggestedAccountType)
-          setTab(res.type)
-          setForm({
-            type: res.type, amount: res.amount, description: res.description,
-            date: res.date, status: 'confirmed', voice_input: text,
-            category_id: cat?.id ?? '', account_id: account?.id ?? '',
-          })
-          setVoiceData(res)
-          setStep('confirm')
-        }
+      if (saved.ok) {
+        const p = saved.parsed
+        setToastMsg({ type: p.type, amount: p.amount, desc: p.description })
+        setStep('success')
+        onSaved()
+        setTimeout(() => { onClose() }, 2200)
       } else {
-        const cat     = resolveCategory(res.suggestedCategoryName)
-        const account = resolveAccount(res.suggestedAccountType)
-        setTab(res.type)
+        // Valor não detectado → abre formulário pré-preenchido para completar
+        const p       = saved.parsed ?? {}
+        const cat     = resolveCategory(p.suggestedCategoryName ?? '')
+        const account = resolveAccount(p.suggestedAccountType ?? null)
+        setTab(p.type ?? 'expense')
         setForm({
-          type: res.type, amount: res.amount, description: res.description,
-          date: res.date, status: 'confirmed', voice_input: text,
+          type: p.type, amount: '', description: p.description ?? '',
+          date: p.date ?? new Date().toISOString().split('T')[0],
+          status: 'confirmed', voice_input: text,
           category_id: cat?.id ?? '', account_id: account?.id ?? '',
         })
-        setVoiceData(res)
-        setStep('confirm')
+        setStep('form')
       }
     }
     rec.start()
@@ -176,93 +160,6 @@ export default function FinTransactionModal({ open, onClose, onSaved, accounts, 
               <div key={i} className={`w-2 h-2 rounded-full ${isExpense ? 'bg-red-500' : 'bg-green-500'} animate-pulse`}
                 style={{ animationDelay: `${i * 0.2}s` }} />
             ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ─── TELA CONFIRMAÇÃO ────────────────────────────────────────────────────────
-  if (step === 'confirm') {
-    const isExpense = tab === 'expense'
-    const cat = categories.find(c => c.id === form.category_id)
-    const acc = accounts.find(a => a.id === form.account_id)
-    return (
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
-        <div className="bg-gray-900 w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl border border-gray-800 shadow-2xl">
-          <div className="px-5 pt-5 pb-4 border-b border-gray-800 flex items-center justify-between">
-            <h3 className="text-base font-bold text-white">Confirmar Lançamento</h3>
-            <button onClick={onClose} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800"><X size={15} /></button>
-          </div>
-
-          {voiceText && (
-            <div className="mx-5 mt-4 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 flex items-start gap-2">
-              <span className="text-base">🎤</span>
-              <p className="text-xs text-gray-400 italic">"{voiceText}"</p>
-            </div>
-          )}
-
-          <div className="p-5 space-y-3">
-            <div className={`rounded-xl p-4 flex items-center gap-3 ${isExpense ? 'bg-red-950 border border-red-900' : 'bg-green-950 border border-green-900'}`}>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isExpense ? 'bg-red-900' : 'bg-green-900'}`}>
-                {isExpense ? <TrendingDown size={20} className="text-red-400" /> : <TrendingUp size={20} className="text-green-400" />}
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">{isExpense ? 'DESPESA' : 'RECEITA'}</p>
-                <p className={`text-2xl font-bold ${isExpense ? 'text-red-300' : 'text-green-300'}`}>
-                  {form.amount > 0 ? formatCurrency(form.amount) : <span className="text-gray-500 text-base">Valor não detectado</span>}
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
-                <span className="text-xs text-gray-500">Descrição</span>
-                <span className="text-sm font-medium text-gray-200">{form.description || '—'}</span>
-              </div>
-              <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
-                <span className="text-xs text-gray-500">Categoria</span>
-                <span className="text-sm font-medium text-gray-200">
-                  {cat ? cat.name : <span className="text-yellow-400 text-xs">Não detectada</span>}
-                </span>
-              </div>
-              <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
-                <span className="text-xs text-gray-500">Conta</span>
-                <span className="text-sm font-medium text-gray-200">
-                  {acc ? acc.name : <span className="text-yellow-400 text-xs">Nenhuma conta</span>}
-                </span>
-              </div>
-              <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
-                <span className="text-xs text-gray-500">Data</span>
-                <span className="text-sm font-medium text-gray-200">
-                  {form.date ? new Date(form.date + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}
-                </span>
-              </div>
-            </div>
-
-            {!form.amount && (
-              <div className="bg-yellow-950 border border-yellow-800 rounded-xl px-4 py-3 text-xs text-yellow-400">
-                ⚠️ Valor não detectado. Clique em "Editar" para preencher.
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-2 px-5 pb-5">
-            <button onClick={() => setStep('form')}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 text-sm font-semibold hover:bg-gray-800 transition-colors">
-              <Edit3 size={14} /> Editar
-            </button>
-            <button onClick={handleSave} disabled={saving || !form.amount}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors">
-              {saving ? 'Salvando...' : <><Check size={16} /> Confirmar</>}
-            </button>
-          </div>
-
-          <div className="border-t border-gray-800 px-5 py-3">
-            <button onClick={() => { setStep('voice'); setVoiceText('') }}
-              className="w-full flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
-              <Mic size={12} /> Falar novamente
-            </button>
           </div>
         </div>
       </div>
