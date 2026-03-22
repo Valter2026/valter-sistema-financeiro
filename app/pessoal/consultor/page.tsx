@@ -262,7 +262,7 @@ export default function ConsultorPage() {
             </div>
             <h2 className="text-2xl font-bold text-white">Consultor IA</h2>
           </div>
-          <p className="text-gray-400 text-sm">Orientações personalizadas · estilo Nathalia Arcuri & Cerbasi</p>
+          <p className="text-gray-400 text-sm">Seu Consultor Financeiro Pessoal com IA</p>
           {genAt && <p className="text-[10px] text-gray-600 mt-0.5">Gerado em {new Date(genAt).toLocaleString('pt-BR')}</p>}
         </div>
         <div className="flex flex-col gap-2 items-end">
