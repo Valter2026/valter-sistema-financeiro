@@ -163,11 +163,12 @@ Regras:
 
 export async function runWeeklyScript(): Promise<string> {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
+  const apiKey = process.env.ANTHROPIC_API_KEY.trim()
   const ctx = await getFinancialContext()
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
-      'x-api-key':         process.env.ANTHROPIC_API_KEY,
+      'x-api-key':         apiKey,
       'anthropic-version': '2023-06-01',
       'content-type':      'application/json',
     },
@@ -185,11 +186,12 @@ export async function runWeeklyScript(): Promise<string> {
 
 export async function runMonthlyScript(): Promise<string> {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
+  const apiKey = process.env.ANTHROPIC_API_KEY.trim()
   const ctx = await getFinancialContext()
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
-      'x-api-key':         process.env.ANTHROPIC_API_KEY,
+      'x-api-key':         apiKey,
       'anthropic-version': '2023-06-01',
       'content-type':      'application/json',
     },
@@ -207,11 +209,12 @@ export async function runMonthlyScript(): Promise<string> {
 
 export async function runAdvisor(question = ''): Promise<any[]> {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
+  const apiKey = process.env.ANTHROPIC_API_KEY.trim()
   const ctx = await getFinancialContext()
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
-      'x-api-key':         process.env.ANTHROPIC_API_KEY,
+      'x-api-key':         apiKey,
       'anthropic-version': '2023-06-01',
       'content-type':      'application/json',
     },
