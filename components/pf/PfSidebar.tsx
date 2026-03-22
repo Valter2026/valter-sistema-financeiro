@@ -3,18 +3,21 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ArrowLeftRight, ArrowDownCircle, Target,
-  CreditCard, Tag, PieChart, ChevronRight, ChevronLeft, Mic
+  CreditCard, Tag, PieChart, ChevronRight, ChevronLeft, Mic,
+  TrendingUp, Upload
 } from 'lucide-react'
 
 const nav = [
-  { href: '/pessoal',              label: 'Dashboard',      icon: LayoutDashboard },
-  { href: '/pessoal/lancamentos',  label: 'Lançamentos',    icon: ArrowLeftRight  },
-  { href: '/pessoal/contas-pagar', label: 'Contas a Pagar', icon: ArrowDownCircle },
-  { href: '/pessoal/metas',        label: 'Metas',          icon: Target          },
-  { href: '/pessoal/orcamento',    label: 'Orçamento',      icon: PieChart        },
-  { href: '/pessoal/relatorios',   label: 'Relatórios',     icon: PieChart        },
-  { href: '/pessoal/contas',       label: 'Contas',         icon: CreditCard      },
-  { href: '/pessoal/categorias',   label: 'Categorias',     icon: Tag             },
+  { href: '/pessoal',                label: 'Dashboard',      icon: LayoutDashboard },
+  { href: '/pessoal/lancamentos',    label: 'Lançamentos',    icon: ArrowLeftRight  },
+  { href: '/pessoal/contas-pagar',   label: 'Contas a Pagar', icon: ArrowDownCircle },
+  { href: '/pessoal/metas',          label: 'Metas',          icon: Target          },
+  { href: '/pessoal/orcamento',      label: 'Orçamento',      icon: PieChart        },
+  { href: '/pessoal/fluxo-caixa',    label: 'Fluxo de Caixa', icon: TrendingUp      },
+  { href: '/pessoal/relatorios',     label: 'Relatórios',     icon: PieChart        },
+  { href: '/pessoal/importar',       label: 'Importar',       icon: Upload          },
+  { href: '/pessoal/contas',         label: 'Contas',         icon: CreditCard      },
+  { href: '/pessoal/categorias',     label: 'Categorias',     icon: Tag             },
 ]
 
 export default function PfSidebar() {
