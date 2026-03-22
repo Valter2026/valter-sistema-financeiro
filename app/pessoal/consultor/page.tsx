@@ -23,7 +23,7 @@ const TYPE_CONFIG = {
   success: { label:'Parabéns', bg:'bg-emerald-950', border:'border-emerald-800', text:'text-emerald-300', icon: CheckCircle,   iconColor:'text-emerald-400' },
 }
 
-const VOICE_LABEL = { feminina: '👩 Nathalia', masculina: '👨 Cerbasi' }
+const VOICE_LABEL = { feminina: '👩 Consultora', masculina: '👨 Consultor' }
 
 function AudioCard({
   title, icon: Icon, iconColor, endpoint, voice, pitch,
@@ -44,9 +44,12 @@ function AudioCard({
 
   useEffect(() => {
     if (typeof window !== 'undefined') synthRef.current = window.speechSynthesis
+    setGenerating(true)
+    // GET já auto-gera se não existir
     fetch(endpoint).then(r => r.json()).then(d => {
       if (d.script) { setScript(d.script); setGenAt(d.generated_at ?? '') }
-    })
+      setGenerating(false)
+    }).catch(() => setGenerating(false))
   }, [endpoint])
 
   const generate = async () => {
@@ -108,9 +111,9 @@ function AudioCard({
             </button>
           )}
           <button onClick={generate} disabled={generating}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors">
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 disabled:opacity-50 transition-colors">
             <RefreshCw size={11} className={generating ? 'animate-spin' : ''} />
-            {generating ? 'Gerando...' : script ? 'Atualizar' : 'Gerar'}
+            {generating ? 'Gerando...' : 'Atualizar'}
           </button>
         </div>
       </div>

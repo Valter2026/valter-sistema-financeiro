@@ -76,21 +76,28 @@ export default function ConfiguracoesPage() {
         <div className="p-6 space-y-5">
           {schedule && (
             <>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-white">Orientações automáticas</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Gera alertas toda vez que você lança uma transação</p>
+              {/* Toggles principais */}
+              {[
+                { key: 'enabled',          label: 'Orientações automáticas',         desc: 'Gera e atualiza orientações automaticamente a cada lançamento' },
+                { key: 'receive_messages', label: 'Receber notificações in-app',      desc: 'Exibe alertas do Consultor no sino e no dashboard' },
+                { key: 'receive_audio',    label: 'Receber orientações em áudio',     desc: 'Habilita os áudios semanais e mensais do Consultor' },
+              ].map(({ key, label, desc }) => (
+                <div key={key} className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-white">{label}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+                  </div>
+                  <button
+                    onClick={() => setSchedule((s: any) => ({ ...s, [key]: !s[key] }))}
+                    className={`relative inline-flex w-11 h-6 rounded-full transition-colors flex-shrink-0 ml-4 ${(schedule[key] ?? true) ? 'bg-emerald-600' : 'bg-gray-700'}`}>
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${(schedule[key] ?? true) ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setSchedule((s: any) => ({ ...s, enabled: !s.enabled }))}
-                  className={`relative inline-flex w-11 h-6 rounded-full transition-colors ${schedule.enabled ? 'bg-emerald-600' : 'bg-gray-700'}`}>
-                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${schedule.enabled ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
-              </div>
+              ))}
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="border-t border-gray-800 pt-4 grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Resumo semanal — dia</label>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Áudio semanal — dia</label>
                   <select
                     value={schedule.weekly_day ?? 1}
                     onChange={e => setSchedule((s: any) => ({ ...s, weekly_day: Number(e.target.value) }))}
@@ -99,7 +106,7 @@ export default function ConfiguracoesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Orientação mensal — dia</label>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Áudio mensal — dia</label>
                   <select
                     value={schedule.monthly_day ?? 1}
                     onChange={e => setSchedule((s: any) => ({ ...s, monthly_day: Number(e.target.value) }))}
@@ -116,14 +123,11 @@ export default function ConfiguracoesPage() {
                   <p className="text-sm font-semibold text-white">WhatsApp</p>
                   <span className="text-[10px] bg-yellow-900 text-yellow-400 border border-yellow-700 rounded-full px-2 py-0.5 font-semibold">Em breve</span>
                 </div>
-                <input
-                  type="text"
-                  disabled
+                <input type="text" disabled
                   placeholder="+55 (11) 99999-9999 — aguardando aprovação da Meta BM"
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-500 cursor-not-allowed"
-                />
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-500 cursor-not-allowed" />
                 <p className="text-[10px] text-gray-500 mt-2">
-                  Assim que a Meta aprovar sua Business Manager, as orientações em voz serão enviadas automaticamente no horário configurado.
+                  Assim que a Meta aprovar sua Business Manager, os áudios do Consultor serão enviados automaticamente no WhatsApp no horário configurado.
                 </p>
               </div>
 
@@ -135,7 +139,7 @@ export default function ConfiguracoesPage() {
                 </button>
                 <button onClick={saveSchedule} disabled={schedSaving}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50">
-                  <Check size={14} /> {schedSaving ? 'Salvando...' : 'Salvar agenda'}
+                  <Check size={14} /> {schedSaving ? 'Salvando...' : 'Salvar preferências'}
                 </button>
               </div>
 
@@ -146,7 +150,7 @@ export default function ConfiguracoesPage() {
               )}
               {schedSaved && (
                 <div className="bg-emerald-950 border border-emerald-800 rounded-xl px-4 py-3 flex items-center gap-2 text-emerald-400 text-sm">
-                  <Check size={15} /> Agenda salva com sucesso!
+                  <Check size={15} /> Preferências salvas!
                 </div>
               )}
             </>
