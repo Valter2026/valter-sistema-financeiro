@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight } from 'lucide-react'
+import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Edit3 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 interface Props {
@@ -15,20 +15,50 @@ interface Props {
 const today = () => new Date().toISOString().split('T')[0]
 
 export default function PfTransactionModal({ open, onClose, onSaved, accounts, categories, initial }: Props) {
+  const [step,      setStep]      = useState<'voice'|'confirm'|'form'>('voice')
   const [tab,       setTab]       = useState<'expense'|'income'|'transfer'>('expense')
   const [form,      setForm]      = useState<any>({})
   const [saving,    setSaving]    = useState(false)
   const [listening, setListening] = useState(false)
   const [voiceText, setVoiceText] = useState('')
-  const [voiceHint, setVoiceHint] = useState('')
+  const [voiceData, setVoiceData] = useState<any>(null)
   const recogRef = useRef<any>(null)
 
   useEffect(() => {
     if (open) {
-      if (initial) { setTab(initial.type ?? 'expense'); setForm(initial) }
-      else setForm({ date: today(), status: 'confirmed', recurrence: 'single' })
+      if (initial?.id) {
+        // Editando lançamento existente
+        setTab(initial.type ?? 'expense')
+        setForm(initial)
+        setStep('form')
+      } else if (initial && initial.amount) {
+        // Vindo do voice
+        setTab(initial.type ?? 'expense')
+        setForm({ ...initial, date: initial.date ?? today(), status: 'confirmed', recurrence: 'single' })
+        setVoiceData(initial)
+        setStep('confirm')
+      } else {
+        setTab(initial?.type ?? 'expense')
+        setForm({ date: today(), status: 'confirmed', recurrence: 'single', ...(initial ?? {}) })
+        setStep('voice')
+      }
+      setVoiceText('')
+      setListening(false)
     }
   }, [open, initial])
+
+  // Resolução de categoria por nome
+  const resolveCategory = (name: string) => {
+    if (!name) return null
+    const lower = name.toLowerCase()
+    return categories.find(c => c.name.toLowerCase() === lower || c.name.toLowerCase().includes(lower) || lower.includes(c.name.toLowerCase())) ?? null
+  }
+
+  // Resolução de conta por tipo
+  const resolveAccount = (type: string | null) => {
+    if (!type) return accounts[0] ?? null
+    return accounts.find(a => a.type === type) ?? accounts[0] ?? null
+  }
 
   const cats = categories.filter(c => !c.parent_id && c.type === (tab === 'transfer' ? 'expense' : tab))
   const subCats = (parentId: string) => categories.filter(c => c.parent_id === parentId)
@@ -46,182 +76,294 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
     onSaved()
   }
 
+  // ─── VOZ ────────────────────────────────────────────────────────────────────
   const startVoice = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SpeechRecognition) { alert('Seu navegador não suporta reconhecimento de voz.'); return }
-
-    const rec = new SpeechRecognition()
-    rec.lang = 'pt-BR'
-    rec.continuous = false
-    rec.interimResults = false
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SR) { alert('Seu navegador não suporta reconhecimento de voz.'); return }
+    const rec = new SR()
+    rec.lang = 'pt-BR'; rec.continuous = false; rec.interimResults = false
     recogRef.current = rec
-
     rec.onstart  = () => setListening(true)
     rec.onend    = () => setListening(false)
     rec.onerror  = () => setListening(false)
     rec.onresult = async (e: any) => {
       const text = e.results[0][0].transcript
       setVoiceText(text)
-      setVoiceHint('Interpretando...')
-
       const res = await fetch('/api/pf/voice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       }).then(r => r.json())
 
-      setTab(res.type)
-      setForm((f: any) => ({
-        ...f,
-        amount:      res.amount || f.amount,
-        description: res.description || f.description,
-        date:        res.date || f.date,
+      const cat     = resolveCategory(res.suggestedCategoryName)
+      const account = resolveAccount(res.suggestedAccountType)
+
+      const filled = {
+        type:        res.type,
+        amount:      res.amount,
+        description: res.description,
+        date:        res.date,
+        status:      'confirmed',
+        recurrence:  'single',
         voice_input: text,
-      }))
-      setVoiceHint(`Detectado: ${res.type === 'expense' ? 'Gasto' : 'Receita'} · ${formatCurrency(res.amount)} · ${res.suggestedCategory || 'sem categoria'}`)
+        category_id: cat?.id ?? '',
+        account_id:  account?.id ?? '',
+        _catName:    cat?.name ?? res.suggestedCategoryName,
+        _accName:    account?.name ?? '',
+      }
+      setTab(res.type)
+      setForm(filled)
+      setVoiceData(res)
+      setStep('confirm')
     }
     rec.start()
   }
 
-  const stopVoice = () => { recogRef.current?.stop(); setListening(false) }
-
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-800">
-
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-white">{form.id ? 'Editar' : 'Novo'} Lançamento</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800 transition-colors">
-            <X size={16} />
-          </button>
-        </div>
-
-        {/* Voz */}
-        <div className="px-6 pt-5">
-          <div className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${listening ? 'border-emerald-500 bg-emerald-950' : 'border-gray-700 bg-gray-800'}`}>
-            <button onClick={listening ? stopVoice : startVoice}
-              className={`p-2.5 rounded-lg transition-colors ${listening ? 'bg-emerald-600 text-white animate-pulse' : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white'}`}>
-              {listening ? <MicOff size={16} /> : <Mic size={16} />}
-            </button>
-            <div className="flex-1 min-w-0">
-              {listening ? (
-                <p className="text-sm text-emerald-400 font-medium">Ouvindo... fale o lançamento</p>
-              ) : voiceText ? (
-                <>
-                  <p className="text-xs text-gray-400 truncate">"{voiceText}"</p>
-                  {voiceHint && <p className="text-xs text-emerald-400 mt-0.5">{voiceHint}</p>}
-                </>
-              ) : (
-                <p className="text-sm text-gray-500">Clique no microfone e fale: <span className="text-gray-400">"gastei 50 no mercado"</span></p>
-              )}
-            </div>
+  // ─── TELA CONFIRMAÇÃO ────────────────────────────────────────────────────────
+  if (step === 'confirm') {
+    const isExpense = tab === 'expense'
+    const cat = categories.find(c => c.id === form.category_id)
+    const acc = accounts.find(a => a.id === form.account_id)
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div className="bg-gray-900 w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl border border-gray-800 shadow-2xl">
+          {/* Cabeçalho */}
+          <div className="px-5 pt-5 pb-4 border-b border-gray-800 flex items-center justify-between">
+            <h3 className="text-base font-bold text-white">Confirmar Lançamento</h3>
+            <button onClick={onClose} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800"><X size={15} /></button>
           </div>
+
+          {/* Voz detectada */}
+          {voiceText && (
+            <div className="mx-5 mt-4 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 flex items-start gap-2">
+              <span className="text-base">🎤</span>
+              <p className="text-xs text-gray-400 italic">"{voiceText}"</p>
+            </div>
+          )}
+
+          {/* Card do lançamento */}
+          <div className="p-5 space-y-3">
+            {/* Tipo */}
+            <div className={`rounded-xl p-4 flex items-center gap-3 ${isExpense ? 'bg-red-950 border border-red-900' : 'bg-emerald-950 border border-emerald-900'}`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isExpense ? 'bg-red-900' : 'bg-emerald-900'}`}>
+                {isExpense ? <TrendingDown size={20} className="text-red-400" /> : <TrendingUp size={20} className="text-emerald-400" />}
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">{isExpense ? 'DESPESA' : 'RECEITA'}</p>
+                <p className={`text-2xl font-bold ${isExpense ? 'text-red-300' : 'text-emerald-300'}`}>
+                  {form.amount > 0 ? formatCurrency(form.amount) : <span className="text-gray-500 text-base">Valor não detectado</span>}
+                </p>
+              </div>
+            </div>
+
+            {/* Campos detectados */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
+                <span className="text-xs text-gray-500">Descrição</span>
+                <span className="text-sm font-medium text-gray-200">{form.description || '—'}</span>
+              </div>
+              <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
+                <span className="text-xs text-gray-500">Categoria</span>
+                <span className="text-sm font-medium text-gray-200">
+                  {cat ? `${cat.icon ?? ''} ${cat.name}` : <span className="text-yellow-400 text-xs">Não detectada</span>}
+                </span>
+              </div>
+              <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
+                <span className="text-xs text-gray-500">Conta</span>
+                <span className="text-sm font-medium text-gray-200">
+                  {acc ? acc.name : <span className="text-yellow-400 text-xs">Nenhuma conta</span>}
+                </span>
+              </div>
+              <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
+                <span className="text-xs text-gray-500">Data</span>
+                <span className="text-sm font-medium text-gray-200">
+                  {form.date ? new Date(form.date + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}
+                </span>
+              </div>
+            </div>
+
+            {/* Aviso se valor não detectado */}
+            {!form.amount && (
+              <div className="bg-yellow-950 border border-yellow-800 rounded-xl px-4 py-3 text-xs text-yellow-400">
+                ⚠️ Valor não detectado. Clique em "Editar" para preencher.
+              </div>
+            )}
+          </div>
+
+          {/* Botões */}
+          <div className="flex gap-2 px-5 pb-5">
+            <button onClick={() => setStep('form')}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 text-sm font-semibold hover:bg-gray-800 transition-colors">
+              <Edit3 size={14} /> Editar
+            </button>
+            <button onClick={handleSave} disabled={saving || !form.amount}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors">
+              {saving ? 'Salvando...' : <><Check size={16} /> Confirmar</>}
+            </button>
+          </div>
+
+          {/* Tentar novamente */}
+          <div className="border-t border-gray-800 px-5 py-3">
+            <button onClick={() => { setStep('voice'); setVoiceText('') }}
+              className="w-full flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+              <Mic size={12} /> Falar novamente
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── TELA DE VOZ ────────────────────────────────────────────────────────────
+  if (step === 'voice') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div className="bg-gray-900 w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl border border-gray-800 shadow-2xl">
+          <div className="px-5 pt-5 pb-4 border-b border-gray-800 flex items-center justify-between">
+            <h3 className="text-base font-bold text-white">Novo Lançamento</h3>
+            <button onClick={onClose} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800"><X size={15} /></button>
+          </div>
+
+          <div className="p-6 flex flex-col items-center">
+            {/* Botão mic grande */}
+            <button onClick={listening ? () => recogRef.current?.stop() : startVoice}
+              className={`w-24 h-24 rounded-full flex items-center justify-center mb-5 transition-all shadow-xl ${
+                listening
+                  ? 'bg-emerald-600 animate-pulse shadow-emerald-500/30'
+                  : 'bg-gray-800 border-2 border-gray-700 hover:border-emerald-500 hover:bg-gray-700'
+              }`}>
+              {listening ? <MicOff size={36} className="text-white" /> : <Mic size={36} className="text-gray-300" />}
+            </button>
+
+            {listening ? (
+              <div className="text-center">
+                <p className="text-emerald-400 font-semibold text-sm mb-1">Ouvindo...</p>
+                <p className="text-gray-500 text-xs">Fale o seu lançamento</p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="text-gray-300 font-semibold text-sm mb-2">Toque para falar</p>
+                <div className="space-y-1 text-center">
+                  <p className="text-xs text-gray-500">"Gastei duzentos reais de combustível"</p>
+                  <p className="text-xs text-gray-500">"Paguei mil e quinhentos de aluguel"</p>
+                  <p className="text-xs text-gray-500">"Recebi cinco mil de salário"</p>
+                  <p className="text-xs text-gray-500">"Comprei R$ 87,50 no supermercado"</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="border-t border-gray-800 px-5 py-3">
+            <button onClick={() => setStep('form')}
+              className="w-full flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+              Preencher manualmente <ChevronRight size={12} />
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── FORMULÁRIO COMPLETO ─────────────────────────────────────────────────────
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-gray-900 w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl border border-gray-800 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="px-5 py-4 border-b border-gray-800 flex items-center justify-between sticky top-0 bg-gray-900 z-10">
+          <h3 className="text-base font-bold text-white">{form.id ? 'Editar' : 'Novo'} Lançamento</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800"><X size={15} /></button>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 px-6 pt-4">
-          {([['expense','Gasto','text-red-400'],['income','Receita','text-emerald-400'],['transfer','Transferência','text-blue-400']] as const).map(([k, l, c]) => (
+        <div className="flex gap-1.5 px-5 pt-4">
+          {([['expense','Gasto'],['income','Receita'],['transfer','Transferência']] as const).map(([k, l]) => (
             <button key={k} onClick={() => setTab(k)}
               className={`flex-1 py-2 rounded-xl text-xs font-bold transition-colors ${
                 tab === k
                   ? k === 'expense' ? 'bg-red-600 text-white' : k === 'income' ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white'
-                  : 'bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white'
+                  : 'bg-gray-800 border border-gray-700 text-gray-400'
               }`}>
-              {k === 'expense' ? <TrendingDown size={12} className="inline mr-1" /> : k === 'income' ? <TrendingUp size={12} className="inline mr-1" /> : <ArrowLeftRight size={12} className="inline mr-1" />}
+              {k === 'expense' ? <TrendingDown size={11} className="inline mr-1" /> : k === 'income' ? <TrendingUp size={11} className="inline mr-1" /> : <ArrowLeftRight size={11} className="inline mr-1" />}
               {l}
             </button>
           ))}
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-5 space-y-3">
           {/* Valor */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Valor (R$)</label>
             <input type="number" step="0.01" placeholder="0,00"
               value={form.amount ?? ''}
               onChange={e => setForm({ ...form, amount: parseFloat(e.target.value) })}
-              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors" />
+              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-base text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors" />
           </div>
-
           {/* Descrição */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Descrição</label>
             <input type="text" placeholder="Ex: Supermercado, Salário..."
               value={form.description ?? ''}
               onChange={e => setForm({ ...form, description: e.target.value })}
-              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors" />
+              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors" />
           </div>
-
           {/* Data */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Data</label>
             <input type="date" value={form.date ?? today()}
               onChange={e => setForm({ ...form, date: e.target.value })}
-              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors" />
+              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors" />
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {/* Categoria */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Categoria</label>
-              <select value={form.category_id ?? ''}
-                onChange={e => setForm({ ...form, category_id: e.target.value })}
-                className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
-                <option value="">Sem categoria</option>
-                {cats.map(c => (
-                  <optgroup key={c.id} label={c.name}>
-                    <option value={c.id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
-                    {subCats(c.id).map(s => (
-                      <option key={s.id} value={s.id}>— {s.name}</option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-            </div>
-
-            {/* Conta */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Conta</label>
-              <select value={form.account_id ?? ''}
-                onChange={e => setForm({ ...form, account_id: e.target.value })}
-                className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
-                <option value="">Selecione</option>
-                {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
-            </div>
+          {/* Categoria */}
+          <div>
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Categoria</label>
+            <select value={form.category_id ?? ''}
+              onChange={e => setForm({ ...form, category_id: e.target.value })}
+              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+              <option value="">Sem categoria</option>
+              {cats.map(c => (
+                <optgroup key={c.id} label={`${c.icon ?? ''} ${c.name}`}>
+                  <option value={c.id}>{c.icon ?? ''} {c.name}</option>
+                  {subCats(c.id).map(s => <option key={s.id} value={s.id}>— {s.name}</option>)}
+                </optgroup>
+              ))}
+            </select>
           </div>
-
+          {/* Conta */}
+          <div>
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Conta / Débito</label>
+            <select value={form.account_id ?? ''}
+              onChange={e => setForm({ ...form, account_id: e.target.value })}
+              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+              <option value="">Selecione a conta</option>
+              {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
           {/* Recorrência */}
           <div>
-            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Tipo de Lançamento</label>
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Tipo</label>
             <select value={form.recurrence ?? 'single'}
               onChange={e => setForm({ ...form, recurrence: e.target.value })}
-              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
               <option value="single">Avulso (único)</option>
               <option value="fixed">Fixo (todo mês)</option>
               <option value="installment">Parcelado</option>
             </select>
           </div>
-
           {form.recurrence === 'installment' && (
             <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Número de Parcelas</label>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Parcelas</label>
               <input type="number" min={2} max={60} placeholder="Ex: 12"
                 value={form.installment_total ?? ''}
                 onChange={e => setForm({ ...form, installment_total: parseInt(e.target.value) })}
-                className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors" />
+                className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors" />
             </div>
           )}
-
           {/* Status */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Situação</label>
             <select value={form.status ?? 'confirmed'}
               onChange={e => setForm({ ...form, status: e.target.value })}
-              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+              className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
               <option value="confirmed">Confirmado (já aconteceu)</option>
               <option value="pending">Pendente (ainda não pago)</option>
               <option value="scheduled">Agendado (futuro)</option>
@@ -229,13 +371,13 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
           </div>
         </div>
 
-        <div className="flex gap-3 px-6 pb-6">
+        <div className="flex gap-2 px-5 pb-5 sticky bottom-0 bg-gray-900 pt-2 border-t border-gray-800">
           <button onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-gray-700 text-gray-400 text-sm font-semibold hover:bg-gray-800 hover:text-white transition-colors">
+            className="flex-1 py-3 rounded-xl border border-gray-700 text-gray-400 text-sm font-semibold hover:bg-gray-800 hover:text-white transition-colors">
             Cancelar
           </button>
           <button onClick={handleSave} disabled={saving}
-            className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors">
+            className="flex-1 py-3 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors">
             {saving ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
