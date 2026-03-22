@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Edit3 } from 'lucide-react'
+import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Edit3, Loader2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 interface Props {
@@ -15,24 +15,23 @@ interface Props {
 const today = () => new Date().toISOString().split('T')[0]
 
 export default function PfTransactionModal({ open, onClose, onSaved, accounts, categories, initial }: Props) {
-  const [step,      setStep]      = useState<'voice'|'confirm'|'form'>('voice')
+  const [step,      setStep]      = useState<'voice'|'saving'|'success'|'confirm'|'form'>('voice')
   const [tab,       setTab]       = useState<'expense'|'income'|'transfer'>('expense')
   const [form,      setForm]      = useState<any>({})
   const [saving,    setSaving]    = useState(false)
   const [listening, setListening] = useState(false)
   const [voiceText, setVoiceText] = useState('')
   const [voiceData, setVoiceData] = useState<any>(null)
+  const [toastMsg,  setToastMsg]  = useState<{ type: 'expense'|'income'; amount: number; desc: string } | null>(null)
   const recogRef = useRef<any>(null)
 
   useEffect(() => {
     if (open) {
       if (initial?.id) {
-        // Editando lançamento existente
         setTab(initial.type ?? 'expense')
         setForm(initial)
         setStep('form')
       } else if (initial && initial.amount) {
-        // Vindo do voice
         setTab(initial.type ?? 'expense')
         setForm({ ...initial, date: initial.date ?? today(), status: 'confirmed', recurrence: 'single' })
         setVoiceData(initial)
@@ -44,23 +43,22 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
       }
       setVoiceText('')
       setListening(false)
+      setToastMsg(null)
     }
   }, [open, initial])
 
-  // Resolução de categoria por nome
   const resolveCategory = (name: string) => {
     if (!name) return null
     const lower = name.toLowerCase()
     return categories.find(c => c.name.toLowerCase() === lower || c.name.toLowerCase().includes(lower) || lower.includes(c.name.toLowerCase())) ?? null
   }
 
-  // Resolução de conta por tipo
   const resolveAccount = (type: string | null) => {
     if (!type) return accounts[0] ?? null
     return accounts.find(a => a.type === type) ?? accounts[0] ?? null
   }
 
-  const cats = categories.filter(c => !c.parent_id && c.type === (tab === 'transfer' ? 'expense' : tab))
+  const cats    = categories.filter(c => !c.parent_id && c.type === (tab === 'transfer' ? 'expense' : tab))
   const subCats = (parentId: string) => categories.filter(c => c.parent_id === parentId)
 
   const handleSave = async () => {
@@ -76,7 +74,7 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
     onSaved()
   }
 
-  // ─── VOZ ────────────────────────────────────────────────────────────────────
+  // ─── VOZ ─────────────────────────────────────────────────────────────────────
   const startVoice = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SR) { alert('Seu navegador não suporta reconhecimento de voz.'); return }
@@ -86,41 +84,108 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
     rec.onstart  = () => setListening(true)
     rec.onend    = () => setListening(false)
     rec.onerror  = () => setListening(false)
+
     rec.onresult = async (e: any) => {
       const text = e.results[0][0].transcript
       setVoiceText(text)
+
+      // Parse rápido (POST)
       const res = await fetch('/api/pf/voice', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       }).then(r => r.json())
 
-      const cat     = resolveCategory(res.suggestedCategoryName)
-      const account = resolveAccount(res.suggestedAccountType)
+      if (res.amount > 0) {
+        // ── AUTO-CONFIRM: salva direto via PUT ──
+        setStep('saving')
+        const saved = await fetch('/api/pf/voice', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        }).then(r => r.json())
 
-      const filled = {
-        type:        res.type,
-        amount:      res.amount,
-        description: res.description,
-        date:        res.date,
-        status:      'confirmed',
-        recurrence:  'single',
-        voice_input: text,
-        category_id: cat?.id ?? '',
-        account_id:  account?.id ?? '',
-        _catName:    cat?.name ?? res.suggestedCategoryName,
-        _accName:    account?.name ?? '',
+        if (saved.ok) {
+          setToastMsg({ type: res.type, amount: res.amount, desc: res.description })
+          setStep('success')
+          onSaved()
+          setTimeout(() => { onClose() }, 2200)
+        } else {
+          // fallback: mostra tela de edição
+          const cat     = resolveCategory(res.suggestedCategoryName)
+          const account = resolveAccount(res.suggestedAccountType)
+          setTab(res.type)
+          setForm({
+            type: res.type, amount: res.amount, description: res.description,
+            date: res.date, status: 'confirmed', recurrence: 'single', voice_input: text,
+            category_id: cat?.id ?? '', account_id: account?.id ?? '',
+          })
+          setVoiceData(res)
+          setStep('confirm')
+        }
+      } else {
+        // Valor não detectado → mostra tela de confirmação manual
+        const cat     = resolveCategory(res.suggestedCategoryName)
+        const account = resolveAccount(res.suggestedAccountType)
+        setTab(res.type)
+        setForm({
+          type: res.type, amount: res.amount, description: res.description,
+          date: res.date, status: 'confirmed', recurrence: 'single', voice_input: text,
+          category_id: cat?.id ?? '', account_id: account?.id ?? '',
+          _catName: cat?.name ?? res.suggestedCategoryName,
+          _accName: account?.name ?? '',
+        })
+        setVoiceData(res)
+        setStep('confirm')
       }
-      setTab(res.type)
-      setForm(filled)
-      setVoiceData(res)
-      setStep('confirm')
     }
     rec.start()
   }
 
   if (!open) return null
 
-  // ─── TELA CONFIRMAÇÃO ────────────────────────────────────────────────────────
+  // ─── SALVANDO ────────────────────────────────────────────────────────────────
+  if (step === 'saving') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div className="bg-gray-900 w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl border border-gray-800 shadow-2xl p-10 flex flex-col items-center gap-4">
+          <Loader2 size={44} className="text-emerald-500 animate-spin" />
+          <div className="text-center">
+            <p className="text-white font-semibold">Salvando lançamento...</p>
+            <p className="text-gray-500 text-xs mt-1">"{voiceText}"</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── SUCESSO ─────────────────────────────────────────────────────────────────
+  if (step === 'success' && toastMsg) {
+    const isExpense = toastMsg.type === 'expense'
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div className="bg-gray-900 w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl border border-gray-800 shadow-2xl p-8 flex flex-col items-center gap-4">
+          {/* Ícone animado */}
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center ${isExpense ? 'bg-red-950' : 'bg-emerald-950'}`}>
+            <Check size={40} className={isExpense ? 'text-red-400' : 'text-emerald-400'} />
+          </div>
+          <div className="text-center">
+            <p className="text-white font-bold text-lg">Lançamento registrado!</p>
+            <p className={`text-2xl font-bold mt-1 ${isExpense ? 'text-red-300' : 'text-emerald-300'}`}>
+              {isExpense ? '−' : '+'}{formatCurrency(toastMsg.amount)}
+            </p>
+            <p className="text-gray-400 text-sm mt-1">{toastMsg.desc}</p>
+          </div>
+          <div className="flex gap-1 mt-1">
+            {[0,1,2].map(i => (
+              <div key={i} className={`w-2 h-2 rounded-full ${isExpense ? 'bg-red-500' : 'bg-emerald-500'} animate-pulse`}
+                style={{ animationDelay: `${i * 0.2}s` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── TELA CONFIRMAÇÃO (valor não detectado ou fallback) ──────────────────────
   if (step === 'confirm') {
     const isExpense = tab === 'expense'
     const cat = categories.find(c => c.id === form.category_id)
@@ -128,13 +193,11 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
     return (
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
         <div className="bg-gray-900 w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl border border-gray-800 shadow-2xl">
-          {/* Cabeçalho */}
           <div className="px-5 pt-5 pb-4 border-b border-gray-800 flex items-center justify-between">
             <h3 className="text-base font-bold text-white">Confirmar Lançamento</h3>
             <button onClick={onClose} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800"><X size={15} /></button>
           </div>
 
-          {/* Voz detectada */}
           {voiceText && (
             <div className="mx-5 mt-4 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 flex items-start gap-2">
               <span className="text-base">🎤</span>
@@ -142,9 +205,7 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
             </div>
           )}
 
-          {/* Card do lançamento */}
           <div className="p-5 space-y-3">
-            {/* Tipo */}
             <div className={`rounded-xl p-4 flex items-center gap-3 ${isExpense ? 'bg-red-950 border border-red-900' : 'bg-emerald-950 border border-emerald-900'}`}>
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isExpense ? 'bg-red-900' : 'bg-emerald-900'}`}>
                 {isExpense ? <TrendingDown size={20} className="text-red-400" /> : <TrendingUp size={20} className="text-emerald-400" />}
@@ -157,7 +218,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
               </div>
             </div>
 
-            {/* Campos detectados */}
             <div className="space-y-2">
               <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
                 <span className="text-xs text-gray-500">Descrição</span>
@@ -183,7 +243,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
               </div>
             </div>
 
-            {/* Aviso se valor não detectado */}
             {!form.amount && (
               <div className="bg-yellow-950 border border-yellow-800 rounded-xl px-4 py-3 text-xs text-yellow-400">
                 ⚠️ Valor não detectado. Clique em "Editar" para preencher.
@@ -191,7 +250,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
             )}
           </div>
 
-          {/* Botões */}
           <div className="flex gap-2 px-5 pb-5">
             <button onClick={() => setStep('form')}
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 text-sm font-semibold hover:bg-gray-800 transition-colors">
@@ -203,7 +261,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
             </button>
           </div>
 
-          {/* Tentar novamente */}
           <div className="border-t border-gray-800 px-5 py-3">
             <button onClick={() => { setStep('voice'); setVoiceText('') }}
               className="w-full flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
@@ -215,7 +272,7 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
     )
   }
 
-  // ─── TELA DE VOZ ────────────────────────────────────────────────────────────
+  // ─── TELA DE VOZ ─────────────────────────────────────────────────────────────
   if (step === 'voice') {
     return (
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -226,7 +283,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
           </div>
 
           <div className="p-6 flex flex-col items-center">
-            {/* Botão mic grande */}
             <button onClick={listening ? () => recogRef.current?.stop() : startVoice}
               className={`w-24 h-24 rounded-full flex items-center justify-center mb-5 transition-all shadow-xl ${
                 listening
@@ -238,12 +294,13 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
 
             {listening ? (
               <div className="text-center">
-                <p className="text-emerald-400 font-semibold text-sm mb-1">Ouvindo...</p>
-                <p className="text-gray-500 text-xs">Fale o seu lançamento</p>
+                <p className="text-emerald-400 font-semibold text-sm mb-1">Ouvindo... fale agora!</p>
+                <p className="text-gray-500 text-xs">O lançamento será salvo automaticamente</p>
               </div>
             ) : (
               <div className="text-center">
                 <p className="text-gray-300 font-semibold text-sm mb-2">Toque para falar</p>
+                <p className="text-gray-600 text-xs mb-3">O lançamento é salvo automaticamente</p>
                 <div className="space-y-1 text-center">
                   <p className="text-xs text-gray-500">"Gastei duzentos reais de combustível"</p>
                   <p className="text-xs text-gray-500">"Paguei mil e quinhentos de aluguel"</p>
@@ -265,7 +322,7 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
     )
   }
 
-  // ─── FORMULÁRIO COMPLETO ─────────────────────────────────────────────────────
+  // ─── FORMULÁRIO COMPLETO ──────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm overflow-y-auto">
       <div className="bg-gray-900 w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl border border-gray-800 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -274,7 +331,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
           <button onClick={onClose} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800"><X size={15} /></button>
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-1.5 px-5 pt-4">
           {([['expense','Gasto'],['income','Receita'],['transfer','Transferência']] as const).map(([k, l]) => (
             <button key={k} onClick={() => setTab(k)}
@@ -290,7 +346,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
         </div>
 
         <div className="p-5 space-y-3">
-          {/* Valor */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Valor (R$)</label>
             <input type="number" step="0.01" placeholder="0,00"
@@ -298,7 +353,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
               onChange={e => setForm({ ...form, amount: parseFloat(e.target.value) })}
               className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-base text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors" />
           </div>
-          {/* Descrição */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Descrição</label>
             <input type="text" placeholder="Ex: Supermercado, Salário..."
@@ -306,14 +360,12 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
               onChange={e => setForm({ ...form, description: e.target.value })}
               className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors" />
           </div>
-          {/* Data */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Data</label>
             <input type="date" value={form.date ?? today()}
               onChange={e => setForm({ ...form, date: e.target.value })}
               className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors" />
           </div>
-          {/* Categoria */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Categoria</label>
             <select value={form.category_id ?? ''}
@@ -328,7 +380,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
               ))}
             </select>
           </div>
-          {/* Conta */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Conta / Débito</label>
             <select value={form.account_id ?? ''}
@@ -338,7 +389,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
               {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
           </div>
-          {/* Recorrência */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Tipo</label>
             <select value={form.recurrence ?? 'single'}
@@ -358,7 +408,6 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
                 className="mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors" />
             </div>
           )}
-          {/* Status */}
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Situação</label>
             <select value={form.status ?? 'confirmed'}
