@@ -12,12 +12,14 @@ const main = [
 ]
 
 const more = [
-  { href: '/pessoal/contas-pagar', label: 'Contas a Pagar' },
-  { href: '/pessoal/orcamento',    label: 'Orçamento'       },
-  { href: '/pessoal/fluxo-caixa', label: 'Fluxo de Caixa'  },
-  { href: '/pessoal/importar',    label: 'Importar Extrato' },
-  { href: '/pessoal/contas',       label: 'Contas'          },
-  { href: '/pessoal/categorias',   label: 'Categorias'      },
+  { href: '/pessoal/contas-pagar',   label: 'Contas a Pagar'  },
+  { href: '/pessoal/cartoes',        label: 'Cartões'          },
+  { href: '/pessoal/orcamento',      label: 'Orçamento'        },
+  { href: '/pessoal/fluxo-caixa',   label: 'Fluxo de Caixa'   },
+  { href: '/pessoal/importar',      label: 'Importar Extrato'  },
+  { href: '/pessoal/contas',         label: 'Contas'           },
+  { href: '/pessoal/categorias',     label: 'Categorias'       },
+  { href: '/pessoal/configuracoes',  label: 'Configurações'    },
 ]
 
 export default function PfBottomNav() {

@@ -14,12 +14,14 @@ import PfTransactionModal from '@/components/pf/PfTransactionModal'
 const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 
 export default function PessoalDashboard() {
-  const [summary,  setSummary]  = useState<any>(null)
-  const [accounts, setAccounts] = useState<any[]>([])
-  const [cats,     setCats]     = useState<any[]>([])
-  const [chart,    setChart]    = useState<any[]>([])
-  const [loading,  setLoading]  = useState(true)
-  const [modal,    setModal]    = useState(false)
+  const [summary,      setSummary]      = useState<any>(null)
+  const [accounts,     setAccounts]     = useState<any[]>([])
+  const [cats,         setCats]         = useState<any[]>([])
+  const [chart,        setChart]        = useState<any[]>([])
+  const [recentTxs,    setRecentTxs]    = useState<any[]>([])
+  const [patrimChart,  setPatrimChart]  = useState<any[]>([])
+  const [loading,      setLoading]      = useState(true)
+  const [modal,        setModal]        = useState(false)
   const year  = new Date().getFullYear()
   const month = new Date().getMonth() + 1
 
@@ -28,25 +30,37 @@ export default function PessoalDashboard() {
     const d = new Date()
     const start = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`
     const end   = d.toISOString().split('T')[0]
-    const [s, acc, cat] = await Promise.all([
+    const [s, acc, cat, recent] = await Promise.all([
       fetch(`/api/pf/summary?start=${start}&end=${end}`).then(r => r.json()),
       fetch('/api/pf/accounts').then(r => r.json()),
       fetch('/api/pf/categories').then(r => r.json()),
+      fetch('/api/pf/transactions?status=confirmed').then(r => r.json()),
     ])
     setSummary(s)
     setAccounts(Array.isArray(acc) ? acc : [])
     setCats(Array.isArray(cat) ? cat : [])
-    const chartData = await Promise.all(
+    setRecentTxs(Array.isArray(recent) ? recent.slice(0, 5) : [])
+
+    const monthlyData = await Promise.all(
       Array.from({ length: 6 }, (_, i) => {
         const d2 = new Date(year, month - 1 - (5 - i), 1)
         const m  = String(d2.getMonth()+1).padStart(2,'0')
         const y  = d2.getFullYear()
         return fetch(`/api/pf/summary?start=${y}-${m}-01&end=${y}-${m}-31`)
           .then(r => r.json())
-          .then(r => ({ label: MONTHS[d2.getMonth()], receitas: r.receitas ?? 0, despesas: r.despesas ?? 0, resultado: (r.receitas ?? 0) - (r.despesas ?? 0) }))
+          .then(r => ({
+            label:     MONTHS[d2.getMonth()],
+            receitas:  r.receitas  ?? 0,
+            despesas:  r.despesas  ?? 0,
+            resultado: (r.receitas ?? 0) - (r.despesas ?? 0),
+            patrimonio: r.totalAtivo ?? 0,
+          }))
       })
     )
-    setChart(chartData)
+    setChart(monthlyData)
+    // Evolução patrimonial acumulada
+    let acum = 0
+    setPatrimChart(monthlyData.map(m => { acum += m.resultado; return { label: m.label, patrimonio: m.patrimonio || acum } }))
     setLoading(false)
   }, [year, month])
 
@@ -204,7 +218,7 @@ export default function PessoalDashboard() {
 
           {/* Área resultado */}
           {chart.length > 0 && (
-            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Sobra/Falta por Mês</h3>
               <ResponsiveContainer width="100%" height={150}>
                 <AreaChart data={chart}>
@@ -226,6 +240,60 @@ export default function PessoalDashboard() {
                     }} />
                 </AreaChart>
               </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Evolução patrimonial */}
+          {patrimChart.some(p => p.patrimonio !== 0) && (
+            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Evolução Patrimonial</h3>
+              <ResponsiveContainer width="100%" height={140}>
+                <AreaChart data={patrimChart}>
+                  <defs>
+                    <linearGradient id="gPatrim" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#f59e0b" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}   />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                  <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 10 }} />
+                  <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} width={30} />
+                  <Tooltip contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8, fontSize: 11 }}
+                    formatter={(v: any) => [formatCurrency(v), 'Patrimônio']} />
+                  <Area type="monotone" dataKey="patrimonio" stroke="#f59e0b" fill="url(#gPatrim)" strokeWidth={2} dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Últimos 5 lançamentos */}
+          {recentTxs.length > 0 && (
+            <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Últimos Lançamentos</h3>
+                <a href="/pessoal/lancamentos" className="text-xs text-emerald-400 hover:text-emerald-300">Ver todos →</a>
+              </div>
+              <div className="divide-y divide-gray-800">
+                {recentTxs.map((tx: any) => (
+                  <div key={tx.id} className="flex items-center gap-3 px-4 py-3">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${tx.type === 'income' ? 'bg-emerald-950' : 'bg-red-950'}`}>
+                      {tx.type === 'income'
+                        ? <TrendingUp size={13} className="text-emerald-400" />
+                        : <TrendingDown size={13} className="text-red-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-gray-200 truncate">{tx.description || tx.category?.name || '—'}</p>
+                      <p className="text-[10px] text-gray-500">
+                        {new Date(tx.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                        {tx.category && ` · ${tx.category.icon ?? ''} ${tx.category.name}`}
+                      </p>
+                    </div>
+                    <p className={`text-xs font-bold flex-shrink-0 ${tx.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {tx.type === 'income' ? '+' : '−'}{formatCurrency(Number(tx.amount))}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </>
