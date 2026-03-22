@@ -3,7 +3,8 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { formatCurrency } from '@/lib/utils'
 import {
   Brain, RefreshCw, Volume2, VolumeX, Send, AlertTriangle,
-  Lightbulb, Target, TrendingUp, CheckCircle, Mic, MicOff, X, Sparkles
+  Lightbulb, Target, CheckCircle, Mic, MicOff, X, Sparkles,
+  Calendar, CalendarDays, Play, Square, ChevronDown, ChevronUp
 } from 'lucide-react'
 
 interface Advice {
@@ -15,14 +16,115 @@ interface Advice {
 }
 
 const TYPE_CONFIG = {
-  alert:   { label:'Alerta',    bg:'bg-red-950',     border:'border-red-800',     text:'text-red-400',     icon: AlertTriangle,  iconColor:'text-red-400'     },
-  warning: { label:'Atenção',   bg:'bg-yellow-950',  border:'border-yellow-800',  text:'text-yellow-400',  icon: AlertTriangle,  iconColor:'text-yellow-400'  },
-  tip:     { label:'Dica',      bg:'bg-gray-900',    border:'border-emerald-800', text:'text-emerald-400', icon: Lightbulb,      iconColor:'text-emerald-400' },
-  goal:    { label:'Meta',      bg:'bg-blue-950',    border:'border-blue-800',    text:'text-blue-400',    icon: Target,         iconColor:'text-blue-400'    },
-  success: { label:'Parabéns',  bg:'bg-emerald-950', border:'border-emerald-800', text:'text-emerald-300', icon: CheckCircle,    iconColor:'text-emerald-400' },
+  alert:   { label:'Alerta',   bg:'bg-red-950',     border:'border-red-800',     text:'text-red-400',     icon: AlertTriangle, iconColor:'text-red-400'     },
+  warning: { label:'Atenção',  bg:'bg-yellow-950',  border:'border-yellow-800',  text:'text-yellow-400',  icon: AlertTriangle, iconColor:'text-yellow-400'  },
+  tip:     { label:'Dica',     bg:'bg-gray-900',    border:'border-emerald-800', text:'text-emerald-400', icon: Lightbulb,     iconColor:'text-emerald-400' },
+  goal:    { label:'Meta',     bg:'bg-blue-950',    border:'border-blue-800',    text:'text-blue-400',    icon: Target,        iconColor:'text-blue-400'    },
+  success: { label:'Parabéns', bg:'bg-emerald-950', border:'border-emerald-800', text:'text-emerald-300', icon: CheckCircle,   iconColor:'text-emerald-400' },
 }
 
 const VOICE_LABEL = { feminina: '👩 Nathalia', masculina: '👨 Cerbasi' }
+
+function AudioCard({
+  title, icon: Icon, iconColor, endpoint, voice, pitch,
+}: {
+  title: string
+  icon: any
+  iconColor: string
+  endpoint: string
+  voice: 'feminina' | 'masculina'
+  pitch: number
+}) {
+  const [script,      setScript]      = useState('')
+  const [genAt,       setGenAt]       = useState('')
+  const [generating,  setGenerating]  = useState(false)
+  const [playing,     setPlaying]     = useState(false)
+  const [expanded,    setExpanded]    = useState(false)
+  const synthRef = useRef<SpeechSynthesis | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') synthRef.current = window.speechSynthesis
+    fetch(endpoint).then(r => r.json()).then(d => {
+      if (d.script) { setScript(d.script); setGenAt(d.generated_at ?? '') }
+    })
+  }, [endpoint])
+
+  const generate = async () => {
+    setGenerating(true)
+    const res = await fetch(endpoint, { method: 'POST' }).then(r => r.json())
+    if (res.script) { setScript(res.script); setGenAt(new Date().toISOString()) }
+    setGenerating(false)
+  }
+
+  const togglePlay = () => {
+    if (!synthRef.current) return
+    if (playing) {
+      synthRef.current.cancel()
+      setPlaying(false)
+      return
+    }
+    const utter  = new SpeechSynthesisUtterance(script)
+    utter.lang   = 'pt-BR'
+    utter.rate   = 1.0
+    utter.pitch  = pitch
+    const voices = synthRef.current.getVoices()
+    const ptV    = voices.filter(v => v.lang.startsWith('pt'))
+    const sel    = voice === 'feminina'
+      ? (ptV.find(v => /female|feminino/i.test(v.name)) ?? ptV[0])
+      : (ptV.find(v => /male|masculino/i.test(v.name))  ?? ptV[ptV.length-1] ?? ptV[0])
+    if (sel) utter.voice = sel
+    utter.onend   = () => setPlaying(false)
+    utter.onerror = () => setPlaying(false)
+    setPlaying(true)
+    synthRef.current.speak(utter)
+  }
+
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="px-5 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center">
+            <Icon size={17} className={iconColor} />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-white">{title}</p>
+            {genAt
+              ? <p className="text-[10px] text-gray-500">Gerado em {new Date(genAt).toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })}</p>
+              : <p className="text-[10px] text-gray-600">Nenhum script gerado ainda</p>
+            }
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {script && (
+            <button onClick={() => setExpanded(!expanded)}
+              className="p-2 rounded-xl text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors">
+              {expanded ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
+            </button>
+          )}
+          {script && (
+            <button onClick={togglePlay}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-colors ${playing ? 'bg-emerald-600 text-white' : 'bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700'}`}>
+              {playing ? <><Square size={11} fill="currentColor"/> Parar</> : <><Play size={11} fill="currentColor"/> Ouvir</>}
+            </button>
+          )}
+          <button onClick={generate} disabled={generating}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors">
+            <RefreshCw size={11} className={generating ? 'animate-spin' : ''} />
+            {generating ? 'Gerando...' : script ? 'Atualizar' : 'Gerar'}
+          </button>
+        </div>
+      </div>
+
+      {/* Transcript expandível */}
+      {expanded && script && (
+        <div className="px-5 pb-5 border-t border-gray-800 pt-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-3">Texto do áudio</p>
+          <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">{script}</p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function ConsultorPage() {
   const [advices,    setAdvices]    = useState<Advice[]>([])
@@ -46,13 +148,8 @@ export default function ConsultorPage() {
     setLoading(true); setError(''); setAdvices([])
     const url = q ? `/api/pf/advisor?q=${encodeURIComponent(q)}` : '/api/pf/advisor'
     const res = await fetch(url).then(r => r.json())
-    if (res.error) {
-      setError(res.error)
-    } else {
-      setAdvices(res.advices ?? [])
-      setContext(res.context ?? null)
-      setGenAt(res.generatedAt ?? '')
-    }
+    if (res.error) { setError(res.error) }
+    else { setAdvices(res.advices ?? []); setContext(res.context ?? null); setGenAt(res.generatedAt ?? '') }
     setLoading(false)
   }, [])
 
@@ -66,27 +163,20 @@ export default function ConsultorPage() {
     setAsking(false)
   }
 
-  // Voz
   const speak = (text: string, idx: number) => {
     if (!synthRef.current) return
     synthRef.current.cancel()
     if (speaking === idx) { setSpeaking(null); return }
-
-    const utter = new SpeechSynthesisUtterance(text)
-    utter.lang  = 'pt-BR'
-    utter.rate  = 1.05
-    utter.pitch = voice === 'feminina' ? 1.2 : 0.85
-
-    const voices = synthRef.current.getVoices()
+    const utter    = new SpeechSynthesisUtterance(text)
+    utter.lang     = 'pt-BR'
+    utter.rate     = 1.05
+    utter.pitch    = voice === 'feminina' ? 1.2 : 0.85
+    const voices   = synthRef.current.getVoices()
     const ptVoices = voices.filter(v => v.lang.startsWith('pt'))
-    if (voice === 'feminina') {
-      const fem = ptVoices.find(v => /female|feminino|f\b/i.test(v.name)) ?? ptVoices[0]
-      if (fem) utter.voice = fem
-    } else {
-      const masc = ptVoices.find(v => /male|masculino|m\b/i.test(v.name)) ?? ptVoices[ptVoices.length-1] ?? ptVoices[0]
-      if (masc) utter.voice = masc
-    }
-
+    const sel      = voice === 'feminina'
+      ? (ptVoices.find(v => /female|feminino/i.test(v.name)) ?? ptVoices[0])
+      : (ptVoices.find(v => /male|masculino/i.test(v.name))  ?? ptVoices[ptVoices.length-1] ?? ptVoices[0])
+    if (sel) utter.voice = sel
     utter.onend   = () => setSpeaking(null)
     utter.onerror = () => setSpeaking(null)
     setSpeaking(idx)
@@ -100,8 +190,7 @@ export default function ConsultorPage() {
     setSpeaking(-1)
     const fullText = advices.map((a, i) => `${i+1}. ${a.title}. ${a.message} ${a.action}`).join(' ... ')
     const utter    = new SpeechSynthesisUtterance(fullText)
-    utter.lang     = 'pt-BR'
-    utter.rate     = 1.0
+    utter.lang     = 'pt-BR'; utter.rate = 1.0
     utter.pitch    = voice === 'feminina' ? 1.2 : 0.85
     const voices   = synthRef.current.getVoices()
     const ptVoices = voices.filter(v => v.lang.startsWith('pt'))
@@ -114,7 +203,6 @@ export default function ConsultorPage() {
     synthRef.current.speak(utter)
   }
 
-  // Pergunta por voz
   const startVoiceQuestion = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SR) return
@@ -128,6 +216,7 @@ export default function ConsultorPage() {
     rec.start()
   }
 
+  const pitch        = voice === 'feminina' ? 1.2 : 0.85
   const highPriority = advices.filter(a => a.priority === 'high')
   const rest         = advices.filter(a => a.priority !== 'high')
   const allAdvices   = [...highPriority, ...rest]
@@ -147,7 +236,6 @@ export default function ConsultorPage() {
           {genAt && <p className="text-[10px] text-gray-600 mt-0.5">Gerado em {new Date(genAt).toLocaleString('pt-BR')}</p>}
         </div>
         <div className="flex flex-col gap-2 items-end">
-          {/* Seletor de voz */}
           <div className="flex gap-1 bg-gray-800 border border-gray-700 rounded-xl p-1">
             {(['feminina','masculina'] as const).map(v => (
               <button key={v} onClick={() => setVoice(v)}
@@ -171,7 +259,7 @@ export default function ConsultorPage() {
         </div>
       </div>
 
-      {/* Resumo rápido do contexto */}
+      {/* Resumo financeiro rápido */}
       {context && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-3">
@@ -193,13 +281,36 @@ export default function ConsultorPage() {
         </div>
       )}
 
+      {/* Áudios — Semana e Mês */}
+      <div className="mb-6 space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Volume2 size={14} className="text-gray-400" />
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Orientações em Áudio · máx. 5 min · direto ao ponto</h3>
+        </div>
+        <AudioCard
+          title="Orientação da Semana"
+          icon={Calendar}
+          iconColor="text-blue-400"
+          endpoint="/api/pf/advisor/weekly"
+          voice={voice}
+          pitch={pitch}
+        />
+        <AudioCard
+          title="Orientação do Mês"
+          icon={CalendarDays}
+          iconColor="text-purple-400"
+          endpoint="/api/pf/advisor/monthly"
+          voice={voice}
+          pitch={pitch}
+        />
+      </div>
+
       {/* Erro de config */}
       {error && error.includes('ANTHROPIC_API_KEY') && (
         <div className="bg-yellow-950 border border-yellow-800 rounded-xl p-5 mb-6">
           <p className="text-yellow-300 font-bold mb-2 flex items-center gap-2"><AlertTriangle size={16}/> Configuração necessária</p>
           <p className="text-yellow-400 text-sm mb-3">Adicione no Vercel Dashboard → Settings → Environment Variables:</p>
           <code className="block bg-gray-900 rounded-lg px-4 py-2 text-xs text-emerald-300 font-mono">ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx</code>
-          <p className="text-yellow-600 text-xs mt-2">Obtenha em console.anthropic.com</p>
         </div>
       )}
       {error && !error.includes('ANTHROPIC_API_KEY') && (
@@ -208,7 +319,7 @@ export default function ConsultorPage() {
 
       {/* Loading */}
       {loading && (
-        <div className="space-y-3">
+        <div className="space-y-3 mb-6">
           <div className="flex items-center gap-3 bg-gray-900 border border-gray-800 rounded-xl p-5">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center animate-pulse">
               <Sparkles size={18} className="text-emerald-400" />
@@ -218,13 +329,17 @@ export default function ConsultorPage() {
               <p className="text-gray-500 text-xs">O consultor está preparando suas orientações personalizadas</p>
             </div>
           </div>
-          {[...Array(4)].map((_,i) => <div key={i} className="h-36 bg-gray-900 rounded-xl animate-pulse border border-gray-800" />)}
+          {[...Array(3)].map((_,i) => <div key={i} className="h-36 bg-gray-900 rounded-xl animate-pulse border border-gray-800" />)}
         </div>
       )}
 
       {/* Cards de orientação */}
       {!loading && allAdvices.length > 0 && (
         <div className="space-y-4 mb-6">
+          <div className="flex items-center gap-2">
+            <Brain size={14} className="text-gray-400" />
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Orientações do dia</h3>
+          </div>
           {allAdvices.map((advice, i) => {
             const cfg  = TYPE_CONFIG[advice.type] ?? TYPE_CONFIG.tip
             const Icon = cfg.icon
@@ -233,7 +348,7 @@ export default function ConsultorPage() {
               <div key={i} className={`rounded-2xl border p-5 ${cfg.bg} ${cfg.border}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3 flex-1">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`} style={{ border: `1px solid`, borderColor: 'transparent' }}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`}>
                       <Icon size={20} className={cfg.iconColor} />
                     </div>
                     <div className="flex-1">

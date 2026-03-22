@@ -126,6 +126,77 @@ ${question ? `PERGUNTA DO USUÁRIO: "${question}"` : ''}
 Gere as orientações financeiras personalizadas em JSON.`
 }
 
+const WEEKLY_PROMPT = `Você é um consultor financeiro pessoal que fala como Nathalia Arcuri: direto, motivador, empoderador.
+Crie um script de áudio para a orientação financeira SEMANAL do usuário.
+
+Regras:
+- MÁXIMO 650 palavras (≈ 5 minutos de fala em ritmo normal)
+- Tom conversacional, como se estivesse falando ao ouvido do usuário
+- Sem títulos, sem markdown, sem bullet points — é para ser lido em voz alta
+- Comece com uma saudação curta e o período (ex: "Olá! Aqui está sua orientação financeira da semana...")
+- Apresente os números de forma natural (não liste, conte uma história)
+- Destaque 2 ou 3 prioridades claras para a semana
+- Termine com 1 frase motivacional curta e 3 ações específicas numeradas
+- Retorne APENAS o texto do script, sem explicações adicionais`
+
+const MONTHLY_PROMPT = `Você é um consultor financeiro pessoal que fala como Gustavo Cerbasi: estratégico, claro, focado em patrimônio.
+Crie um script de áudio para a orientação financeira MENSAL do usuário.
+
+Regras:
+- MÁXIMO 650 palavras (≈ 5 minutos de fala em ritmo normal)
+- Tom consultivo e estratégico, como uma sessão de coaching financeiro
+- Sem títulos, sem markdown, sem bullet points — é para ser lido em voz alta
+- Comece com "Sua orientação financeira do mês de [mês]..."
+- Resuma o desempenho do mês com os números reais
+- Analise o progresso das metas
+- Diga exatamente o que precisa acontecer no restante do mês para os objetivos serem alcançados
+- Termine com 3 decisões financeiras prioritárias para o mês
+- Retorne APENAS o texto do script, sem explicações adicionais`
+
+export async function runWeeklyScript(): Promise<string> {
+  if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
+  const ctx = await getFinancialContext()
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key':         process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'content-type':      'application/json',
+    },
+    body: JSON.stringify({
+      model:      'claude-sonnet-4-6',
+      max_tokens: 1500,
+      system:     WEEKLY_PROMPT,
+      messages:   [{ role: 'user', content: buildUserMessage(ctx) }],
+    }),
+  })
+  if (!res.ok) throw new Error(`Anthropic API: ${await res.text()}`)
+  const aiRes = await res.json()
+  return aiRes.content?.[0]?.text?.trim() ?? ''
+}
+
+export async function runMonthlyScript(): Promise<string> {
+  if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
+  const ctx = await getFinancialContext()
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key':         process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'content-type':      'application/json',
+    },
+    body: JSON.stringify({
+      model:      'claude-sonnet-4-6',
+      max_tokens: 1500,
+      system:     MONTHLY_PROMPT,
+      messages:   [{ role: 'user', content: buildUserMessage(ctx) }],
+    }),
+  })
+  if (!res.ok) throw new Error(`Anthropic API: ${await res.text()}`)
+  const aiRes = await res.json()
+  return aiRes.content?.[0]?.text?.trim() ?? ''
+}
+
 export async function runAdvisor(question = ''): Promise<any[]> {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
   const ctx = await getFinancialContext()
