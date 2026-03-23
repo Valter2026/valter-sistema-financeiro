@@ -1,30 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
-import { parseAppointmentVoice } from '@/lib/appointment-voice-parser'
+import { parseAppointmentVoiceCommand } from '@/lib/appointment-voice-parser'
+import { handleAppointmentVoice } from '@/lib/appointment-voice-handler'
 
+const TABLE = 'fin_appointments' as const
+
+/** POST — parse apenas, sem salvar */
 export async function POST(req: NextRequest) {
   const { text } = await req.json()
   if (!text) return NextResponse.json({ error: 'Texto vazio' }, { status: 400 })
-  return NextResponse.json(parseAppointmentVoice(text))
+  return NextResponse.json(parseAppointmentVoiceCommand(text))
 }
 
+/** PUT — executa comando de voz (criar / atualizar / excluir) */
 export async function PUT(req: NextRequest) {
-  const { text } = await req.json()
+  const { text, forceId } = await req.json()
   if (!text) return NextResponse.json({ error: 'Texto vazio' }, { status: 400 })
 
-  const parsed = parseAppointmentVoice(text)
-  const { data, error } = await supabaseAdmin
-    .from('fin_appointments')
-    .insert([{
-      title:       parsed.title,
-      date:        parsed.date,
-      time:        parsed.time,
-      type:        parsed.type,
-      status:      'scheduled',
-      voice_input: parsed.voice_input,
-    }])
-    .select().single()
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true, appointment: data, parsed })
+  const result = await handleAppointmentVoice(text, TABLE, forceId)
+  if (!result.ok) return NextResponse.json(result, { status: result.reason === 'multiple_matches' ? 300 : 404 })
+  return NextResponse.json(result)
 }
