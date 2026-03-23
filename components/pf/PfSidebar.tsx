@@ -6,13 +6,14 @@ import {
   LayoutDashboard, ArrowLeftRight, ArrowDownCircle, Target,
   CreditCard, Tag, PieChart, ChevronRight, ChevronLeft, Mic,
   TrendingUp, Upload, Settings, BarChart2, Wallet, FolderOpen,
-  Brain, PanelLeftClose, PanelLeftOpen
+  Brain, PanelLeftClose, PanelLeftOpen, CalendarDays
 } from 'lucide-react'
 
 const nav = [
   { href: '/pessoal',                label: 'Dashboard',      icon: LayoutDashboard },
   { href: '/pessoal/consultor',      label: 'Consultor IA',   icon: Brain           },
   { href: '/pessoal/lancamentos',    label: 'Lançamentos',    icon: ArrowLeftRight  },
+  { href: '/pessoal/agenda',         label: 'Agenda',         icon: CalendarDays    },
   { href: '/pessoal/contas-pagar',   label: 'Contas a Pagar', icon: ArrowDownCircle },
   { href: '/pessoal/cartoes',        label: 'Cartões',        icon: CreditCard      },
   { href: '/pessoal/metas',          label: 'Metas',          icon: Target          },

@@ -5,12 +5,13 @@ import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight,
   TrendingUp, FileBarChart2, CreditCard, Tag, Upload, ChevronRight, ChevronLeft,
-  Brain, Settings, PanelLeftClose, PanelLeftOpen
+  Brain, Settings, PanelLeftClose, PanelLeftOpen, CalendarDays
 } from 'lucide-react'
 
 const nav = [
   { href: '/financas',                label: 'Dashboard',         icon: LayoutDashboard },
   { href: '/financas/lancamentos',    label: 'Lançamentos',       icon: ArrowLeftRight },
+  { href: '/financas/agenda',         label: 'Agenda',            icon: CalendarDays },
   { href: '/financas/contas-pagar',   label: 'Contas a Pagar',    icon: ArrowDownCircle },
   { href: '/financas/contas-receber', label: 'Contas a Receber',  icon: ArrowUpCircle },
   { href: '/financas/fluxo-caixa',    label: 'Fluxo de Caixa',    icon: TrendingUp },
