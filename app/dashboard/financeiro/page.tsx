@@ -67,7 +67,7 @@ export default function FinanceiroPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Financeiro</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Financeiro</h2>
           <p className="text-gray-400 text-sm mt-1">DRE · Comparativos · Reembolsos — {filterLabel(filter)}</p>
         </div>
       </div>

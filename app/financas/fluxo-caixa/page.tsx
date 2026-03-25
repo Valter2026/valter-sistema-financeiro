@@ -29,10 +29,10 @@ export default function FluxoCaixaPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-2xl font-bold text-white">Fluxo de Caixa</h2>
-          <p className="text-gray-400 text-sm mt-1">Realizado + projetado por mês</p>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Fluxo de Caixa</h2>
+          <p className="text-gray-400 text-xs md:text-sm mt-0.5">Realizado + projetado por mês</p>
         </div>
         <div className="flex gap-2">
           {[year - 1, year, year + 1].map(y => (
@@ -45,26 +45,26 @@ export default function FluxoCaixaPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="rounded-xl border-l-4 border-green-500 bg-green-950 p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total Receitas</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalReceitas)}</p>
-          <p className="text-xs text-green-400 mt-1 flex items-center gap-1"><TrendingUp size={11} /> no ano</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <div className="rounded-xl border-l-4 border-green-500 bg-green-950 p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide mb-1 truncate">Total Receitas</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalReceitas)}</p>
+          <p className="text-[10px] text-green-400 mt-1 flex items-center gap-1"><TrendingUp size={9} /> no ano</p>
         </div>
-        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total Despesas</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalDespesas)}</p>
-          <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><TrendingDown size={11} /> no ano</p>
+        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide mb-1 truncate">Total Despesas</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalDespesas)}</p>
+          <p className="text-[10px] text-red-400 mt-1 flex items-center gap-1"><TrendingDown size={9} /> no ano</p>
         </div>
-        <div className={`rounded-xl border-l-4 p-5 ${resultado >= 0 ? 'border-blue-500 bg-blue-950' : 'border-red-500 bg-red-950'}`}>
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Resultado Anual</p>
-          <p className={`text-2xl font-bold ${resultado >= 0 ? 'text-white' : 'text-red-400'}`}>{formatCurrency(resultado)}</p>
-          <p className={`text-xs mt-1 ${resultado >= 0 ? 'text-blue-400' : 'text-red-400'}`}>{resultado >= 0 ? '▲ superávit' : '▼ déficit'}</p>
+        <div className={`rounded-xl border-l-4 p-3 md:p-5 ${resultado >= 0 ? 'border-blue-500 bg-blue-950' : 'border-red-500 bg-red-950'}`}>
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide mb-1 truncate">Resultado Anual</p>
+          <p className={`text-sm md:text-xl font-bold tabular-nums truncate ${resultado >= 0 ? 'text-white' : 'text-red-400'}`}>{formatCurrency(resultado)}</p>
+          <p className={`text-[10px] mt-1 ${resultado >= 0 ? 'text-blue-400' : 'text-red-400'}`}>{resultado >= 0 ? '▲ superávit' : '▼ déficit'}</p>
         </div>
-        <div className={`rounded-xl border-l-4 p-5 ${saldoFinal >= 0 ? 'border-yellow-500 bg-yellow-950' : 'border-red-500 bg-red-950'}`}>
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Saldo Final</p>
-          <p className={`text-2xl font-bold ${saldoFinal >= 0 ? 'text-white' : 'text-red-400'}`}>{formatCurrency(saldoFinal)}</p>
-          <p className="text-xs text-gray-400 mt-1">acumulado {year}</p>
+        <div className={`rounded-xl border-l-4 p-3 md:p-5 ${saldoFinal >= 0 ? 'border-yellow-500 bg-yellow-950' : 'border-red-500 bg-red-950'}`}>
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide mb-1 truncate">Saldo Final</p>
+          <p className={`text-sm md:text-xl font-bold tabular-nums truncate ${saldoFinal >= 0 ? 'text-white' : 'text-red-400'}`}>{formatCurrency(saldoFinal)}</p>
+          <p className="text-[10px] text-gray-400 mt-1">acumulado {year}</p>
         </div>
       </div>
 
@@ -73,7 +73,7 @@ export default function FluxoCaixaPage() {
       ) : (
         <>
           {/* Gráfico receitas x despesas */}
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
+          <div className="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-800 mb-5">
             <h3 className="text-sm font-semibold text-gray-300 mb-4">Receitas × Despesas por Mês — {year}</h3>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={fluxo} barSize={18}>
@@ -92,7 +92,7 @@ export default function FluxoCaixaPage() {
           </div>
 
           {/* Gráfico saldo acumulado */}
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
+          <div className="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-800 mb-5">
             <h3 className="text-sm font-semibold text-gray-300 mb-4">Evolução do Saldo — {year}</h3>
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={fluxo}>

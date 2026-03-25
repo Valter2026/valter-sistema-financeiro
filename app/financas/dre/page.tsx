@@ -27,7 +27,7 @@ export default function DrePage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">DRE Gerencial</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">DRE Gerencial</h2>
           <p className="text-gray-400 text-sm mt-1">Demonstrativo de Resultado do Exercício</p>
         </div>
         <div className="flex gap-2">
@@ -41,7 +41,7 @@ export default function DrePage() {
       </div>
 
       {/* DRE resumo */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
+      <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 md:p-6 mb-5">
         <h3 className="text-sm font-semibold text-gray-300 mb-5">Resultado {year}</h3>
         <div className="space-y-1">
           {[
@@ -66,7 +66,7 @@ export default function DrePage() {
       ) : (
         <>
           {/* Gráfico evolução */}
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
+          <div className="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-800 mb-5">
             <h3 className="text-sm font-semibold text-gray-300 mb-4">Evolução Mensal — {year}</h3>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={evolucao} barSize={18}>
@@ -85,7 +85,7 @@ export default function DrePage() {
           </div>
 
           {/* Resultado mensal linha */}
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
+          <div className="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-800 mb-5">
             <h3 className="text-sm font-semibold text-gray-300 mb-4">Resultado Líquido por Mês</h3>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={evolucao}>

@@ -231,7 +231,7 @@ export default function FinConsultorPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
               <Brain size={18} className="text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-white">Consultor IA</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-white">Consultor IA</h2>
           </div>
           <p className="text-gray-400 text-sm">Seu Consultor Financeiro Empresarial com IA</p>
           {genAt && <p className="text-[10px] text-gray-600 mt-0.5">Gerado em {new Date(genAt).toLocaleString('pt-BR')}</p>}

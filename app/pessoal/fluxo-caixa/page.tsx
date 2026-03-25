@@ -50,7 +50,7 @@ export default function FluxoCaixaPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Fluxo de Caixa</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Fluxo de Caixa</h2>
           <p className="text-gray-400 text-sm mt-1">Entradas e saídas dia a dia</p>
         </div>
         <div className="flex gap-2">
@@ -72,12 +72,12 @@ export default function FluxoCaixaPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div className="rounded-xl border-l-4 border-emerald-500 bg-emerald-950 p-5">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total Entradas</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(data?.totalReceitas ?? 0)}</p>
+          <p className="text-xl md:text-2xl font-bold text-white">{formatCurrency(data?.totalReceitas ?? 0)}</p>
           <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1"><TrendingUp size={11} /> {MONTHS[mes-1]}</p>
         </div>
         <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-5">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total Saídas</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(data?.totalDespesas ?? 0)}</p>
+          <p className="text-xl md:text-2xl font-bold text-white">{formatCurrency(data?.totalDespesas ?? 0)}</p>
           <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><TrendingDown size={11} /> {MONTHS[mes-1]}</p>
         </div>
         <div className={`rounded-xl border-l-4 p-5 ${(data?.resultado ?? 0) >= 0 ? 'border-blue-500 bg-blue-950' : 'border-red-500 bg-red-950'}`}>

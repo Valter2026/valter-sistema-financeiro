@@ -50,7 +50,7 @@ export default function MetasPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Metas</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Metas</h2>
           <p className="text-gray-400 text-sm mt-1">Seus objetivos financeiros</p>
         </div>
         <button onClick={() => setForm({ color: COLORS[0], icon: '🎯', current_amount: 0 })}

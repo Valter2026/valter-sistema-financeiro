@@ -50,7 +50,7 @@ export default function ContasPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Contas</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Contas</h2>
           <p className="text-gray-400 text-sm mt-1">Bancos, cartões, caixa e investimentos</p>
         </div>
         <button onClick={() => setForm({ color: COLORS[0], type: 'checking', opening_balance: 0 })}

@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import PfSidebar from '@/components/pf/PfSidebar'
 import PfBottomNav from '@/components/pf/PfBottomNav'
 import PfNotificationBell from '@/components/pf/PfNotificationBell'
+import Link from 'next/link'
+import { ChevronLeft } from 'lucide-react'
 
 export default function PessoalLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -29,9 +31,16 @@ export default function PessoalLayout({ children }: { children: React.ReactNode 
 
       {/* Header mobile com sino */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-30 bg-gray-950 border-b border-gray-800 flex items-center justify-between px-4 py-3">
-        <div>
-          <p className="text-[10px] text-emerald-400 font-semibold uppercase tracking-widest">Módulo</p>
-          <h1 className="text-sm font-bold text-white leading-none">Finanças Pessoais</h1>
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard" className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+            <ChevronLeft size={13} />
+            <span>CRM</span>
+          </Link>
+          <div className="w-px h-4 bg-gray-700" />
+          <div>
+            <p className="text-[10px] text-emerald-400 font-semibold uppercase tracking-widest">Módulo</p>
+            <h1 className="text-sm font-bold text-white leading-none">Finanças Pessoais</h1>
+          </div>
         </div>
         <PfNotificationBell />
       </header>

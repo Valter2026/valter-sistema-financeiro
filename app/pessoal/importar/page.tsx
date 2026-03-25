@@ -151,7 +151,7 @@ export default function ImportarPage() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white">Importar Extrato</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-white">Importar Extrato</h2>
         <p className="text-gray-400 text-sm mt-1">Suporte a OFX (extrato bancário) e CSV</p>
       </div>
 

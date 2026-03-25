@@ -59,7 +59,7 @@ export default function ProjetosPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Projetos</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Projetos</h2>
           <p className="text-gray-400 text-sm mt-1">Orçamentos temporários — viagem, reforma, evento</p>
         </div>
         <button onClick={() => setForm({ name:'', budget:0, color:'#6b7280', icon:'📁', status:'active' })}

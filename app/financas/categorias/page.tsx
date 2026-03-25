@@ -44,7 +44,7 @@ export default function CategoriasPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Categorias</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Categorias</h2>
           <p className="text-gray-400 text-sm mt-1">Organize suas receitas e despesas</p>
         </div>
         <button onClick={() => setForm({ type: aba, color: COLORS[0] })}

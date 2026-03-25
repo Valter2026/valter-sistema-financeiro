@@ -54,7 +54,7 @@ export default function PfContasPagarPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Contas a Pagar</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Contas a Pagar</h2>
           <p className="text-gray-400 text-sm mt-1">{txs.length} conta(s) em aberto</p>
         </div>
         <button onClick={() => { setEditing({ type: 'expense', status: 'pending' }); setModal(true) }}
@@ -63,27 +63,27 @@ export default function PfContasPagarPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle size={14} className="text-red-400" />
-            <p className="text-xs text-gray-400 uppercase tracking-wide">Em atraso</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-3 md:p-5">
+          <div className="flex items-center gap-2 mb-1.5">
+            <AlertTriangle size={13} className="text-red-400" />
+            <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide">Em atraso</p>
           </div>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalAtrasado)}</p>
-          <p className="text-xs text-red-400 mt-1">{atrasadas.length} conta(s)</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalAtrasado)}</p>
+          <p className="text-[10px] text-red-400 mt-1">{atrasadas.length} conta(s)</p>
         </div>
-        <div className="rounded-xl border-l-4 border-yellow-500 bg-yellow-950 p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock size={14} className="text-yellow-400" />
-            <p className="text-xs text-gray-400 uppercase tracking-wide">A vencer</p>
+        <div className="rounded-xl border-l-4 border-yellow-500 bg-yellow-950 p-3 md:p-5">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Clock size={13} className="text-yellow-400" />
+            <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide">A vencer</p>
           </div>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalPendente)}</p>
-          <p className="text-xs text-yellow-400 mt-1">{pendentes.length} conta(s)</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalPendente)}</p>
+          <p className="text-[10px] text-yellow-400 mt-1">{pendentes.length} conta(s)</p>
         </div>
-        <div className="rounded-xl border-l-4 border-blue-500 bg-blue-950 p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Total em aberto</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalAtrasado + totalPendente)}</p>
-          <p className="text-xs text-blue-400 mt-1">{txs.length} conta(s)</p>
+        <div className="rounded-xl border-l-4 border-blue-500 bg-blue-950 p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide mb-1.5">Total em aberto</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalAtrasado + totalPendente)}</p>
+          <p className="text-[10px] text-blue-400 mt-1">{txs.length} conta(s)</p>
         </div>
       </div>
 

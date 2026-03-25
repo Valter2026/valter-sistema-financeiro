@@ -55,7 +55,7 @@ export default function ProdutosPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Produtos</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Produtos</h2>
           <p className="text-gray-400 text-sm mt-1">
             {vendas ? `${produtos.length} produtos com vendas · ${filterLabel(filter)}` : 'Carregando...'}
           </p>

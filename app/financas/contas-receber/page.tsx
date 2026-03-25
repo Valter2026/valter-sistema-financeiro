@@ -52,39 +52,39 @@ export default function ContasReceberPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-2xl font-bold text-white">Contas a Receber</h2>
-          <p className="text-gray-400 text-sm mt-1">{txs.length} recebimento(s) em aberto</p>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Contas a Receber</h2>
+          <p className="text-gray-400 text-xs md:text-sm mt-0.5">{txs.length} recebimento(s) em aberto</p>
         </div>
         <button onClick={() => { setEditing({ type: 'income', status: 'pending' }); setModal(true) }}
-          className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">
-          <Plus size={16} /> Novo a Receber
+          className="flex items-center gap-2 bg-blue-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-semibold hover:bg-blue-700 transition-colors">
+          <Plus size={15} /> <span className="hidden sm:inline">Novo a Receber</span><span className="sm:hidden">Novo</span>
         </button>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="rounded-xl border-l-4 border-yellow-500 bg-yellow-950 p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock size={14} className="text-yellow-400" />
-            <p className="text-xs text-gray-400 uppercase tracking-wide">Em atraso</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+        <div className="rounded-xl border-l-4 border-yellow-500 bg-yellow-950 p-3 md:p-5">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Clock size={13} className="text-yellow-400" />
+            <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide">Em atraso</p>
           </div>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalAtrasado)}</p>
-          <p className="text-xs text-yellow-400 mt-1">{atrasadas.length} recebimento(s)</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalAtrasado)}</p>
+          <p className="text-[10px] text-yellow-400 mt-1">{atrasadas.length} recebimento(s)</p>
         </div>
-        <div className="rounded-xl border-l-4 border-blue-500 bg-blue-950 p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <ArrowUpCircle size={14} className="text-blue-400" />
-            <p className="text-xs text-gray-400 uppercase tracking-wide">A receber</p>
+        <div className="rounded-xl border-l-4 border-blue-500 bg-blue-950 p-3 md:p-5">
+          <div className="flex items-center gap-2 mb-1.5">
+            <ArrowUpCircle size={13} className="text-blue-400" />
+            <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide">A receber</p>
           </div>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalPendente)}</p>
-          <p className="text-xs text-blue-400 mt-1">{pendentes.length} recebimento(s)</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalPendente)}</p>
+          <p className="text-[10px] text-blue-400 mt-1">{pendentes.length} recebimento(s)</p>
         </div>
-        <div className="rounded-xl border-l-4 border-green-500 bg-green-950 p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Total esperado</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalAtrasado + totalPendente)}</p>
-          <p className="text-xs text-green-400 mt-1">{txs.length} recebimento(s)</p>
+        <div className="rounded-xl border-l-4 border-green-500 bg-green-950 p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide mb-1.5">Total esperado</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalAtrasado + totalPendente)}</p>
+          <p className="text-[10px] text-green-400 mt-1">{txs.length} recebimento(s)</p>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ export default function ContasReceberPage() {
       </div>
 
       {/* Tabela */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden overflow-x-auto">
         {loading ? (
           <div>{[...Array(5)].map((_,i) => <div key={i} className="h-14 bg-gray-800 animate-pulse border-b border-gray-700" />)}</div>
         ) : lista.length === 0 ? (

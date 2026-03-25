@@ -52,39 +52,39 @@ export default function ContasPagarPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-2xl font-bold text-white">Contas a Pagar</h2>
-          <p className="text-gray-400 text-sm mt-1">{txs.length} conta(s) em aberto</p>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Contas a Pagar</h2>
+          <p className="text-gray-400 text-xs md:text-sm mt-0.5">{txs.length} conta(s) em aberto</p>
         </div>
         <button onClick={() => { setEditing({ type: 'expense', status: 'pending' }); setModal(true) }}
-          className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">
-          <Plus size={16} /> Nova Conta a Pagar
+          className="flex items-center gap-2 bg-blue-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-semibold hover:bg-blue-700 transition-colors">
+          <Plus size={15} /> <span className="hidden sm:inline">Nova Conta a Pagar</span><span className="sm:hidden">Nova</span>
         </button>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle size={14} className="text-red-400" />
-            <p className="text-xs text-gray-400 uppercase tracking-wide">Vencidas</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+        <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-3 md:p-5">
+          <div className="flex items-center gap-2 mb-1.5">
+            <AlertTriangle size={13} className="text-red-400" />
+            <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide">Vencidas</p>
           </div>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalVencido)}</p>
-          <p className="text-xs text-red-400 mt-1">{vencidas.length} conta(s)</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalVencido)}</p>
+          <p className="text-[10px] text-red-400 mt-1">{vencidas.length} conta(s)</p>
         </div>
-        <div className="rounded-xl border-l-4 border-yellow-500 bg-yellow-950 p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock size={14} className="text-yellow-400" />
-            <p className="text-xs text-gray-400 uppercase tracking-wide">A vencer</p>
+        <div className="rounded-xl border-l-4 border-yellow-500 bg-yellow-950 p-3 md:p-5">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Clock size={13} className="text-yellow-400" />
+            <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide">A vencer</p>
           </div>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalPendente)}</p>
-          <p className="text-xs text-yellow-400 mt-1">{pendentes.length} conta(s)</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalPendente)}</p>
+          <p className="text-[10px] text-yellow-400 mt-1">{pendentes.length} conta(s)</p>
         </div>
-        <div className="rounded-xl border-l-4 border-gray-600 bg-gray-900 p-5 border border-gray-800">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Total em aberto</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(totalVencido + totalPendente)}</p>
-          <p className="text-xs text-gray-500 mt-1">{txs.length} conta(s)</p>
+        <div className="rounded-xl border-l-4 border-gray-600 bg-gray-900 p-3 md:p-5 border border-gray-800">
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wide mb-1.5">Total em aberto</p>
+          <p className="text-sm md:text-xl font-bold text-white tabular-nums truncate">{formatCurrency(totalVencido + totalPendente)}</p>
+          <p className="text-[10px] text-gray-500 mt-1">{txs.length} conta(s)</p>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ export default function ContasPagarPage() {
       </div>
 
       {/* Tabela */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden overflow-x-auto">
         {loading ? (
           <div>{[...Array(5)].map((_,i) => <div key={i} className="h-14 bg-gray-800 animate-pulse border-b border-gray-700" />)}</div>
         ) : lista.length === 0 ? (

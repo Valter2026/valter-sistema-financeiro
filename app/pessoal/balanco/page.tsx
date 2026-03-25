@@ -27,7 +27,7 @@ export default function BalancoPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Balanço Patrimonial</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Balanço Patrimonial</h2>
           <p className="text-gray-400 text-sm mt-1">Ativos, passivos e patrimônio líquido</p>
         </div>
         <button onClick={load} className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 transition-colors">
@@ -43,12 +43,12 @@ export default function BalancoPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             <div className="rounded-xl border-l-4 border-emerald-500 bg-emerald-950 p-5">
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total Ativos</p>
-              <p className="text-2xl font-bold text-white">{formatCurrency(data?.totalAtivos ?? 0)}</p>
+              <p className="text-xl md:text-2xl font-bold text-white">{formatCurrency(data?.totalAtivos ?? 0)}</p>
               <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1"><TrendingUp size={11} /> Recursos disponíveis</p>
             </div>
             <div className="rounded-xl border-l-4 border-red-500 bg-red-950 p-5">
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total Passivos</p>
-              <p className="text-2xl font-bold text-white">{formatCurrency(data?.totalPassivos ?? 0)}</p>
+              <p className="text-xl md:text-2xl font-bold text-white">{formatCurrency(data?.totalPassivos ?? 0)}</p>
               <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><TrendingDown size={11} /> Dívidas e obrigações</p>
             </div>
             <div className={`rounded-xl border-l-4 p-5 ${positivo ? 'border-blue-500 bg-blue-950' : 'border-red-500 bg-red-950'}`}>

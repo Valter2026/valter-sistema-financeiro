@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ArrowLeftRight, Target, PieChart, MoreHorizontal } from 'lucide-react'
+import { LayoutDashboard, ArrowLeftRight, Target, PieChart, MoreHorizontal, ChevronLeft } from 'lucide-react'
 import { useState } from 'react'
 
 const main = [
@@ -23,6 +23,7 @@ const more = [
   { href: '/pessoal/contas',         label: 'Contas'              },
   { href: '/pessoal/categorias',     label: 'Categorias'          },
   { href: '/pessoal/configuracoes',  label: 'Configurações'       },
+  { href: '/dashboard',              label: '← Voltar ao CRM'     },
 ]
 
 export default function PfBottomNav() {
@@ -39,7 +40,9 @@ export default function PfBottomNav() {
             {more.map(item => (
               <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
                 className={`flex items-center px-5 py-4 border-b border-gray-800 last:border-0 text-sm font-medium transition-colors ${
-                  path.startsWith(item.href) ? 'text-emerald-400 bg-emerald-950/50' : 'text-gray-300 hover:bg-gray-800'
+                  item.href === '/dashboard'
+                    ? 'text-blue-400 hover:bg-gray-800'
+                    : path.startsWith(item.href) ? 'text-emerald-400 bg-emerald-950/50' : 'text-gray-300 hover:bg-gray-800'
                 }`}>
                 {item.label}
               </Link>

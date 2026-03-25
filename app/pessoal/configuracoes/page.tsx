@@ -63,7 +63,7 @@ export default function ConfiguracoesPage() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white">Configurações</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-white">Configurações</h2>
         <p className="text-gray-400 text-sm mt-1">Notificações e preferências</p>
       </div>
 

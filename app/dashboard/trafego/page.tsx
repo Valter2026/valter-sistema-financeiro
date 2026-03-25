@@ -4,7 +4,7 @@ export default function TrafegoPage() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white">Tráfego Pago</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-white">Tráfego Pago</h2>
         <p className="text-gray-400 text-sm mt-1">Meta Ads — Facebook & Instagram</p>
       </div>
 

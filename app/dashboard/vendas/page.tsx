@@ -56,7 +56,7 @@ export default function VendasPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Vendas</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Vendas</h2>
           <p className="text-gray-400 text-sm mt-1">
             {data ? `${data.totalRegistros} registros · ${data.quantidade} pagas · ${filterLabel(filter)}` : 'Carregando...'}
           </p>

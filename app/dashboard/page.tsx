@@ -58,7 +58,7 @@ export default function DashboardPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">Visão Geral</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Visão Geral</h2>
           <p className="text-gray-400 text-sm mt-1">
             {data ? `${data.totalRegistros} registros · ${data.quantidade} vendas pagas · ${filterLabel(filter)}` : 'Carregando...'}
           </p>
@@ -72,7 +72,7 @@ export default function DashboardPage() {
       {error && <div className="bg-red-950 border border-red-700 rounded-xl p-4 mb-6 text-red-300 text-sm">Erro: {error}</div>}
 
       {loading ? (
-        <div className="grid grid-cols-4 gap-4 mb-8">{[...Array(8)].map((_,i) => <div key={i} className="h-28 bg-gray-800 rounded-xl animate-pulse"/>)}</div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">{[...Array(8)].map((_,i) => <div key={i} className="h-20 md:h-28 bg-gray-800 rounded-xl animate-pulse"/>)}</div>
       ) : (
         <>
           {/* KPIs financeiros */}
