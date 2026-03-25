@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-book DRE — Guia Completo Para Aumentar o Lucro do Seu Negócio | Valter Leite</title>
+  <meta name="description" content="Você sabe se seu negócio dá lucro ou prejuízo — de verdade? O DRE simplificado que todo pequeno empresário precisava entender. Sem contador, sem complicação." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '[META_PIXEL_ID]');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=[META_PIXEL_ID]&ev=PageView&noscript=1" /></noscript>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Identidade DRE: Roxo/Azul Escuro — diferencia do Laranja (Precificação) e Verde (Fluxo de Caixa) */
+      --roxo:          #7C3AED;
+      --roxo-hover:    #6D28D9;
+      --roxo-claro:    rgba(124,58,237,0.15);
+      --roxo-borda:    rgba(124,58,237,0.35);
+      --roxo-glow:     rgba(124,58,237,0.12);
+      --azul-escuro:   #1E1B4B;
+      --indigo:        #4F46E5;
+      --indigo-claro:  rgba(79,70,229,0.12);
+      /* Marca (constantes em todas as páginas) */
+      --laranja:       #FF6B00;
+      --laranja-hover: #E05E00;
+      --amarelo:       #FFD600;
+      --verde:         #22C55E;
+      --vermelho:      #EF4444;
+      /* Fundo e neutros */
+      --preto:         #0A0A0A;
+      --cinza-escuro:  #111111;
+      --cinza-card:    #1A1A1A;
+      --cinza-borda:   #2A2A2A;
+      --cinza-texto:   #A0A0A0;
+      --branco:        #FFFFFF;
+      --radius:        12px;
+      --sombra:        0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--preto);
+      color: var(--branco);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── UTILITÁRIOS ── */
+    .container { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+
+    .tag {
+      display: inline-block;
+      background: var(--roxo-claro);
+      color: var(--roxo);
+      border: 1px solid var(--roxo-borda);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .tag-laranja {
+      background: rgba(255,107,0,0.12);
+      color: var(--laranja);
+      border-color: rgba(255,107,0,0.3);
+    }
+    .tag-verde {
+      background: rgba(34,197,94,0.12);
+      color: var(--verde);
+      border-color: rgba(34,197,94,0.3);
+    }
+    .divisor {
+      width: 100%;
+      height: 1px;
+      background: var(--cinza-borda);
+      margin: 0;
+    }
+    .destaque-roxo  { color: var(--roxo); }
+    .destaque-laranja { color: var(--laranja); }
+    .destaque-verde { color: var(--verde); }
+    .destaque-vermelho { color: var(--vermelho); }
+
+    /* ── BARRA URGÊNCIA TOPO ── */
+    .barra-urgencia {
+      background: linear-gradient(90deg, var(--roxo) 0%, var(--indigo) 100%);
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .barra-urgencia span { color: var(--amarelo); }
+
+    /* ── COUNTDOWN ── */
+    .countdown-wrapper {
+      background: var(--roxo-glow);
+      border: 1px solid var(--roxo-borda);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0 auto 32px;
+      max-width: 440px;
+      flex-wrap: wrap;
+    }
+    .countdown-label {
+      font-size: 13px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .countdown-timer {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .countdown-bloco {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      min-width: 52px;
+    }
+    .countdown-num {
+      display: block;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--roxo);
+      line-height: 1;
+    }
+    .countdown-unit {
+      display: block;
+      font-size: 10px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .countdown-sep { font-size: 20px; font-weight: 900; color: var(--roxo); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 48px 0 40px;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.09) 0%, transparent 68%);
+    }
+    .hero .tag { margin-bottom: 20px; }
+    .hero h1 {
+      font-size: clamp(26px, 5vw, 48px);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--roxo);
+    }
+    .hero .sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: #CCCCCC;
+      max-width: 620px;
+      margin: 0 auto 32px;
+      font-weight: 400;
+    }
+    .hero .sub strong { color: var(--branco); font-weight: 700; }
+
+    /* ── BOTÃO CTA ── */
+    .btn-cta {
+      display: inline-block;
+      background: var(--laranja);
+      color: var(--branco);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: clamp(15px, 2.5vw, 18px);
+      padding: 18px 36px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 rgba(255,107,0,0.4);
+      text-align: center;
+      width: 100%;
+      max-width: 480px;
+      letter-spacing: 0.2px;
+    }
+    .btn-cta:hover {
+      background: var(--laranja-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,107,0,0.35);
+    }
+    .btn-cta:active { transform: translateY(0); }
+    .btn-cta.pulse { animation: pulse 2.2s infinite; }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255,107,0,0.5); }
+      60%  { box-shadow: 0 0 0 14px rgba(255,107,0,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,107,0,0); }
+    }
+    .btn-garantia {
+      display: block;
+      font-size: 12px;
+      color: var(--cinza-texto);
+      margin-top: 10px;
+      text-align: center;
+    }
+    .btn-garantia span { color: var(--verde); font-weight: 700; }
+
+    /* ── PROVA RÁPIDA ── */
+    .prova-rapida {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 24px 0;
+      border-top: 1px solid var(--cinza-borda);
+      border-bottom: 1px solid var(--cinza-borda);
+      margin: 32px 0;
+    }
+    .prova-item { text-align: center; }
+    .prova-num {
+      display: block;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--roxo);
+      line-height: 1;
+    }
+    .prova-desc {
+      font-size: 12px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* ── HOOK / PERGUNTA LOOP ── */
+    .secao-hook {
+      padding: 48px 0;
+      text-align: center;
+    }
+    .caixa-pergunta {
+      background: linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(79,70,229,0.06) 100%);
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 16px;
+      padding: 36px 32px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .caixa-pergunta .icone-grande {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .caixa-pergunta h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .caixa-pergunta p {
+      font-size: 16px;
+      color: #BBBBBB;
+      line-height: 1.7;
+    }
+    .caixa-pergunta p strong { color: var(--branco); }
+
+    /* ── RECONHECIMENTO ── */
+    .secao-reconhece { padding: 48px 0; }
+    .secao-reconhece h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+    .lista-reconhece {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .lista-reconhece li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-left: 3px solid var(--vermelho);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-size: 15px;
+      color: #DDDDDD;
+    }
+    .lista-reconhece li .icone { font-size: 18px; flex-shrink: 0; line-height: 1.5; }
+    .lista-reconhece li strong { color: var(--branco); display: block; margin-bottom: 2px; }
+
+    /* ── DRE VISUAL (elemento exclusivo desta página) ── */
+    .secao-dre-visual { padding: 48px 0; }
+    .secao-dre-visual h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 10px;
+      line-height: 1.2;
+      text-align: center;
+    }
+    .secao-dre-visual .sub-dre {
+      text-align: center;
+      color: var(--cinza-texto);
+      font-size: 15px;
+      margin-bottom: 28px;
+    }
+    .dre-container {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 560px;
+      margin: 0 auto 20px;
+    }
+    .dre-header {
+      background: linear-gradient(135deg, var(--roxo) 0%, var(--indigo) 100%);
+      padding: 16px 24px;
+      text-align: center;
+    }
+    .dre-header span {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+    }
+    .dre-linha {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--cinza-borda);
+      font-size: 15px;
+    }
+    .dre-linha:last-child { border-bottom: none; }
+    .dre-linha .desc { color: #CCCCCC; font-weight: 500; }
+    .dre-linha .valor-pos { color: var(--verde); font-weight: 700; }
+    .dre-linha .valor-neg { color: #AAAAAA; font-weight: 600; }
+    .dre-separador {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cinza-borda), transparent);
+      margin: 0;
+    }
+    .dre-linha-lucro {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: rgba(239,68,68,0.08);
+      border-top: 2px solid rgba(239,68,68,0.4);
+    }
+    .dre-linha-lucro .desc {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--branco);
+    }
+    .dre-linha-lucro .valor-lucro {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 900;
+      color: var(--vermelho);
+    }
+    .dre-aviso {
+      text-align: center;
+      font-size: 14px;
+      color: var(--cinza-texto);
+      margin-top: 12px;
+      font-style: italic;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .dre-aviso strong { color: var(--branco); }
+    .dre-callout {
+      background: linear-gradient(135deg, rgba(239,68,68,0.07) 0%, rgba(124,58,237,0.07) 100%);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-top: 24px;
+      text-align: center;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .dre-callout p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #DDDDDD;
+    }
+    .dre-callout p strong { color: var(--branco); }
+
+    /* ── AGITAÇÃO ── */
+    .secao-agitacao { padding: 48px 0; }
+    .secao-agitacao h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+    .agitacao-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .agitacao-card {
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .agitacao-card .num {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--vermelho);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .agitacao-card h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--branco);
+      margin-bottom: 6px;
+    }
+    .agitacao-card p {
+      font-size: 14px;
+      color: #BBBBBB;
+      line-height: 1.6;
+    }
+
+    /* ── DESMISTIFICAÇÃO DO DRE ── */
+    .secao-desmistifica { padding: 48px 0; }
+    .desmistifica-card {
+      background: linear-gradient(135deg, rgba(124,58,237,0.07) 0%, rgba(79,70,229,0.05) 100%);
+      border: 1px solid var(--roxo-borda);
+      border-radius: 16px;
+      padding: 36px 32px;
+      text-align: center;
+    }
+    .desmistifica-card .icone-dre {
+      width: 64px;
+      height: 64px;
+      background: var(--roxo-claro);
+      border: 1px solid var(--roxo-borda);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 20px;
+    }
+    .desmistifica-card h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 16px;
+      color: var(--branco);
+    }
+    .desmistifica-card h2 em {
+      font-style: normal;
+      color: var(--roxo);
+    }
+    .desmistifica-card p {
+      font-size: 16px;
+      color: #BBBBBB;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .desmistifica-card p strong { color: var(--branco); }
+    .desmistifica-equacao {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      margin-top: 20px;
+      font-size: 15px;
+      color: #CCCCCC;
+      line-height: 2;
+      text-align: left;
+    }
+    .desmistifica-equacao .linha-eq {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+    }
+    .desmistifica-equacao .op { color: var(--cinza-texto); margin-right: 8px; }
+    .desmistifica-equacao .resultado-eq {
+      border-top: 1px solid var(--cinza-borda);
+      padding-top: 10px;
+      margin-top: 6px;
+      font-weight: 900;
+      color: var(--roxo);
+      font-size: 16px;
+    }
+
+    /* ── SOLUÇÃO / EBOOK ── */
+    .secao-solucao { padding: 48px 0; }
+    .ebook-card {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .ebook-topo {
+      background: linear-gradient(135deg, var(--azul-escuro) 0%, #2D1B69 50%, #1E1B4B 100%);
+      padding: 40px 32px;
+      text-align: center;
+      position: relative;
+      border-bottom: 2px solid var(--roxo-borda);
+    }
+    .ebook-topo .ebook-mockup {
+      width: 130px;
+      height: 170px;
+      background: linear-gradient(135deg, var(--roxo) 0%, var(--indigo) 100%);
+      border-radius: 8px 14px 14px 8px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      box-shadow: -5px 5px 20px rgba(0,0,0,0.5), 2px 2px 0 rgba(255,255,255,0.05) inset;
+      position: relative;
+    }
+    .ebook-topo .ebook-mockup::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px 0 0 8px;
+    }
+    .ebook-topo h3 {
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 900;
+      line-height: 1.3;
+      color: var(--branco);
+      margin-bottom: 8px;
+    }
+    .ebook-topo .subtitulo-ebook {
+      font-size: 14px;
+      color: rgba(255,255,255,0.65);
+    }
+    .ebook-corpo { padding: 32px; }
+    .ebook-corpo h3 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      color: var(--branco);
+    }
+
+    /* ── BENEFÍCIOS ── */
+    .lista-beneficios {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .lista-beneficios li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      color: #DDDDDD;
+      line-height: 1.5;
+    }
+    .lista-beneficios li .check-roxo {
+      color: var(--roxo);
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-weight: 900;
+    }
+    .lista-beneficios li strong { color: var(--branco); }
+
+    /* ── AUTORIDADE ── */
+    .secao-autor { padding: 48px 0; }
+    .autor-card {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    .autor-foto {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--roxo), var(--indigo));
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      border: 3px solid var(--roxo-borda);
+      overflow: hidden;
+    }
+    .autor-foto img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .autor-info h3 {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .autor-info .cargo {
+      font-size: 13px;
+      color: var(--roxo);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .autor-info p {
+      font-size: 14px;
+      color: #BBBBBB;
+      line-height: 1.7;
+    }
+    .autor-info p strong { color: var(--branco); }
+    @media (max-width: 520px) {
+      .autor-card { flex-direction: column; align-items: center; text-align: center; }
+    }
+
+    /* ── DEPOIMENTOS ── */
+    .secao-depoimentos { padding: 48px 0; }
+    .secao-depoimentos h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+    .depoimentos-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .depo-card {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .depo-stars { color: var(--amarelo); font-size: 16px; margin-bottom: 12px; }
+    .depo-texto {
+      font-size: 15px;
+      color: #DDDDDD;
+      line-height: 1.7;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+    .depo-resultado {
+      display: inline-block;
+      background: var(--roxo-claro);
+      color: var(--roxo);
+      border: 1px solid var(--roxo-borda);
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+    .depo-autor {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .depo-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--roxo), var(--indigo));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .depo-nome {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--branco);
+    }
+
+    /* ── OFERTA ── */
+    .secao-oferta { padding: 48px 0; }
+    .secao-oferta h2 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      margin-bottom: 8px;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .secao-oferta .sub-oferta {
+      text-align: center;
+      font-size: 15px;
+      color: var(--cinza-texto);
+      margin-bottom: 28px;
+    }
+    .oferta-card {
+      background: var(--cinza-card);
+      border: 2px solid var(--roxo-borda);
+      border-radius: 20px;
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow: 0 0 48px rgba(124,58,237,0.1);
+    }
+    .oferta-de {
+      font-size: 16px;
+      color: var(--cinza-texto);
+      text-decoration: line-through;
+      margin-bottom: 4px;
+    }
+    .oferta-por { font-size: 14px; color: var(--cinza-texto); margin-bottom: 8px; }
+    .oferta-preco {
+      font-size: clamp(44px, 8vw, 64px);
+      font-weight: 900;
+      color: var(--roxo);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .oferta-preco span {
+      font-size: clamp(20px, 4vw, 28px);
+      vertical-align: super;
+    }
+    .oferta-parcela {
+      font-size: 14px;
+      color: var(--cinza-texto);
+      margin-bottom: 28px;
+    }
+    .oferta-inclusao {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .oferta-inclusao li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #CCCCCC;
+    }
+    .oferta-inclusao li .check { color: var(--roxo); font-size: 16px; }
+
+    /* ── ORDER BUMP ── */
+    .order-bump {
+      background: linear-gradient(135deg, rgba(255,214,0,0.06) 0%, rgba(255,107,0,0.06) 100%);
+      border: 2px dashed rgba(255,214,0,0.4);
+      border-radius: 16px;
+      padding: 28px 24px;
+      margin-top: 24px;
+    }
+    .order-bump .ob-badge {
+      display: inline-block;
+      background: var(--amarelo);
+      color: #1A0A00;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 14px;
+    }
+    .order-bump h3 {
+      font-size: clamp(17px, 3vw, 22px);
+      font-weight: 900;
+      color: var(--amarelo);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .order-bump p {
+      font-size: 14px;
+      color: #CCCCCC;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .order-bump p strong { color: var(--branco); }
+    .ob-itens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .ob-item {
+      background: rgba(255,214,0,0.08);
+      border: 1px solid rgba(255,214,0,0.2);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--amarelo);
+    }
+    .ob-preco-linha {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .ob-de {
+      font-size: 15px;
+      color: var(--cinza-texto);
+      text-decoration: line-through;
+    }
+    .ob-por {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 900;
+      color: var(--amarelo);
+    }
+    .ob-economia {
+      background: rgba(34,197,94,0.15);
+      color: var(--verde);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .btn-bump {
+      display: inline-block;
+      background: var(--amarelo);
+      color: #1A0A00;
+      text-decoration: none;
+      font-weight: 900;
+      font-size: clamp(14px, 2.5vw, 16px);
+      padding: 16px 28px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      text-align: center;
+      width: 100%;
+      letter-spacing: 0.2px;
+    }
+    .btn-bump:hover { opacity: 0.92; transform: translateY(-1px); }
+
+    /* ── GARANTIA ── */
+    .secao-garantia { padding: 48px 0; }
+    .garantia-card {
+      background: rgba(34,197,94,0.05);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 20px;
+      padding: 36px 32px;
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .garantia-icone {
+      width: 72px;
+      height: 72px;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+    .garantia-texto h3 {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--verde);
+    }
+    .garantia-texto p {
+      font-size: 15px;
+      color: #BBBBBB;
+      line-height: 1.7;
+    }
+    .garantia-texto p strong { color: var(--branco); }
+    @media (max-width: 520px) {
+      .garantia-card { flex-direction: column; align-items: center; text-align: center; }
+    }
+
+    /* ── FAQ ── */
+    .secao-faq { padding: 48px 0; }
+    .secao-faq h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+    .faq-lista { display: flex; flex-direction: column; gap: 8px; }
+    .faq-item {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .faq-pergunta {
+      width: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      color: var(--branco);
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.2s;
+    }
+    .faq-pergunta:hover { background: rgba(255,255,255,0.03); }
+    .faq-seta {
+      flex-shrink: 0;
+      font-size: 18px;
+      transition: transform 0.25s;
+      color: var(--roxo);
+    }
+    .faq-item.aberto .faq-seta { transform: rotate(45deg); }
+    .faq-resposta {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s ease;
+    }
+    .faq-item.aberto .faq-resposta { max-height: 300px; }
+    .faq-resposta-inner {
+      padding: 0 20px 18px;
+      font-size: 14px;
+      color: #BBBBBB;
+      line-height: 1.7;
+      border-top: 1px solid var(--cinza-borda);
+      padding-top: 16px;
+    }
+    .faq-resposta-inner strong { color: var(--branco); }
+
+    /* ── CTA FINAL ── */
+    .secao-cta-final {
+      padding: 56px 0;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.08) 0%, transparent 70%);
+      border-top: 1px solid var(--cinza-borda);
+    }
+    .secao-cta-final h2 {
+      font-size: clamp(22px, 4vw, 36px);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .secao-cta-final p {
+      font-size: 16px;
+      color: #CCCCCC;
+      max-width: 540px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+    .secao-cta-final p strong { color: var(--branco); }
+
+    /* ── RODAPÉ ── */
+    .rodape {
+      background: var(--cinza-escuro);
+      border-top: 1px solid var(--cinza-borda);
+      padding: 28px 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--cinza-texto);
+      line-height: 1.8;
+    }
+    .rodape a { color: var(--cinza-texto); text-decoration: underline; }
+
+    /* ── SEÇÃO PADRÃO ── */
+    .secao-titulo {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+
+    /* ── RESPONSIVO ── */
+    @media (min-width: 640px) {
+      .agitacao-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE URGÊNCIA -->
+  <div class="barra-urgencia">
+    Oferta especial por tempo limitado — <span>R$27,90</span> enquanto durar
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <span class="tag">Controle financeiro real</span>
+      <h1>
+        Você Sabe Se Seu Negócio<br />
+        Dá <em>Lucro ou Prejuízo</em>?<br />
+        <span style="font-size: 0.75em; color: #AAAAAA; font-weight: 700;">(De verdade?)</span>
+      </h1>
+      <p class="sub">
+        Porque <strong>ter dinheiro no bolso não é lucro.</strong> É faturamento. E a diferença entre os dois pode estar quebrando o seu negócio — sem você perceber.
+      </p>
+
+      <!-- COUNTDOWN -->
+      <div class="countdown-wrapper">
+        <span class="countdown-label">Oferta expira em</span>
+        <div class="countdown-timer">
+          <div class="countdown-bloco">
+            <span class="countdown-num" id="cd-min">14</span>
+            <span class="countdown-unit">min</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-bloco">
+            <span class="countdown-num" id="cd-seg">59</span>
+            <span class="countdown-unit">seg</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="[LINK_CHECKOUT_DRE]" class="btn-cta pulse" onclick="fbq('track','InitiateCheckout',{content_name:'Ebook DRE',value:27.90,currency:'BRL'})">
+        Quero Entender Meu Lucro de Verdade — R$27,90
+      </a>
+      <span class="btn-garantia">Acesso imediato &nbsp;|&nbsp; <span>7 dias de garantia</span> &nbsp;|&nbsp; Pagamento 100% seguro</span>
+
+      <!-- PROVA RÁPIDA -->
+      <div class="prova-rapida">
+        <div class="prova-item">
+          <span class="prova-num">[NUMERO_CLIENTES]+</span>
+          <span class="prova-desc">Empresários transformados</span>
+        </div>
+        <div class="prova-item">
+          <span class="prova-num">7 dias</span>
+          <span class="prova-desc">Garantia total</span>
+        </div>
+        <div class="prova-item">
+          <span class="prova-num">R$27,90</span>
+          <span class="prova-desc">Acesso vitalício</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- HOOK: PERGUNTA QUE O PÚBLICO NÃO CONSEGUE RESPONDER COM CERTEZA -->
+  <section class="secao-hook">
+    <div class="container">
+      <div class="caixa-pergunta">
+        <span class="icone-grande">🤔</span>
+        <h2>No final do mês, você consegue responder com certeza: o meu negócio lucrou quanto?</h2>
+        <p>
+          Se a resposta foi <strong>"mais ou menos", "acho que sim"</strong> ou <strong>"não sei exatamente"</strong> — você está tomando decisões com os olhos fechados.<br /><br />
+          E não é culpa sua. <strong>Ninguém te ensinou a medir o lucro de verdade.</strong> O contador faz o balanço anual, mas não te ajuda a decidir no dia a dia. O resultado? Você descobre que quebrou só quando já é tarde.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- IDENTIFICAÇÃO: "VOCÊ FAZ ISSO?" -->
+  <section class="secao-reconhece">
+    <div class="container">
+      <h2 class="secao-titulo">Você se reconhece em alguma dessas situações?</h2>
+      <ul class="lista-reconhece">
+        <li>
+          <span class="icone">💸</span>
+          <div>
+            <strong>Pix pessoal misturado com o da empresa</strong>
+            Você paga fornecedor do celular pessoal. Vai ao mercado e usa o caixa do negócio. No fim, não sabe o que é despesa da empresa e o que é seu.
+          </div>
+        </li>
+        <li>
+          <span class="icone">📊</span>
+          <div>
+            <strong>Faturou bem — mas no fim do mês sumiu tudo</strong>
+            Entrou dinheiro, pagou as contas, e o saldo final não bateu com o que você esperava. Onde foi parar o resto?
+          </div>
+        </li>
+        <li>
+          <span class="icone">🤷</span>
+          <div>
+            <strong>Acha que lucra porque tem dinheiro no bolso</strong>
+            Tem R$5.000 na conta hoje — isso é lucro? Ou é dinheiro de cliente que ainda vai virar despesa amanhã? Você não sabe distinguir.
+          </div>
+        </li>
+        <li>
+          <span class="icone">📋</span>
+          <div>
+            <strong>Contador faz o balanço anual mas não ajuda a decidir</strong>
+            Você liga para saber se pode contratar funcionário ou comprar equipamento. E ouve: "Aguarda o fechamento do mês." Enquanto isso, a decisão precisa ser tomada agora.
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- DRE VISUAL: REVELAÇÃO CHOCANTE -->
+  <section class="secao-dre-visual">
+    <div class="container">
+      <h2 class="secao-titulo">A revelação que ninguém quer ver — mas todo empresário precisa</h2>
+      <p class="sub-dre">Olha o que acontece quando um negócio que fatura R$15.000 por mês passa pelo DRE:</p>
+
+      <div class="dre-container">
+        <div class="dre-header">
+          <span>DRE — Demonstrativo do Resultado do Exercício</span>
+        </div>
+        <div class="dre-linha">
+          <span class="desc">Faturamento bruto</span>
+          <span class="valor-pos">R$15.000,00 ✓</span>
+        </div>
+        <div class="dre-separador"></div>
+        <div class="dre-linha">
+          <span class="desc">(-) Custo dos produtos / serviços</span>
+          <span class="valor-neg">- R$6.000,00</span>
+        </div>
+        <div class="dre-linha">
+          <span class="desc">(-) Custos fixos (aluguel, energia, etc.)</span>
+          <span class="valor-neg">- R$4.500,00</span>
+        </div>
+        <div class="dre-linha">
+          <span class="desc">(-) Impostos e taxas</span>
+          <span class="valor-neg">- R$1.800,00</span>
+        </div>
+        <div class="dre-linha">
+          <span class="desc">(-) Pró-labore (seu salário)</span>
+          <span class="valor-neg">- R$2.500,00</span>
+        </div>
+        <div class="dre-linha-lucro">
+          <span class="desc">= LUCRO REAL DO MÊS</span>
+          <span class="valor-lucro">R$200,00</span>
+        </div>
+      </div>
+
+      <p class="dre-aviso">
+        Faturou R$15.000. Lucrou <strong>R$200,00</strong>. Isso equivale a 1,3% de margem.<br />
+        Um trabalho de 30 dias — e a empresa ficou com menos que um dia de trabalho como empregado CLT.
+      </p>
+
+      <div class="dre-callout">
+        <p>
+          <strong>Esse cenário é mais comum do que você imagina.</strong> Muitos negócios que faturam R$10k, R$20k ou R$30k por mês operam no prejuízo — e o dono só descobre quando a conta bancária zera. O DRE é o único instrumento que prova a verdade antes que seja tarde.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- AGITAÇÃO: CONSEQUÊNCIAS DE CONTINUAR NO ESCURO -->
+  <section class="secao-agitacao">
+    <div class="container">
+      <h2 class="secao-titulo">O que acontece quando você não sabe seu lucro real</h2>
+      <div class="agitacao-grid">
+        <div class="agitacao-card">
+          <div class="num">01</div>
+          <h3>Você paga imposto sobre dinheiro que não tem</h3>
+          <p>Sem separar as contas, o Fisco vê tudo como renda. Você paga imposto sobre faturamento — não sobre lucro. E aí? Sobra menos ainda.</p>
+        </div>
+        <div class="agitacao-card">
+          <div class="num">02</div>
+          <h3>Decisões erradas na hora certa</h3>
+          <p>Contratar um funcionário. Abrir uma segunda unidade. Comprar equipamento. Sem saber o lucro real, toda decisão é uma aposta no escuro.</p>
+        </div>
+        <div class="agitacao-card">
+          <div class="num">03</div>
+          <h3>Trabalha muito, ganha pouco — sem entender por quê</h3>
+          <p>Você se desdobra, atende mais clientes, aumenta o faturamento. Mas o cansaço cresce e o saldo da conta não reflete o esforço. A resposta está no DRE.</p>
+        </div>
+        <div class="agitacao-card">
+          <div class="num">04</div>
+          <h3>Crescimento que quebra o negócio</h3>
+          <p>Crescer sem saber a margem real é receita para a falência. Quem mais vende — sem controle — mais deve. E o negócio implode no auge do crescimento.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- DESMISTIFICAÇÃO DO DRE -->
+  <section class="secao-desmistifica">
+    <div class="container">
+      <div class="desmistifica-card">
+        <div class="icone-dre">📋</div>
+        <h2>DRE não é coisa de empresa grande.<br /><em>É uma soma e uma subtração.</em></h2>
+        <p>
+          O nome assusta. "Demonstrativo do Resultado do Exercício" parece coisa de contador, de grande empresa, de quem tem CFO e departamento financeiro.
+        </p>
+        <p>
+          <strong>Não é.</strong> O DRE é, na essência, uma única pergunta respondida de forma organizada: <strong>depois de pagar tudo, quanto sobrou?</strong>
+        </p>
+        <p>
+          A lógica é simples:
+        </p>
+        <div class="desmistifica-equacao">
+          <div class="linha-eq"><span class="op">+</span> <span>Tudo que entrou (faturamento)</span></div>
+          <div class="linha-eq"><span class="op">-</span> <span>Tudo que saiu (custos, impostos, salários)</span></div>
+          <div class="linha-eq resultado-eq"><span class="op">=</span> <span>Lucro real — ou prejuízo real</span></div>
+        </div>
+        <p style="margin-top: 20px;">
+          O e-book transforma essa lógica em um método prático que você aplica no seu negócio hoje — <strong>mesmo sem saber nada de contabilidade, sem planilha complicada, sem contador ao lado.</strong>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- SOLUÇÃO: O E-BOOK + BENEFÍCIOS -->
+  <section class="secao-solucao">
+    <div class="container">
+      <h2 class="secao-titulo" style="text-align:center; margin-bottom: 28px;">O que você vai dominar com este e-book</h2>
+      <div class="ebook-card">
+        <div class="ebook-topo">
+          <div class="ebook-mockup">📋</div>
+          <h3>E-book DRE — Guia Completo Para Aumentar o Lucro do Seu Negócio</h3>
+          <p class="subtitulo-ebook">Por Valter Leite &nbsp;|&nbsp; Acesso imediato</p>
+        </div>
+        <div class="ebook-corpo">
+          <h3>7 transformações que este e-book entrega:</h3>
+          <ul class="lista-beneficios">
+            <li>
+              <span class="check-roxo">◆</span>
+              <div><strong>Descubra seu lucro real agora</strong> — aprenda a montar seu DRE do zero, com um modelo simples que cabe em uma folha e revela o resultado verdadeiro do seu negócio</div>
+            </li>
+            <li>
+              <span class="check-roxo">◆</span>
+              <div><strong>Separe de vez o dinheiro pessoal do empresarial</strong> — entenda por que essa mistura é a principal causa de quebra entre MEI e pequeno empresário, e como sair dela hoje</div>
+            </li>
+            <li>
+              <span class="check-roxo">◆</span>
+              <div><strong>Identifique onde seu lucro está vazando</strong> — o DRE mostra exatamente em quais linhas de custo o dinheiro some sem você perceber</div>
+            </li>
+            <li>
+              <span class="check-roxo">◆</span>
+              <div><strong>Tome decisões com segurança</strong> — contratar, expandir, investir ou cortar custos: saiba quando dizer sim e quando dizer não — com base em número, não em intuição</div>
+            </li>
+            <li>
+              <span class="check-roxo">◆</span>
+              <div><strong>Calcule sua margem de lucro real</strong> — descubra se você está trabalhando para pagar as contas ou para efetivamente construir patrimônio</div>
+            </li>
+            <li>
+              <span class="check-roxo">◆</span>
+              <div><strong>Professionalize seu negócio sem precisar de contador no dia a dia</strong> — toda empresa séria tem DRE; agora o seu vai ter também, de forma simples e prática</div>
+            </li>
+            <li>
+              <span class="check-roxo">◆</span>
+              <div><strong>Use o DRE para crescer com segurança</strong> — entenda como os empresários que crescem de forma sustentável usam esse instrumento para planejar cada passo</div>
+            </li>
+          </ul>
+          <div style="text-align:center;">
+            <a href="[LINK_CHECKOUT_DRE]" class="btn-cta" onclick="fbq('track','InitiateCheckout',{content_name:'Ebook DRE',value:27.90,currency:'BRL'})">
+              Quero Meu E-book Agora — R$27,90
+            </a>
+            <span class="btn-garantia">Acesso imediato após pagamento &nbsp;|&nbsp; <span>Garantia de 7 dias</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- AUTORIDADE -->
+  <section class="secao-autor">
+    <div class="container">
+      <h2 class="secao-titulo">Quem criou este método</h2>
+      <div class="autor-card">
+        <div class="autor-foto">
+          <img src="[FOTO_VALTER]" alt="Valter Leite" onerror="this.style.display='none'; this.parentNode.textContent='VL'" />
+        </div>
+        <div class="autor-info">
+          <h3>Valter Leite</h3>
+          <p class="cargo">Especialista em Finanças Empresariais</p>
+          <p>
+            Valter Leite dedicou anos a transformar conceitos financeiros complexos em <strong>métodos práticos para MEIs e pequenos empresários</strong> que precisam de resultado — não de teoria acadêmica.<br /><br />
+            Já ajudou <strong>mais de [NUMERO_CLIENTES] empreendedores</strong> a entenderem suas finanças e tomarem decisões com base em números reais. Sua missão: fazer o pequeno empresário brasileiro lucrar de verdade — não só faturar.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- DEPOIMENTOS -->
+  <section class="secao-depoimentos">
+    <div class="container">
+      <h2 class="secao-titulo">O que dizem quem já aplicou</h2>
+      <div class="depoimentos-grid">
+
+        <div class="depo-card">
+          <div class="depo-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="depo-texto">"[DEPOIMENTO_1_TEXTO]"</p>
+          <span class="depo-resultado">[DEPOIMENTO_1_RESULTADO]</span>
+          <div class="depo-autor">
+            <div class="depo-avatar">👤</div>
+            <span class="depo-nome">[DEPOIMENTO_1_NOME]</span>
+          </div>
+        </div>
+
+        <div class="depo-card">
+          <div class="depo-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="depo-texto">"[DEPOIMENTO_2_TEXTO]"</p>
+          <span class="depo-resultado">[DEPOIMENTO_2_RESULTADO]</span>
+          <div class="depo-autor">
+            <div class="depo-avatar">👤</div>
+            <span class="depo-nome">[DEPOIMENTO_2_NOME]</span>
+          </div>
+        </div>
+
+        <div class="depo-card">
+          <div class="depo-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="depo-texto">"[DEPOIMENTO_3_TEXTO]"</p>
+          <span class="depo-resultado">[DEPOIMENTO_3_RESULTADO]</span>
+          <div class="depo-autor">
+            <div class="depo-avatar">👤</div>
+            <span class="depo-nome">[DEPOIMENTO_3_NOME]</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- OFERTA + ORDER BUMP -->
+  <section class="secao-oferta">
+    <div class="container">
+      <h2>Sua escolha agora</h2>
+      <p class="sub-oferta">Continuar no escuro — ou descobrir o lucro real do seu negócio por menos que um almoço</p>
+
+      <div class="oferta-card">
+        <span class="tag" style="margin-bottom: 16px;">Acesso imediato</span>
+        <h3 style="font-size: clamp(18px,3vw,22px); font-weight: 900; margin-bottom: 16px; line-height: 1.3;">
+          E-book DRE — Guia Completo Para Aumentar o Lucro do Seu Negócio
+        </h3>
+
+        <p class="oferta-de">De R$97,00</p>
+        <p class="oferta-por">Por apenas</p>
+        <div class="oferta-preco"><span>R$</span>27<span style="font-size: 0.6em; vertical-align: baseline;">,90</span></div>
+        <p class="oferta-parcela">Pagamento único — acesso vitalício</p>
+
+        <ul class="oferta-inclusao">
+          <li><span class="check">◆</span> E-book completo em PDF (acesso imediato)</li>
+          <li><span class="check">◆</span> Modelo de DRE simplificado para usar hoje</li>
+          <li><span class="check">◆</span> Método passo a passo sem precisar de contador</li>
+          <li><span class="check">◆</span> Exemplos reais para MEI e pequeno empresário</li>
+          <li><span class="check">◆</span> Linguagem simples — sem jargão contábil</li>
+        </ul>
+
+        <a href="[LINK_CHECKOUT_DRE]" class="btn-cta pulse" onclick="fbq('track','InitiateCheckout',{content_name:'Ebook DRE',value:27.90,currency:'BRL'})">
+          Quero Descobrir Meu Lucro Real — R$27,90
+        </a>
+        <span class="btn-garantia">Pix, cartão ou boleto &nbsp;|&nbsp; <span>7 dias de garantia incondicional</span></span>
+
+        <!-- ORDER BUMP -->
+        <div class="order-bump">
+          <span class="ob-badge">Oferta exclusiva — adicione antes de finalizar</span>
+          <h3>Leve o Pacote Completo: Empresário Master</h3>
+          <p>
+            Já que você vai dominar o DRE, por que não ter o controle financeiro completo do seu negócio? O <strong>Pacote Empresário Master</strong> reúne os 3 pilares que todo pequeno empresário precisa dominar:
+          </p>
+          <div class="ob-itens">
+            <span class="ob-item">E-book DRE</span>
+            <span class="ob-item">E-book Precificação Lucrativa</span>
+            <span class="ob-item">E-book Fluxo de Caixa</span>
+          </div>
+          <p>
+            <strong>DRE revela o lucro.</strong> Precificação garante margem em cada venda. Fluxo de Caixa mostra onde o dinheiro vai. Os três juntos formam o triângulo do controle financeiro real — e custam juntos menos que uma consultoria de 1 hora.
+          </p>
+          <div class="ob-preco-linha">
+            <span class="ob-de">R$164,70 separados</span>
+            <span class="ob-por">R$87,90</span>
+            <span class="ob-economia">Economia de R$76,80</span>
+          </div>
+          <a href="[LINK_CHECKOUT_MASTER]" class="btn-bump" onclick="fbq('track','InitiateCheckout',{content_name:'Pacote Empresario Master',value:87.90,currency:'BRL'})">
+            Sim, quero o Pacote Completo por R$87,90
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- GARANTIA -->
+  <section class="secao-garantia">
+    <div class="container">
+      <div class="garantia-card">
+        <div class="garantia-icone">🛡️</div>
+        <div class="garantia-texto">
+          <h3>Garantia de 7 dias — sem perguntas</h3>
+          <p>
+            Compre, acesse e aplique. Se por qualquer motivo você não ficar satisfeito nos <strong>primeiros 7 dias</strong>, devolvemos 100% do seu dinheiro — sem burocracia, sem questionamento, sem enrolação.<br /><br />
+            O risco é zero. O prejuízo de continuar sem saber seu lucro real é enorme.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- FAQ -->
+  <section class="secao-faq">
+    <div class="container">
+      <h2 class="secao-titulo">Perguntas frequentes</h2>
+      <div class="faq-lista">
+
+        <div class="faq-item">
+          <button class="faq-pergunta" onclick="toggleFaq(this)">
+            Eu não sei nada de contabilidade. Vou conseguir entender?
+            <span class="faq-seta">+</span>
+          </button>
+          <div class="faq-resposta">
+            <div class="faq-resposta-inner">
+              Sim — e este e-book foi criado exatamente para você. <strong>Nenhum jargão técnico, nenhuma fórmula complicada.</strong> A linguagem é simples, os exemplos são do cotidiano do pequeno empresário, e o método é passo a passo. Se você sabe somar e subtrair, você entende o DRE.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-pergunta" onclick="toggleFaq(this)">
+            O DRE não é só para empresa grande?
+            <span class="faq-seta">+</span>
+          </button>
+          <div class="faq-resposta">
+            <div class="faq-resposta-inner">
+              Esse é o maior mito. <strong>Todo negócio que tem entrada e saída de dinheiro precisa de DRE</strong> — do MEI ao grande empresário. Na verdade, para o pequeno empresário é ainda mais urgente: é ele quem mais perde dinheiro por não medir o lucro real. O DRE foi adaptado neste e-book para a realidade de quem fatura R$5k a R$50k por mês.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-pergunta" onclick="toggleFaq(this)">
+            Como vou receber o e-book após a compra?
+            <span class="faq-seta">+</span>
+          </button>
+          <div class="faq-resposta">
+            <div class="faq-resposta-inner">
+              Imediatamente após a confirmação do pagamento, você recebe o link de acesso no seu e-mail. <strong>O acesso é vitalício</strong> — você pode baixar e guardar no seu computador ou celular para sempre.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-pergunta" onclick="toggleFaq(this)">
+            Já tenho contador. Ainda preciso disso?
+            <span class="faq-seta">+</span>
+          </button>
+          <div class="faq-resposta">
+            <div class="faq-resposta-inner">
+              O contador cuida da parte fiscal e legal do seu negócio. <strong>O DRE é sobre gestão — é você tomando decisões no dia a dia com base em números.</strong> São papéis diferentes. Com este e-book, você vai saber exatamente quais perguntas fazer para o seu contador — e deixará de depender dele para saber se está lucrando.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-pergunta" onclick="toggleFaq(this)">
+            Qual a diferença entre DRE, Fluxo de Caixa e Precificação?
+            <span class="faq-seta">+</span>
+          </button>
+          <div class="faq-resposta">
+            <div class="faq-resposta-inner">
+              São três instrumentos complementares — cada um responde uma pergunta diferente. <strong>Precificação</strong> garante que você cobra o preço certo em cada venda. <strong>Fluxo de Caixa</strong> mostra onde o dinheiro entra e sai — para você nunca ficar no vermelho. <strong>DRE</strong> revela o lucro real do período — o resultado final depois de tudo. Os três juntos formam o controle financeiro completo do seu negócio.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-pergunta" onclick="toggleFaq(this)">
+            Quais formas de pagamento são aceitas?
+            <span class="faq-seta">+</span>
+          </button>
+          <div class="faq-resposta">
+            <div class="faq-resposta-inner">
+              Pix (aprovação imediata), cartão de crédito e boleto bancário. O ambiente de pagamento é <strong>100% seguro e criptografado.</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- CTA FINAL -->
+  <section class="secao-cta-final">
+    <div class="container">
+      <h2>
+        Seu negócio merece uma resposta<br />
+        <span class="destaque-roxo">concreta e honesta.</span>
+      </h2>
+      <p>
+        Todo mês que passa sem saber seu lucro real é um mês de decisões no escuro — contratos errados, custos ignorados, crescimento que pode quebrar o negócio.<br /><br />
+        <strong>Por R$27,90, você deixa de adivinhar. E começa a saber.</strong>
+      </p>
+      <a href="[LINK_CHECKOUT_DRE]" class="btn-cta pulse" style="max-width: 520px;" onclick="fbq('track','InitiateCheckout',{content_name:'Ebook DRE',value:27.90,currency:'BRL'})">
+        Quero Saber o Lucro Real do Meu Negócio
+      </a>
+      <span class="btn-garantia" style="margin-top: 12px;">R$27,90 &nbsp;|&nbsp; Acesso imediato &nbsp;|&nbsp; <span>7 dias de garantia</span></span>
+    </div>
+  </section>
+
+  <!-- RODAPÉ -->
+  <footer class="rodape">
+    <p>
+      &copy; 2026 Valter Leite &mdash; <a href="https://www.valterleite.com.br" target="_blank">valterleite.com.br</a><br />
+      Este produto é um e-book digital entregue por meio da plataforma Eduzz.<br />
+      Os resultados apresentados são individuais e não constituem garantia de desempenho.<br />
+      <a href="#">Política de Privacidade</a> &nbsp;|&nbsp; <a href="#">Termos de Uso</a>
+    </p>
+  </footer>
+
+  <!-- JAVASCRIPT: COUNTDOWN + FAQ -->
+  <script>
+    // ── COUNTDOWN (sessionStorage 15 min) ──────────────────────────────────
+    (function () {
+      var DURACAO = 15 * 60;
+      var chave = 'dre_countdown_expiry';
+      var agora = Math.floor(Date.now() / 1000);
+      var expiry = sessionStorage.getItem(chave);
+
+      if (!expiry || parseInt(expiry) <= agora) {
+        expiry = agora + DURACAO;
+        sessionStorage.setItem(chave, expiry);
+      }
+
+      function atualizar() {
+        var restante = parseInt(sessionStorage.getItem(chave)) - Math.floor(Date.now() / 1000);
+        if (restante <= 0) {
+          restante = 0;
+          document.getElementById('cd-min').textContent = '00';
+          document.getElementById('cd-seg').textContent = '00';
+          return;
+        }
+        var m = Math.floor(restante / 60);
+        var s = restante % 60;
+        document.getElementById('cd-min').textContent = m < 10 ? '0' + m : m;
+        document.getElementById('cd-seg').textContent = s < 10 ? '0' + s : s;
+        setTimeout(atualizar, 1000);
+      }
+      atualizar();
+    })();
+
+    // ── FAQ ACCORDION ──────────────────────────────────────────────────────
+    function toggleFaq(btn) {
+      var item = btn.closest('.faq-item');
+      var estaAberto = item.classList.contains('aberto');
+      // fecha todos
+      document.querySelectorAll('.faq-item.aberto').forEach(function (el) {
+        el.classList.remove('aberto');
+      });
+      // abre o clicado (se estava fechado)
+      if (!estaAberto) {
+        item.classList.add('aberto');
+      }
+    }
+  </script>
+
+</body>
+</html>

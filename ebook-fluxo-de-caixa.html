@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-book Fluxo de Caixa — Valter Leite</title>
+  <meta name="description" content="O dinheiro não some — você só não sabe onde ele vai. E vamos resolver isso hoje. Guia completo de Fluxo de Caixa para MEI e pequeno empresário." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '[META_PIXEL_ID]');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=[META_PIXEL_ID]&ev=PageView&noscript=1" /></noscript>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --laranja: #FF6B00;
+      --laranja-hover: #E05E00;
+      --amarelo: #FFD600;
+      --verde: #22C55E;
+      --verde-hover: #16A34A;
+      --verde-claro: rgba(34,197,94,0.15);
+      --verde-borda: rgba(34,197,94,0.3);
+      --preto: #0A0A0A;
+      --cinza-escuro: #111111;
+      --cinza-card: #1A1A1A;
+      --cinza-borda: #2A2A2A;
+      --cinza-texto: #A0A0A0;
+      --vermelho: #EF4444;
+      --branco: #FFFFFF;
+      --radius: 12px;
+      --sombra: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--preto);
+      color: var(--branco);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── UTILITÁRIOS ── */
+    .container { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+
+    .tag {
+      display: inline-block;
+      background: rgba(255,107,0,0.15);
+      color: var(--laranja);
+      border: 1px solid rgba(255,107,0,0.3);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .tag-verde {
+      background: var(--verde-claro);
+      color: var(--verde);
+      border-color: var(--verde-borda);
+    }
+    .divisor {
+      width: 100%;
+      height: 1px;
+      background: var(--cinza-borda);
+      margin: 0;
+    }
+    .destaque-laranja { color: var(--laranja); }
+    .destaque-verde { color: var(--verde); }
+
+    /* ── BARRA URGÊNCIA TOPO ── */
+    .barra-urgencia {
+      background: var(--laranja);
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .barra-urgencia span { color: var(--amarelo); }
+
+    /* ── COUNTDOWN ── */
+    .countdown-wrapper {
+      background: rgba(255,107,0,0.08);
+      border: 1px solid rgba(255,107,0,0.2);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0 auto 32px;
+      max-width: 440px;
+      flex-wrap: wrap;
+    }
+    .countdown-label {
+      font-size: 13px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .countdown-timer {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .countdown-bloco {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      min-width: 52px;
+    }
+    .countdown-num {
+      display: block;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--laranja);
+      line-height: 1;
+    }
+    .countdown-unit {
+      display: block;
+      font-size: 10px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .countdown-sep { font-size: 20px; font-weight: 900; color: var(--laranja); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 48px 0 40px;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.07) 0%, transparent 70%);
+    }
+    .hero .tag { margin-bottom: 20px; }
+    .hero h1 {
+      font-size: clamp(26px, 5vw, 46px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+    .hero .sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: #CCCCCC;
+      max-width: 600px;
+      margin: 0 auto 32px;
+      font-weight: 400;
+    }
+    .hero .sub strong { color: var(--branco); font-weight: 700; }
+
+    /* ── BOTÃO CTA ── */
+    .btn-cta {
+      display: inline-block;
+      background: var(--laranja);
+      color: var(--branco);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: clamp(15px, 2.5vw, 18px);
+      padding: 18px 36px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 rgba(255,107,0,0.4);
+      text-align: center;
+      width: 100%;
+      max-width: 480px;
+      letter-spacing: 0.2px;
+    }
+    .btn-cta:hover {
+      background: var(--laranja-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,107,0,0.35);
+    }
+    .btn-cta:active { transform: translateY(0); }
+    .btn-cta.pulse { animation: pulse 2.2s infinite; }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255,107,0,0.5); }
+      60%  { box-shadow: 0 0 0 14px rgba(255,107,0,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,107,0,0); }
+    }
+    .btn-garantia {
+      display: block;
+      font-size: 12px;
+      color: var(--cinza-texto);
+      margin-top: 10px;
+      text-align: center;
+    }
+    .btn-garantia span { color: var(--verde); font-weight: 700; }
+
+    /* ── PROVA RÁPIDA ── */
+    .prova-rapida {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 24px 0;
+      border-top: 1px solid var(--cinza-borda);
+      border-bottom: 1px solid var(--cinza-borda);
+      margin: 32px 0;
+    }
+    .prova-item { text-align: center; }
+    .prova-num {
+      display: block;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--verde);
+      line-height: 1;
+    }
+    .prova-desc {
+      font-size: 12px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* ── HOOK / PERGUNTA LOOP ── */
+    .secao-hook {
+      padding: 48px 0;
+      text-align: center;
+    }
+    .caixa-pergunta {
+      background: linear-gradient(135deg, rgba(34,197,94,0.07) 0%, rgba(255,107,0,0.05) 100%);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 16px;
+      padding: 36px 32px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .caixa-pergunta .icone-grande {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .caixa-pergunta h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .caixa-pergunta p {
+      font-size: 16px;
+      color: #BBBBBB;
+      line-height: 1.7;
+    }
+    .caixa-pergunta p strong { color: var(--branco); }
+
+    /* ── RECONHECIMENTO (bullets "você reconhece?") ── */
+    .secao-reconhece { padding: 48px 0; }
+    .secao-reconhece h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+    .lista-reconhece {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .lista-reconhece li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-left: 3px solid var(--vermelho);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-size: 15px;
+      color: #DDDDDD;
+    }
+    .lista-reconhece li .check { font-size: 18px; flex-shrink: 0; line-height: 1.5; }
+    .lista-reconhece li strong { color: var(--branco); display: block; margin-bottom: 2px; }
+
+    /* ── AGITAÇÃO ── */
+    .secao-agitacao { padding: 48px 0; }
+    .secao-agitacao h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+    .agitacao-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .agitacao-card {
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .agitacao-card .num {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--vermelho);
+      opacity: 0.4;
+      line-height: 1;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .agitacao-card strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--branco);
+      margin-bottom: 6px;
+    }
+    .agitacao-card p {
+      font-size: 14px;
+      color: #AAAAAA;
+      line-height: 1.6;
+    }
+
+    /* ── DIAGRAMA "ONDE VAI O DINHEIRO" ── */
+    .secao-diagrama { padding: 48px 0; }
+    .secao-diagrama h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .secao-diagrama .sub-titulo {
+      font-size: 15px;
+      color: var(--cinza-texto);
+      margin-bottom: 32px;
+    }
+    .diagrama-container {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 16px;
+      padding: 28px 24px;
+    }
+    .diagrama-entrada {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .diagrama-entrada .valor-entrada {
+      display: inline-block;
+      background: var(--verde-claro);
+      border: 2px solid var(--verde-borda);
+      color: var(--verde);
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      padding: 12px 28px;
+      border-radius: var(--radius);
+    }
+    .diagrama-entrada .rotulo {
+      display: block;
+      font-size: 12px;
+      color: var(--cinza-texto);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .diagrama-seta {
+      text-align: center;
+      color: var(--cinza-texto);
+      font-size: 22px;
+      margin: 10px 0;
+    }
+    .diagrama-saidas {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 480px) {
+      .diagrama-saidas { grid-template-columns: 1fr; }
+    }
+    .saida-item {
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.18);
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .saida-item .saida-icone { font-size: 20px; display: block; margin-bottom: 4px; }
+    .saida-item .saida-nome {
+      font-size: 13px;
+      font-weight: 700;
+      color: #CCCCCC;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .saida-item .saida-valor {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--vermelho);
+    }
+    .saida-item.invisivel {
+      background: rgba(239,68,68,0.10);
+      border-color: rgba(239,68,68,0.30);
+    }
+    .saida-item.invisivel .saida-nome { color: #EF9999; }
+    .diagrama-resultado {
+      text-align: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--cinza-borda);
+    }
+    .diagrama-resultado .valor-sobra {
+      display: inline-block;
+      background: rgba(239,68,68,0.10);
+      border: 2px solid rgba(239,68,68,0.3);
+      color: var(--vermelho);
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      padding: 10px 24px;
+      border-radius: var(--radius);
+    }
+    .diagrama-resultado .rotulo-sobra {
+      display: block;
+      font-size: 12px;
+      color: var(--cinza-texto);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .diagrama-legenda {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: rgba(239,68,68,0.04);
+      border: 1px dashed rgba(239,68,68,0.2);
+      border-radius: 10px;
+      font-size: 13px;
+      color: #AAAAAA;
+      text-align: center;
+    }
+    .diagrama-legenda strong { color: #EF9999; }
+    .diagrama-cta-texto {
+      margin-top: 20px;
+      background: var(--verde-claro);
+      border: 1px solid var(--verde-borda);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 15px;
+      color: var(--verde);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* ── REVELAÇÃO ── */
+    .secao-revelacao { padding: 48px 0; }
+    .caixa-revelacao {
+      background: linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(34,197,94,0.03) 100%);
+      border: 1px solid var(--verde-borda);
+      border-radius: 16px;
+      padding: 36px 32px;
+      text-align: center;
+    }
+    .caixa-revelacao .icone-revelacao { font-size: 44px; display: block; margin-bottom: 16px; }
+    .caixa-revelacao h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .caixa-revelacao p {
+      font-size: 16px;
+      color: #CCCCCC;
+      line-height: 1.7;
+      max-width: 580px;
+      margin: 0 auto 12px;
+    }
+    .caixa-revelacao p strong { color: var(--branco); }
+    .caixa-revelacao .frase-chave {
+      font-size: clamp(17px, 2.8vw, 22px);
+      font-weight: 800;
+      color: var(--verde);
+      margin-top: 16px;
+      line-height: 1.4;
+    }
+
+    /* ── SOLUÇÃO (produto) ── */
+    .secao-solucao { padding: 48px 0; }
+    .secao-solucao h2 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+    .secao-solucao p {
+      font-size: 16px;
+      color: #CCCCCC;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+    .secao-solucao p strong { color: var(--branco); }
+
+    .capa-mockup {
+      display: block;
+      margin: 32px auto;
+      max-width: 280px;
+      width: 100%;
+      background: linear-gradient(135deg, #0F2417 0%, #1A3A25 50%, #0F2417 100%);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(34,197,94,0.15), var(--sombra);
+    }
+    .capa-mockup .capa-tag {
+      display: inline-block;
+      background: var(--verde-claro);
+      color: var(--verde);
+      border: 1px solid var(--verde-borda);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+    .capa-mockup .capa-titulo {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--verde);
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .capa-mockup .capa-sub {
+      font-size: 12px;
+      color: #6BCF8A;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .capa-mockup .capa-linha {
+      width: 40px;
+      height: 3px;
+      background: var(--verde);
+      margin: 0 auto 16px;
+      border-radius: 2px;
+      opacity: 0.5;
+    }
+    .capa-mockup .capa-autor {
+      font-size: 12px;
+      color: #6BCF8A;
+      font-weight: 600;
+    }
+    .capa-mockup .capa-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    /* ── O QUE ESTÁ DENTRO ── */
+    .secao-dentro { padding: 48px 0; }
+    .secao-dentro h2 {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 900;
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+    .lista-dentro {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .lista-dentro li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-left: 3px solid var(--verde);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-size: 15px;
+      color: #DDDDDD;
+    }
+    .lista-dentro li .check { font-size: 18px; flex-shrink: 0; line-height: 1.5; }
+    .lista-dentro li strong { color: var(--branco); display: block; margin-bottom: 2px; }
+
+    /* ── BENEFÍCIOS / TRANSFORMAÇÃO ── */
+    .secao-beneficios { padding: 48px 0; }
+    .secao-beneficios h2 {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 900;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .secao-beneficios .sub-titulo {
+      font-size: 15px;
+      color: var(--cinza-texto);
+      margin-bottom: 28px;
+    }
+    .beneficios-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 540px) {
+      .beneficios-grid { grid-template-columns: 1fr; }
+    }
+    .beneficio-card {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      transition: border-color 0.2s;
+    }
+    .beneficio-card:hover { border-color: var(--verde-borda); }
+    .beneficio-card .ben-icone { font-size: 26px; display: block; margin-bottom: 10px; }
+    .beneficio-card strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--branco);
+      margin-bottom: 6px;
+    }
+    .beneficio-card p {
+      font-size: 13px;
+      color: #AAAAAA;
+      line-height: 1.5;
+    }
+    .beneficio-card p .verde { color: var(--verde); font-weight: 700; }
+
+    /* ── AUTORIDADE ── */
+    .secao-autoridade { padding: 48px 0; }
+    .autoridade-card {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+    }
+    @media (max-width: 600px) {
+      .autoridade-card { flex-direction: column; align-items: center; text-align: center; }
+    }
+    .autoridade-foto {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1A3A25, #2A5A38);
+      border: 3px solid var(--verde-borda);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      overflow: hidden;
+    }
+    .autoridade-foto img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .autoridade-conteudo h3 {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--branco);
+      margin-bottom: 4px;
+    }
+    .autoridade-conteudo .cargo {
+      font-size: 13px;
+      color: var(--verde);
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .autoridade-conteudo p {
+      font-size: 14px;
+      color: #BBBBBB;
+      line-height: 1.6;
+    }
+    .autoridade-conteudo p strong { color: var(--branco); }
+
+    /* ── DEPOIMENTOS ── */
+    .secao-depoimentos { padding: 48px 0; }
+    .secao-depoimentos h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+    .depoimentos-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .depo-card {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .depo-stars { color: var(--amarelo); font-size: 16px; margin-bottom: 12px; }
+    .depo-texto {
+      font-size: 15px;
+      color: #DDDDDD;
+      line-height: 1.7;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+    .depo-resultado {
+      display: inline-block;
+      background: var(--verde-claro);
+      color: var(--verde);
+      border: 1px solid var(--verde-borda);
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+    .depo-autor {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .depo-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cinza-borda), #333);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .depo-nome {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--branco);
+    }
+
+    /* ── OFERTA ── */
+    .secao-oferta { padding: 48px 0; }
+    .secao-oferta h2 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      margin-bottom: 8px;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .secao-oferta .sub-oferta {
+      text-align: center;
+      font-size: 15px;
+      color: var(--cinza-texto);
+      margin-bottom: 28px;
+    }
+    .oferta-card {
+      background: var(--cinza-card);
+      border: 2px solid var(--verde-borda);
+      border-radius: 20px;
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(34,197,94,0.08);
+    }
+    .oferta-de {
+      font-size: 16px;
+      color: var(--cinza-texto);
+      text-decoration: line-through;
+      margin-bottom: 4px;
+    }
+    .oferta-por { font-size: 14px; color: var(--cinza-texto); margin-bottom: 8px; }
+    .oferta-preco {
+      font-size: clamp(44px, 8vw, 64px);
+      font-weight: 900;
+      color: var(--verde);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .oferta-preco span {
+      font-size: clamp(20px, 4vw, 28px);
+      vertical-align: super;
+    }
+    .oferta-parcela {
+      font-size: 14px;
+      color: var(--cinza-texto);
+      margin-bottom: 28px;
+    }
+    .oferta-inclusao {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .oferta-inclusao li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #CCCCCC;
+    }
+    .oferta-inclusao li .check { color: var(--verde); font-size: 16px; }
+
+    /* ── ORDER BUMP ── */
+    .order-bump {
+      background: linear-gradient(135deg, rgba(255,214,0,0.06) 0%, rgba(255,107,0,0.06) 100%);
+      border: 2px dashed rgba(255,214,0,0.4);
+      border-radius: 16px;
+      padding: 28px 24px;
+      margin-top: 24px;
+    }
+    .order-bump .ob-badge {
+      display: inline-block;
+      background: var(--amarelo);
+      color: #1A0A00;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 14px;
+    }
+    .order-bump h3 {
+      font-size: clamp(17px, 3vw, 22px);
+      font-weight: 900;
+      color: var(--amarelo);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .order-bump p {
+      font-size: 14px;
+      color: #CCCCCC;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .order-bump p strong { color: var(--branco); }
+    .ob-itens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .ob-item {
+      background: rgba(255,214,0,0.08);
+      border: 1px solid rgba(255,214,0,0.2);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--amarelo);
+    }
+    .ob-preco-linha {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .ob-de {
+      font-size: 15px;
+      color: var(--cinza-texto);
+      text-decoration: line-through;
+    }
+    .ob-por {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 900;
+      color: var(--amarelo);
+    }
+    .ob-economia {
+      background: rgba(34,197,94,0.15);
+      color: var(--verde);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .btn-bump {
+      display: inline-block;
+      background: var(--amarelo);
+      color: #1A0A00;
+      text-decoration: none;
+      font-weight: 900;
+      font-size: clamp(14px, 2.5vw, 17px);
+      padding: 16px 28px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      text-align: center;
+      width: 100%;
+      letter-spacing: 0.2px;
+    }
+    .btn-bump:hover { opacity: 0.9; transform: translateY(-2px); }
+
+    /* ── GARANTIA ── */
+    .secao-garantia { padding: 48px 0; }
+    .garantia-card {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    @media (max-width: 540px) {
+      .garantia-card { flex-direction: column; text-align: center; }
+    }
+    .garantia-icone {
+      font-size: 56px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .garantia-conteudo h3 {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--branco);
+      margin-bottom: 8px;
+    }
+    .garantia-conteudo h3 span { color: var(--verde); }
+    .garantia-conteudo p {
+      font-size: 14px;
+      color: #AAAAAA;
+      line-height: 1.6;
+    }
+    .garantia-conteudo p strong { color: var(--branco); }
+
+    /* ── FAQ ── */
+    .secao-faq { padding: 48px 0; }
+    .secao-faq h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .faq-item {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .faq-pergunta {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--branco);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 18px 20px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .faq-pergunta .seta {
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: transform 0.25s;
+      color: var(--verde);
+    }
+    .faq-item.aberto .faq-pergunta .seta { transform: rotate(180deg); }
+    .faq-resposta {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .faq-item.aberto .faq-resposta { max-height: 300px; }
+    .faq-resposta-inner {
+      padding: 0 20px 20px;
+      font-size: 14px;
+      color: #AAAAAA;
+      line-height: 1.7;
+      border-top: 1px solid var(--cinza-borda);
+      padding-top: 16px;
+    }
+    .faq-resposta-inner strong { color: var(--branco); }
+
+    /* ── CTA FINAL ── */
+    .secao-cta-final {
+      padding: 56px 0;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.07) 0%, transparent 70%);
+    }
+    .secao-cta-final h2 {
+      font-size: clamp(24px, 4.5vw, 38px);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .secao-cta-final p {
+      font-size: 16px;
+      color: #BBBBBB;
+      max-width: 520px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+    .secao-cta-final p strong { color: var(--branco); }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 32px 0;
+      text-align: center;
+      border-top: 1px solid var(--cinza-borda);
+    }
+    .footer p {
+      font-size: 12px;
+      color: var(--cinza-texto);
+      margin-bottom: 8px;
+    }
+    .footer a { color: var(--cinza-texto); }
+
+    /* ── UTILITÁRIOS EXTRAS ── */
+    .texto-centro { text-align: center; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+    .mb-32 { margin-bottom: 32px; }
+    .mt-32 { margin-top: 32px; }
+  </style>
+</head>
+<body>
+
+<!-- ────────────────────────────────────────────
+  BARRA DE URGÊNCIA
+──────────────────────────────────────────── -->
+<div class="barra-urgencia">
+  Oferta especial ativa agora — <span>R$27,90</span> com garantia de 7 dias
+</div>
+
+<!-- ────────────────────────────────────────────
+  HERO
+──────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="tag">E-BOOK DIGITAL</div>
+    <h1>
+      O Dinheiro Não Some.<br />
+      <span class="destaque-laranja">Você Só Não Sabe Onde Ele Vai.</span><br />
+      E Vamos Resolver Isso Hoje.
+    </h1>
+    <p class="sub">
+      O guia prático de Fluxo de Caixa para dono de negócio físico que <strong>fatura todo mês mas no fim não sabe para onde o dinheiro foi.</strong>
+    </p>
+
+    <!-- Countdown -->
+    <div class="countdown-wrapper">
+      <span class="countdown-label">Oferta expira em</span>
+      <div class="countdown-timer">
+        <div class="countdown-bloco">
+          <span class="countdown-num" id="cd-min">15</span>
+          <span class="countdown-unit">Min</span>
+        </div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-bloco">
+          <span class="countdown-num" id="cd-seg">00</span>
+          <span class="countdown-unit">Seg</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="[LINK_CHECKOUT_FLUXO]" class="btn-cta pulse" onclick="fbq('track','InitiateCheckout',{content_name:'Ebook Fluxo de Caixa',value:27.90,currency:'BRL'})">
+      Quero Parar de Ver o Dinheiro Sumir — R$27,90
+    </a>
+    <span class="btn-garantia">Acesso imediato. <span>Garantia de 7 dias.</span> Pagamento 100% seguro.</span>
+
+    <!-- Prova rápida -->
+    <div class="prova-rapida">
+      <div class="prova-item">
+        <span class="prova-num">[NUMERO_CLIENTES]</span>
+        <span class="prova-desc">Empresários</span>
+      </div>
+      <div class="prova-item">
+        <span class="prova-num">7 dias</span>
+        <span class="prova-desc">de Garantia</span>
+      </div>
+      <div class="prova-item">
+        <span class="prova-num">R$27,90</span>
+        <span class="prova-desc">Acesso total</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  HOOK — PERGUNTA QUE ABRE O LOOP
+──────────────────────────────────────────── -->
+<section class="secao-hook">
+  <div class="container">
+    <div class="caixa-pergunta">
+      <span class="icone-grande">🤔</span>
+      <h2>
+        Você consegue responder esta pergunta agora?<br />
+        <span class="destaque-verde">"Quanto dinheiro vai sobrar no fim deste mês?"</span>
+      </h2>
+      <p>
+        Se você hesitou, não sabe ao certo ou ficou com aquela sensação de desconforto —
+        <strong>você não está sozinho.</strong>
+        A maioria dos donos de negócio físico vive exatamente assim:
+        trabalhando muito, faturando todo mês, e sem conseguir responder essa pergunta básica.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  IDENTIFICAÇÃO — "VOCÊ RECONHECE ISSO?"
+──────────────────────────────────────────── -->
+<section class="secao-reconhece">
+  <div class="container">
+    <h2>Você reconhece alguma dessas situações?</h2>
+    <ul class="lista-reconhece">
+      <li>
+        <span class="check">☑</span>
+        <div>
+          <strong>No fim do mês, o caixa está zerado ou negativo</strong>
+          Você faturou bem, pagou tudo, mas não sobrou nada. Parece que o dinheiro foi embora antes mesmo de você ver.
+        </div>
+      </li>
+      <li>
+        <span class="check">☑</span>
+        <div>
+          <strong>Você sabe quanto entra, mas não sabe quanto sai de verdade</strong>
+          Fornecedor, funcionário, aluguel, energia, embalagem, taxa de cartão, manutenção... você perdeu a conta de onde o dinheiro vai.
+        </div>
+      </li>
+      <li>
+        <span class="check">☑</span>
+        <div>
+          <strong>Nunca tem dinheiro para investir no negócio</strong>
+          Queria comprar um equipamento, reformar, aumentar o estoque, mas sempre aparece uma urgência e o investimento fica para o mês que vem.
+        </div>
+      </li>
+      <li>
+        <span class="check">☑</span>
+        <div>
+          <strong>Você sente que trabalha muito e não evolui financeiramente</strong>
+          Meses de esforço, vendas acontecendo, e mesmo assim a situação financeira não muda. Dá uma frustração difícil de explicar.
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  DIAGRAMA — ONDE VAI O DINHEIRO
+──────────────────────────────────────────── -->
+<section class="secao-diagrama">
+  <div class="container">
+    <h2>Onde vai o dinheiro do seu negócio?</h2>
+    <p class="sub-titulo">Esse é o ciclo que a maioria dos empresários não enxerga até que seja tarde demais.</p>
+    <div class="diagrama-container">
+
+      <!-- Entrada -->
+      <div class="diagrama-entrada">
+        <div class="valor-entrada">R$ 15.000 faturados</div>
+        <span class="rotulo">O que entra no mês</span>
+      </div>
+
+      <div class="diagrama-seta">↓</div>
+
+      <!-- Saídas visíveis -->
+      <p style="font-size:12px;color:var(--cinza-texto);text-align:center;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:12px;">Saídas que você vê</p>
+      <div class="diagrama-saidas">
+        <div class="saida-item">
+          <span class="saida-icone">🏠</span>
+          <span class="saida-nome">Aluguel</span>
+          <span class="saida-valor">- R$ 2.800</span>
+        </div>
+        <div class="saida-item">
+          <span class="saida-icone">👥</span>
+          <span class="saida-nome">Funcionários</span>
+          <span class="saida-valor">- R$ 3.500</span>
+        </div>
+        <div class="saida-item">
+          <span class="saida-icone">📦</span>
+          <span class="saida-nome">Fornecedores</span>
+          <span class="saida-valor">- R$ 4.200</span>
+        </div>
+        <div class="saida-item">
+          <span class="saida-icone">⚡</span>
+          <span class="saida-nome">Energia + água</span>
+          <span class="saida-valor">- R$ 680</span>
+        </div>
+      </div>
+
+      <!-- Saídas invisíveis -->
+      <p style="font-size:12px;color:#EF9999;text-align:center;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:16px 0 12px;">Saídas que você NÃO enxerga</p>
+      <div class="diagrama-saidas">
+        <div class="saida-item invisivel">
+          <span class="saida-icone">💳</span>
+          <span class="saida-nome">Taxa cartão + maquininha</span>
+          <span class="saida-valor">- R$ 450</span>
+        </div>
+        <div class="saida-item invisivel">
+          <span class="saida-icone">🔧</span>
+          <span class="saida-nome">Manutenções inesperadas</span>
+          <span class="saida-valor">- R$ 600</span>
+        </div>
+        <div class="saida-item invisivel">
+          <span class="saida-icone">📊</span>
+          <span class="saida-nome">Impostos e taxas</span>
+          <span class="saida-valor">- R$ 900</span>
+        </div>
+        <div class="saida-item invisivel">
+          <span class="saida-icone">🛒</span>
+          <span class="saida-nome">Compras sem registro</span>
+          <span class="saida-valor">- R$ 720</span>
+        </div>
+      </div>
+
+      <div class="diagrama-seta">↓</div>
+
+      <!-- Resultado -->
+      <div class="diagrama-resultado">
+        <div class="valor-sobra">R$ 150 sobrando</div>
+        <span class="rotulo-sobra">Resultado real no fim do mês</span>
+      </div>
+
+      <div class="diagrama-legenda">
+        <strong>Você faturou R$15.000 e sobrou R$150.</strong> Não porque você gastou errado — mas porque você não estava enxergando o que saía. Esse é o problema do Fluxo de Caixa sem controle.
+      </div>
+
+      <div class="diagrama-cta-texto">
+        Com controle de Fluxo de Caixa, você teria enxergado esses R$2.670 em saídas invisíveis antes de gastá-los.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  AGITAÇÃO
+──────────────────────────────────────────── -->
+<section class="secao-agitacao">
+  <div class="container">
+    <h2>O que acontece <span class="destaque-laranja">se você continuar assim?</span></h2>
+    <div class="agitacao-grid">
+      <div class="agitacao-card">
+        <span class="num">01</span>
+        <strong>Cada mês de trabalho jogado fora</strong>
+        <p>Você trabalha o mês inteiro, vende, se esforça — e no final não consegue guardar nada, não consegue investir nada. É como correr em esteira: movimento sem avanço.</p>
+      </div>
+      <div class="agitacao-card">
+        <span class="num">02</span>
+        <strong>O negócio sempre no limite</strong>
+        <p>Sem previsão de caixa, qualquer imprevisto vira crise. Um mês fraco, um equipamento quebrado, um fornecedor antecipando cobrança — e você entra no vermelho.</p>
+      </div>
+      <div class="agitacao-card">
+        <span class="num">03</span>
+        <strong>Você nunca sai do "sobrevivendo"</strong>
+        <p>Quem não controla o caixa nunca consegue escalar. Não tem margem para contratar, não tem margem para investir, não tem margem para crescer. O negócio fica pequeno por falta de controle — não por falta de venda.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  REVELAÇÃO
+──────────────────────────────────────────── -->
+<section class="secao-revelacao">
+  <div class="container">
+    <div class="caixa-revelacao">
+      <span class="icone-revelacao">💡</span>
+      <h2>
+        A verdade que ninguém te contou:<br />
+        <span class="destaque-verde">Não é falta de dinheiro. É falta de controle.</span>
+      </h2>
+      <p>
+        O dinheiro não some por magia. Ele vai para algum lugar — só que você não está registrando.
+        Gastos invisíveis, saídas sem registro, contas pagas em datas erradas.
+        <strong>Quando você começa a enxergar o caixa, você descobre que o dinheiro estava lá o tempo todo.</strong>
+      </p>
+      <p>
+        Fluxo de Caixa não é coisa de contador. É uma habilidade de dono de negócio.
+        E você pode aprender em poucas horas — sem ser técnico, sem usar planilha complicada.
+      </p>
+      <div class="frase-chave">
+        "Controle não é burocracia. É liberdade para saber exatamente o que você pode gastar."
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  SOLUÇÃO — O E-BOOK
+──────────────────────────────────────────── -->
+<section class="secao-solucao">
+  <div class="container">
+    <h2>
+      Apresentando o <span class="destaque-laranja">E-book Fluxo de Caixa</span>
+    </h2>
+    <p>
+      Um guia prático, direto ao ponto, escrito para dono de loja, salão, restaurante, mercadinho e oficina.
+      <strong>Sem linguagem de contador. Sem fórmulas complicadas. Só o que funciona no dia a dia do seu negócio.</strong>
+    </p>
+    <p>
+      Em poucas horas de leitura, você vai entender exatamente onde o seu dinheiro vai todo mês —
+      e o que fazer para começar a sobrar.
+    </p>
+
+    <!-- Mockup do e-book -->
+    <div class="capa-mockup">
+      <span class="capa-icon">📗</span>
+      <div class="capa-tag">E-book Digital</div>
+      <div class="capa-titulo">Fluxo de Caixa</div>
+      <div class="capa-sub">Guia Completo para Fazer Sobrar Dinheiro no Seu Negócio</div>
+      <div class="capa-linha"></div>
+      <div class="capa-autor">Valter Leite</div>
+    </div>
+
+    <div class="texto-centro">
+      <a href="[LINK_CHECKOUT_FLUXO]" class="btn-cta" onclick="fbq('track','InitiateCheckout',{content_name:'Ebook Fluxo de Caixa',value:27.90,currency:'BRL'})">
+        Quero o E-book — R$27,90
+      </a>
+      <span class="btn-garantia">Acesso imediato. <span>7 dias de garantia.</span></span>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  O QUE VOCÊ VAI APRENDER
+──────────────────────────────────────────── -->
+<section class="secao-dentro">
+  <div class="container">
+    <h2>O que está dentro do e-book</h2>
+    <ul class="lista-dentro">
+      <li>
+        <span class="check">📌</span>
+        <div>
+          <strong>O que é Fluxo de Caixa de verdade</strong>
+          Explicado da forma que um dono de negócio entende — sem jargão contábil.
+        </div>
+      </li>
+      <li>
+        <span class="check">📌</span>
+        <div>
+          <strong>Como mapear todas as saídas do seu negócio</strong>
+          Incluindo as invisíveis que comem o seu caixa sem você perceber.
+        </div>
+      </li>
+      <li>
+        <span class="check">📌</span>
+        <div>
+          <strong>Projeção de caixa: saber antes de gastar</strong>
+          Como prever quanto você vai ter no fim do mês antes mesmo que o mês comece.
+        </div>
+      </li>
+      <li>
+        <span class="check">📌</span>
+        <div>
+          <strong>A regra do caixa mínimo</strong>
+          Quanto seu negócio precisa ter em caixa para não entrar em pânico no próximo imprevisto.
+        </div>
+      </li>
+      <li>
+        <span class="check">📌</span>
+        <div>
+          <strong>Como separar o dinheiro do negócio do dinheiro pessoal</strong>
+          O erro número um de 90% dos pequenos empresários — e como corrigir hoje.
+        </div>
+      </li>
+      <li>
+        <span class="check">📌</span>
+        <div>
+          <strong>Rotina de controle em 15 minutos por dia</strong>
+          Um método simples para você manter o caixa organizado sem precisar de horas ou de contador.
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  BENEFÍCIOS / TRANSFORMAÇÃO
+──────────────────────────────────────────── -->
+<section class="secao-beneficios">
+  <div class="container">
+    <h2>O que muda na sua vida <span class="destaque-verde">depois do e-book</span></h2>
+    <p class="sub-titulo">Não são features — são transformações reais no seu dia a dia.</p>
+    <div class="beneficios-grid">
+      <div class="beneficio-card">
+        <span class="ben-icone">💰</span>
+        <strong>Você sabe onde o dinheiro vai</strong>
+        <p>Chega de aquele sentimento de que o caixa sumiu. Você passa a <span class="verde">enxergar cada saída</span> com clareza.</p>
+      </div>
+      <div class="beneficio-card">
+        <span class="ben-icone">📅</span>
+        <strong>Você prevê o fim do mês antes dele chegar</strong>
+        <p>Com projeção de caixa, você sabe hoje se vai <span class="verde">sobrar ou faltar</span> — e age antes que seja urgência.</p>
+      </div>
+      <div class="beneficio-card">
+        <span class="ben-icone">😌</span>
+        <strong>Você dorme sem ansiedade financeira</strong>
+        <p>Aquela angústia de não saber a situação real do caixa desaparece quando você <span class="verde">tem controle de verdade</span>.</p>
+      </div>
+      <div class="beneficio-card">
+        <span class="ben-icone">📈</span>
+        <strong>Você finalmente consegue investir no negócio</strong>
+        <p>Com dinheiro sobrando de forma previsível, você para de <span class="verde">adiar o crescimento</span> por falta de caixa.</p>
+      </div>
+      <div class="beneficio-card">
+        <span class="ben-icone">🛡️</span>
+        <strong>Seu negócio para de viver no limite</strong>
+        <p>Caixa mínimo estruturado significa que um mês fraco ou um imprevisto <span class="verde">não vira mais uma crise</span>.</p>
+      </div>
+      <div class="beneficio-card">
+        <span class="ben-icone">💼</span>
+        <strong>Você se sente dono do seu negócio de verdade</strong>
+        <p>Não mais refém do caixa. <span class="verde">Você decide</span> o que gastar, quando gastar e quanto guardar.</p>
+      </div>
+      <div class="beneficio-card">
+        <span class="ben-icone">⏱️</span>
+        <strong>15 minutos por dia resolvem o controle financeiro</strong>
+        <p>Sem complicação. Sem planilha de engenharia. <span class="verde">Simples o suficiente</span> para você manter todos os dias.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  AUTORIDADE
+──────────────────────────────────────────── -->
+<section class="secao-autoridade">
+  <div class="container">
+    <div class="autoridade-card">
+      <div class="autoridade-foto">
+        <!-- Substituir pelo caminho real da foto -->
+        <img src="[FOTO_VALTER]" alt="Valter Leite" onerror="this.style.display='none';this.parentElement.innerHTML='👨‍💼'" />
+      </div>
+      <div class="autoridade-conteudo">
+        <h3>Valter Leite</h3>
+        <div class="cargo">Especialista em Gestão Financeira para Pequenos Negócios</div>
+        <p>
+          Valter ajudou <strong>mais de [NUMERO_CLIENTES] empresários</strong> a entenderem as finanças do próprio negócio —
+          sem precisar de contador, sem planilhas complicadas e sem jargão técnico.
+          A metodologia é direta, prática e foi criada para quem tem negócio físico e precisa de resultado imediato.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  DEPOIMENTOS
+──────────────────────────────────────────── -->
+<section class="secao-depoimentos">
+  <div class="container">
+    <h2>Quem aplicou, <span class="destaque-verde">viu sobrar</span></h2>
+    <div class="depoimentos-grid">
+
+      <div class="depo-card">
+        <div class="depo-stars">★★★★★</div>
+        <p class="depo-texto">"[DEPOIMENTO_1_TEXTO]"</p>
+        <div class="depo-resultado">[DEPOIMENTO_1_RESULTADO]</div>
+        <div class="depo-autor">
+          <div class="depo-avatar">👤</div>
+          <span class="depo-nome">[DEPOIMENTO_1_NOME]</span>
+        </div>
+      </div>
+
+      <div class="depo-card">
+        <div class="depo-stars">★★★★★</div>
+        <p class="depo-texto">"[DEPOIMENTO_2_TEXTO]"</p>
+        <div class="depo-resultado">[DEPOIMENTO_2_RESULTADO]</div>
+        <div class="depo-autor">
+          <div class="depo-avatar">👤</div>
+          <span class="depo-nome">[DEPOIMENTO_2_NOME]</span>
+        </div>
+      </div>
+
+      <div class="depo-card">
+        <div class="depo-stars">★★★★★</div>
+        <p class="depo-texto">"[DEPOIMENTO_3_TEXTO]"</p>
+        <div class="depo-resultado">[DEPOIMENTO_3_RESULTADO]</div>
+        <div class="depo-autor">
+          <div class="depo-avatar">👤</div>
+          <span class="depo-nome">[DEPOIMENTO_3_NOME]</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  OFERTA PRINCIPAL
+──────────────────────────────────────────── -->
+<section class="secao-oferta">
+  <div class="container">
+    <h2>Quanto vale <span class="destaque-verde">parar de perder dinheiro</span> todo mês?</h2>
+    <p class="sub-oferta">Esse conhecimento pode te devolver muito mais do que o valor do e-book no primeiro mês de controle.</p>
+
+    <div class="oferta-card">
+      <div class="oferta-de">De R$97,00</div>
+      <div class="oferta-por">Por apenas</div>
+      <div class="oferta-preco"><span>R$</span>27,90</div>
+      <div class="oferta-parcela">Pagamento único. Acesso imediato. Para sempre.</div>
+
+      <ul class="oferta-inclusao">
+        <li><span class="check">✅</span> E-book Fluxo de Caixa completo (acesso imediato)</li>
+        <li><span class="check">✅</span> Método de controle em 15 minutos por dia</li>
+        <li><span class="check">✅</span> Guia de projeção de caixa mensal</span></li>
+        <li><span class="check">✅</span> Capítulo especial: separar dinheiro pessoal do negócio</li>
+        <li><span class="check">✅</span> Leitura rápida — conteúdo direto ao ponto</li>
+        <li><span class="check">✅</span> Funciona para loja, salão, restaurante, mercadinho e oficina</li>
+      </ul>
+
+      <a href="[LINK_CHECKOUT_FLUXO]" class="btn-cta pulse" onclick="fbq('track','InitiateCheckout',{content_name:'Ebook Fluxo de Caixa',value:27.90,currency:'BRL'})">
+        Quero o E-book Agora — R$27,90
+      </a>
+      <span class="btn-garantia">Acesso imediato. <span>7 dias de garantia incondicional.</span> Pagamento 100% seguro.</span>
+
+      <!-- ORDER BUMP -->
+      <div class="order-bump">
+        <div class="ob-badge">OFERTA ESPECIAL — ADICIONAR AO PEDIDO</div>
+        <h3>Pacote E-books Empresário Master</h3>
+        <p>
+          Leve também o E-book de Precificação Lucrativa e o E-book de DRE.
+          <strong>Os 3 pilares da gestão financeira de qualquer pequeno negócio — em um único pacote.</strong>
+        </p>
+        <div class="ob-itens">
+          <div class="ob-item">E-book Fluxo de Caixa</div>
+          <div class="ob-item">E-book Precificação Lucrativa</div>
+          <div class="ob-item">E-book DRE</div>
+        </div>
+        <div class="ob-preco-linha">
+          <span class="ob-de">De R$291,00</span>
+          <span class="ob-por">R$87,90</span>
+          <span class="ob-economia">Economize 70%</span>
+        </div>
+        <a href="[LINK_CHECKOUT_MASTER]" class="btn-bump" onclick="fbq('track','InitiateCheckout',{content_name:'Pacote Empresario Master',value:87.90,currency:'BRL'})">
+          Quero o Pacote Completo por R$87,90
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  GARANTIA
+──────────────────────────────────────────── -->
+<section class="secao-garantia">
+  <div class="container">
+    <div class="garantia-card">
+      <div class="garantia-icone">🛡️</div>
+      <div class="garantia-conteudo">
+        <h3>Garantia de <span>7 Dias</span> — sem perguntas</h3>
+        <p>
+          Se dentro de 7 dias você achar que o e-book não valeu nem o preço do almoço,
+          <strong>eu devolvo 100% do seu dinheiro sem burocracia e sem precisar explicar nada.</strong>
+          O risco é zero do seu lado. O único risco que existe aqui é continuar sem controle do caixa.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  FAQ
+──────────────────────────────────────────── -->
+<section class="secao-faq">
+  <div class="container">
+    <h2>Dúvidas frequentes</h2>
+
+    <div class="faq-item">
+      <button class="faq-pergunta">
+        Preciso saber contabilidade para aplicar o que está no e-book?
+        <span class="seta">▼</span>
+      </button>
+      <div class="faq-resposta">
+        <div class="faq-resposta-inner">
+          Não. O e-book foi escrito justamente para quem <strong>não é contador</strong>. Tudo é explicado em linguagem simples, com exemplos do dia a dia de negócios físicos. Se você sabe fazer uma compra e registrar uma venda, você consegue aplicar.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-pergunta">
+        Funciona para o meu tipo de negócio?
+        <span class="seta">▼</span>
+      </button>
+      <div class="faq-resposta">
+        <div class="faq-resposta-inner">
+          Sim. O método foi desenvolvido para <strong>negócios físicos de pequeno porte</strong>: loja de roupas, salão de beleza, restaurante, mercadinho, padaria, oficina mecânica, pet shop, entre outros. Se você fatura entre R$5.000 e R$50.000 por mês, este e-book foi feito para você.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-pergunta">
+        Como vou receber o e-book depois de comprar?
+        <span class="seta">▼</span>
+      </button>
+      <div class="faq-resposta">
+        <div class="faq-resposta-inner">
+          <strong>Acesso imediato</strong> após confirmação do pagamento. Você recebe um e-mail com o link para download. O e-book está em formato PDF e pode ser lido no celular, tablet ou computador.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-pergunta">
+        E se eu não gostar?
+        <span class="seta">▼</span>
+      </button>
+      <div class="faq-resposta">
+        <div class="faq-resposta-inner">
+          Você tem <strong>7 dias de garantia total</strong>. Basta entrar em contato e devolvemos 100% do valor pago. Sem perguntas, sem burocracia.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-pergunta">
+        O Pacote Master vale a pena? Por que levar os 3 e-books?
+        <span class="seta">▼</span>
+      </button>
+      <div class="faq-resposta">
+        <div class="faq-resposta-inner">
+          Fluxo de Caixa resolve o problema do dinheiro que some. Precificação resolve o problema de vender sem lucrar. DRE mostra o resultado real do negócio. São os <strong>3 pilares da saúde financeira de qualquer pequeno negócio</strong>. Separados custam R$291 — no pacote, R$87,90. Se você quer dominar as finanças do seu negócio de verdade, o Pacote Master é o caminho mais rápido.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ────────────────────────────────────────────
+  CTA FINAL
+──────────────────────────────────────────── -->
+<section class="secao-cta-final">
+  <div class="container">
+    <h2>
+      Cada mês sem controle é um mês de trabalho<br />
+      <span class="destaque-verde">jogado fora.</span>
+    </h2>
+    <p>
+      Você não trabalhou o mês inteiro para chegar no zero. O e-book Fluxo de Caixa vai te mostrar exatamente onde o dinheiro está indo — e como fazer ele começar a sobrar.
+      <strong>Por R$27,90. Com 7 dias de garantia.</strong>
+    </p>
+
+    <!-- Countdown repetido -->
+    <div class="countdown-wrapper" style="margin-bottom:28px;">
+      <span class="countdown-label">Oferta expira em</span>
+      <div class="countdown-timer">
+        <div class="countdown-bloco">
+          <span class="countdown-num" id="cd-min-2">15</span>
+          <span class="countdown-unit">Min</span>
+        </div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-bloco">
+          <span class="countdown-num" id="cd-seg-2">00</span>
+          <span class="countdown-unit">Seg</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="[LINK_CHECKOUT_FLUXO]" class="btn-cta pulse" onclick="fbq('track','InitiateCheckout',{content_name:'Ebook Fluxo de Caixa',value:27.90,currency:'BRL'})">
+      Quero Parar de Ver o Dinheiro Sumir — R$27,90
+    </a>
+    <span class="btn-garantia" style="margin-top:12px;">Acesso imediato. <span>Garantia de 7 dias.</span> Pagamento 100% seguro.</span>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────
+  FOOTER
+──────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <p>© 2026 Valter Leite. Todos os direitos reservados.</p>
+    <p><a href="https://www.valterleite.com.br">www.valterleite.com.br</a> | @valterleiteoficial</p>
+    <p style="margin-top:12px;font-size:11px;color:#555;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;">
+      Este produto é um e-book digital. Os resultados apresentados são casos reais de clientes que aplicaram o método, mas não constituem garantia de resultado individual. Cada negócio tem sua realidade. A garantia de 7 dias é válida a partir da data de compra.
+    </p>
+  </div>
+</footer>
+
+<!-- ────────────────────────────────────────────
+  JAVASCRIPT
+──────────────────────────────────────────── -->
+<script>
+  // ── COUNTDOWN (sessionStorage — não reseta no F5) ──
+  (function () {
+    var DURACAO = 15 * 60; // 15 minutos em segundos
+    var CHAVE = 'fluxo_caixa_countdown_fim';
+
+    var agora = Math.floor(Date.now() / 1000);
+    var fim = parseInt(sessionStorage.getItem(CHAVE), 10);
+
+    if (!fim || fim <= agora) {
+      fim = agora + DURACAO;
+      sessionStorage.setItem(CHAVE, fim);
+    }
+
+    function atualizar() {
+      var agora = Math.floor(Date.now() / 1000);
+      var restante = fim - agora;
+      if (restante < 0) restante = 0;
+
+      var min = Math.floor(restante / 60);
+      var seg = restante % 60;
+
+      var mm = String(min).padStart(2, '0');
+      var ss = String(seg).padStart(2, '0');
+
+      var els = [
+        { m: document.getElementById('cd-min'), s: document.getElementById('cd-seg') },
+        { m: document.getElementById('cd-min-2'), s: document.getElementById('cd-seg-2') }
+      ];
+
+      els.forEach(function (el) {
+        if (el.m) el.m.textContent = mm;
+        if (el.s) el.s.textContent = ss;
+      });
+
+      if (restante > 0) {
+        setTimeout(atualizar, 1000);
+      }
+    }
+
+    atualizar();
+  })();
+
+  // ── FAQ ACCORDION ──
+  document.querySelectorAll('.faq-pergunta').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = btn.closest('.faq-item');
+      var estaAberto = item.classList.contains('aberto');
+
+      // Fechar todos
+      document.querySelectorAll('.faq-item').forEach(function (i) {
+        i.classList.remove('aberto');
+      });
+
+      // Abrir o clicado (se estava fechado)
+      if (!estaAberto) {
+        item.classList.add('aberto');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

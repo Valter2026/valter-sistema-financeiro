@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-book Precificação Lucrativa — Valter Leite</title>
+  <meta name="description" content="Descubra o preço certo e pare de trabalhar de graça. O método de precificação para empreendedores que querem lucrar de verdade." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '[META_PIXEL_ID]');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=[META_PIXEL_ID]&ev=PageView&noscript=1" /></noscript>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --laranja: #FF6B00;
+      --laranja-hover: #E05E00;
+      --amarelo: #FFD600;
+      --preto: #0A0A0A;
+      --cinza-escuro: #111111;
+      --cinza-card: #1A1A1A;
+      --cinza-borda: #2A2A2A;
+      --cinza-texto: #A0A0A0;
+      --branco: #FFFFFF;
+      --verde: #22C55E;
+      --radius: 12px;
+      --sombra: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--preto);
+      color: var(--branco);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── UTILITÁRIOS ── */
+    .container { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+    .tag {
+      display: inline-block;
+      background: rgba(255,107,0,0.15);
+      color: var(--laranja);
+      border: 1px solid rgba(255,107,0,0.3);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .tag-verde {
+      background: rgba(34,197,94,0.12);
+      color: var(--verde);
+      border-color: rgba(34,197,94,0.3);
+    }
+    .divisor {
+      width: 100%;
+      height: 1px;
+      background: var(--cinza-borda);
+      margin: 0;
+    }
+
+    /* ── BARRA URGÊNCIA TOPO ── */
+    .barra-urgencia {
+      background: var(--laranja);
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .barra-urgencia span { color: var(--amarelo); }
+
+    /* ── COUNTDOWN ── */
+    .countdown-wrapper {
+      background: rgba(255,107,0,0.08);
+      border: 1px solid rgba(255,107,0,0.2);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0 auto 32px;
+      max-width: 420px;
+      flex-wrap: wrap;
+    }
+    .countdown-label {
+      font-size: 13px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .countdown-timer {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .countdown-bloco {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      min-width: 52px;
+    }
+    .countdown-num {
+      display: block;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--laranja);
+      line-height: 1;
+    }
+    .countdown-unit {
+      display: block;
+      font-size: 10px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .countdown-sep { font-size: 20px; font-weight: 900; color: var(--laranja); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 48px 0 40px;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,107,0,0.08) 0%, transparent 70%);
+    }
+    .hero .tag { margin-bottom: 20px; }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+    .hero h1 .destaque {
+      color: var(--laranja);
+      position: relative;
+    }
+    .hero .sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: #CCCCCC;
+      max-width: 600px;
+      margin: 0 auto 32px;
+      font-weight: 400;
+    }
+    .hero .sub strong { color: var(--branco); font-weight: 700; }
+
+    /* ── BOTÃO CTA ── */
+    .btn-cta {
+      display: inline-block;
+      background: var(--laranja);
+      color: var(--branco);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: clamp(15px, 2.5vw, 18px);
+      padding: 18px 36px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 rgba(255,107,0,0.4);
+      text-align: center;
+      width: 100%;
+      max-width: 480px;
+      letter-spacing: 0.2px;
+    }
+    .btn-cta:hover {
+      background: var(--laranja-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,107,0,0.35);
+    }
+    .btn-cta:active { transform: translateY(0); }
+    .btn-cta.pulse {
+      animation: pulse 2.2s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255,107,0,0.5); }
+      60%  { box-shadow: 0 0 0 14px rgba(255,107,0,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,107,0,0); }
+    }
+    .btn-garantia {
+      display: block;
+      font-size: 12px;
+      color: var(--cinza-texto);
+      margin-top: 10px;
+      text-align: center;
+    }
+    .btn-garantia span { color: var(--verde); font-weight: 700; }
+
+    /* ── PROVA SOCIAL RÁPIDA ── */
+    .prova-rapida {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 24px 0;
+      border-top: 1px solid var(--cinza-borda);
+      border-bottom: 1px solid var(--cinza-borda);
+      margin: 32px 0;
+    }
+    .prova-item {
+      text-align: center;
+    }
+    .prova-num {
+      display: block;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--laranja);
+      line-height: 1;
+    }
+    .prova-desc {
+      font-size: 12px;
+      color: var(--cinza-texto);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* ── DOR ── */
+    .secao-dor {
+      padding: 48px 0;
+    }
+    .secao-dor h2 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+    .lista-dor {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .lista-dor li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-left: 3px solid #EF4444;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-size: 15px;
+      color: #DDDDDD;
+    }
+    .lista-dor li .icone { font-size: 20px; flex-shrink: 0; line-height: 1.4; }
+    .lista-dor li strong { color: var(--branco); display: block; margin-bottom: 2px; }
+
+    .caixa-agitacao {
+      background: rgba(239,68,68,0.07);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      font-size: 16px;
+      color: #DDDDDD;
+      line-height: 1.7;
+    }
+    .caixa-agitacao strong { color: var(--branco); }
+
+    /* ── SOLUÇÃO ── */
+    .secao-solucao { padding: 48px 0; }
+    .secao-solucao h2 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+    .secao-solucao h2 .destaque { color: var(--laranja); }
+    .secao-solucao p {
+      font-size: 16px;
+      color: #CCCCCC;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+    .secao-solucao p strong { color: var(--branco); }
+
+    .capa-mockup {
+      display: block;
+      margin: 32px auto;
+      max-width: 280px;
+      width: 100%;
+      background: linear-gradient(135deg, var(--cinza-card) 0%, #222 100%);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: var(--sombra);
+    }
+    .capa-mockup .capa-titulo {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--laranja);
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .capa-mockup .capa-sub {
+      font-size: 13px;
+      color: var(--cinza-texto);
+    }
+    .capa-mockup .capa-icone {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .capa-mockup .capa-autor {
+      margin-top: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #888;
+      border-top: 1px solid var(--cinza-borda);
+      padding-top: 16px;
+    }
+
+    /* ── AUTORIDADE ── */
+    .secao-autoridade { padding: 48px 0; }
+    .card-autoridade {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      padding: 32px;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .foto-autoridade {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--laranja);
+      flex-shrink: 0;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      overflow: hidden;
+    }
+    .foto-autoridade img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .autoridade-texto h3 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .autoridade-texto .cargo {
+      font-size: 13px;
+      color: var(--laranja);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    .autoridade-texto p {
+      font-size: 15px;
+      color: #CCCCCC;
+      line-height: 1.7;
+    }
+
+    /* ── O QUE VOCÊ VAI APRENDER ── */
+    .secao-beneficios { padding: 48px 0; }
+    .secao-beneficios h2 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+    .lista-beneficios {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .lista-beneficios li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 15px;
+      color: #DDDDDD;
+      padding: 14px 18px;
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: 10px;
+    }
+    .lista-beneficios li .check {
+      color: var(--verde);
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-weight: 900;
+    }
+    .lista-beneficios li strong { color: var(--branco); }
+
+    /* ── DEPOIMENTOS ── */
+    .secao-depoimentos { padding: 48px 0; }
+    .secao-depoimentos h2 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      margin-bottom: 28px;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .grid-depoimentos {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .card-depoimento {
+      background: var(--cinza-card);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .depo-estrelas { color: var(--amarelo); font-size: 16px; margin-bottom: 12px; letter-spacing: 2px; }
+    .depo-texto {
+      font-size: 15px;
+      color: #DDDDDD;
+      line-height: 1.7;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+    .depo-resultado {
+      display: inline-block;
+      background: rgba(34,197,94,0.12);
+      color: var(--verde);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+    .depo-nome {
+      font-size: 13px;
+      font-weight: 700;
+      color: #888;
+      border-top: 1px solid var(--cinza-borda);
+      padding-top: 14px;
+      margin-top: 4px;
+    }
+
+    /* ── OFERTA ── */
+    .secao-oferta { padding: 48px 0; }
+    .card-oferta {
+      background: var(--cinza-card);
+      border: 2px solid var(--laranja);
+      border-radius: 16px;
+      padding: 36px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-oferta::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--laranja), var(--amarelo), var(--laranja));
+    }
+    .oferta-nome {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--cinza-texto);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .oferta-titulo {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 900;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .oferta-preco-antigo {
+      font-size: 15px;
+      color: var(--cinza-texto);
+      text-decoration: line-through;
+      margin-bottom: 4px;
+    }
+    .oferta-preco {
+      font-size: clamp(42px, 8vw, 58px);
+      font-weight: 900;
+      color: var(--laranja);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .oferta-preco sup {
+      font-size: 24px;
+      vertical-align: super;
+      font-weight: 800;
+    }
+    .oferta-parcelas {
+      font-size: 14px;
+      color: var(--cinza-texto);
+      margin-bottom: 28px;
+    }
+    .oferta-inclui {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .oferta-inclui li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      color: #DDDDDD;
+    }
+    .oferta-inclui li .check { color: var(--verde); font-weight: 900; font-size: 16px; }
+    .oferta-garantia {
+      background: rgba(34,197,94,0.07);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .garantia-icone { font-size: 28px; flex-shrink: 0; }
+    .garantia-texto { font-size: 13px; color: #CCCCCC; line-height: 1.5; }
+    .garantia-texto strong { color: var(--verde); display: block; margin-bottom: 2px; }
+
+    /* ── ORDER BUMP ── */
+    .secao-order-bump { padding: 40px 0 48px; }
+    .card-bump {
+      background: linear-gradient(135deg, #1A1000 0%, #1A1A00 100%);
+      border: 2px solid var(--amarelo);
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-bump::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--amarelo), var(--laranja), var(--amarelo));
+    }
+    .bump-tag {
+      display: inline-block;
+      background: var(--amarelo);
+      color: #000;
+      font-weight: 900;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+    .bump-titulo {
+      font-size: clamp(18px, 3.5vw, 24px);
+      font-weight: 900;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .bump-titulo .destaque { color: var(--amarelo); }
+    .bump-desc {
+      font-size: 14px;
+      color: #CCCCCC;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .bump-inclui {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .bump-inclui li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #DDDDDD;
+    }
+    .bump-inclui li .check { color: var(--amarelo); font-weight: 900; }
+    .bump-preco-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .bump-preco-info { }
+    .bump-preco-de {
+      font-size: 13px;
+      color: var(--cinza-texto);
+      text-decoration: line-through;
+    }
+    .bump-preco-por {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--amarelo);
+      line-height: 1;
+    }
+    .bump-economia {
+      font-size: 12px;
+      color: var(--verde);
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .btn-bump {
+      display: inline-block;
+      background: var(--amarelo);
+      color: #000;
+      text-decoration: none;
+      font-weight: 900;
+      font-size: 15px;
+      padding: 16px 28px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-align: center;
+      flex: 1;
+      min-width: 200px;
+      letter-spacing: 0.2px;
+    }
+    .btn-bump:hover {
+      background: #E6C200;
+      transform: translateY(-2px);
+    }
+
+    /* ── FAQ ── */
+    .secao-faq { padding: 48px 0; }
+    .secao-faq h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--cinza-borda);
+      padding: 20px 0;
+    }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-pergunta {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--branco);
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .faq-resposta {
+      font-size: 14px;
+      color: #AAAAAA;
+      line-height: 1.7;
+    }
+
+    /* ── CTA FINAL ── */
+    .secao-cta-final {
+      padding: 56px 0 64px;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255,107,0,0.07) 0%, transparent 70%);
+    }
+    .secao-cta-final h2 {
+      font-size: clamp(24px, 4.5vw, 38px);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .secao-cta-final h2 .destaque { color: var(--laranja); }
+    .secao-cta-final p {
+      font-size: 16px;
+      color: #AAAAAA;
+      margin-bottom: 32px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── RODAPÉ ── */
+    footer {
+      background: #070707;
+      border-top: 1px solid var(--cinza-borda);
+      padding: 32px 20px;
+      text-align: center;
+    }
+    footer p {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.8;
+    }
+    footer a { color: #666; text-decoration: underline; }
+
+    /* ── RESPONSIVO ── */
+    @media (min-width: 600px) {
+      .grid-depoimentos { grid-template-columns: 1fr 1fr; }
+      .card-autoridade { flex-wrap: nowrap; }
+    }
+    @media (max-width: 500px) {
+      .prova-rapida { gap: 16px; }
+      .card-oferta { padding: 28px 20px; }
+      .card-bump { padding: 24px 18px; }
+      .bump-preco-wrapper { flex-direction: column; }
+      .btn-bump { width: 100%; }
+      .countdown-wrapper { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA URGÊNCIA -->
+  <div class="barra-urgencia">
+    Oferta especial disponivel por tempo limitado — <span>Preco pode subir a qualquer momento</span>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <section style="padding: 20px 20px 0; text-align: center;">
+    <div class="countdown-wrapper">
+      <span class="countdown-label">Esta oferta expira em</span>
+      <div class="countdown-timer">
+        <div class="countdown-bloco">
+          <span class="countdown-num" id="cd-min">15</span>
+          <span class="countdown-unit">min</span>
+        </div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-bloco">
+          <span class="countdown-num" id="cd-seg">00</span>
+          <span class="countdown-unit">seg</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="container">
+      <span class="tag">E-book Digital — Entrega Imediata</span>
+      <h1>
+        Voce vende, vende, vende —<br>
+        e no fim do mes o dinheiro<br>
+        <span class="destaque">simplesmente some.</span>
+      </h1>
+      <p class="sub">
+        O problema nao e a quantidade de vendas.<br>
+        <strong>O problema e que voce nao sabe o preco certo do seu produto.</strong>
+      </p>
+
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 32px;">
+        <a href="[LINK_CHECKOUT_BASICO]" class="btn-cta pulse" onclick="fbq('track', 'InitiateCheckout')">
+          QUERO APRENDER A PRECIFICAR CERTO — R$27,90
+        </a>
+        <span class="btn-garantia">
+          <span>Garantia de 7 dias</span> — Se nao gostar, devolvemos 100% do seu dinheiro
+        </span>
+      </div>
+
+      <!-- PROVA SOCIAL RAPIDA -->
+      <div class="prova-rapida">
+        <div class="prova-item">
+          <span class="prova-num">205</span>
+          <span class="prova-desc">Vendas Comprovadas</span>
+        </div>
+        <div class="prova-item">
+          <span class="prova-num">[NUMERO_RESULTADO]%</span>
+          <span class="prova-desc">Aumentaram o lucro</span>
+        </div>
+        <div class="prova-item">
+          <span class="prova-num">7 dias</span>
+          <span class="prova-desc">Garantia total</span>
+        </div>
+        <div class="prova-item">
+          <span class="prova-num">R$27,90</span>
+          <span class="prova-desc">Acesso vitalicio</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- ─── DOR ─── -->
+  <section class="secao-dor">
+    <div class="container">
+      <span class="tag" style="margin-bottom: 20px; display: inline-block;">Voce se identifica com isso?</span>
+      <h2>
+        Trabalha o dia todo e nao entende<br>
+        por que o lucro nunca aparece
+      </h2>
+      <ul class="lista-dor">
+        <li>
+          <span class="icone">&#128533;</span>
+          <div>
+            <strong>Voce cobra "no olho" e nao sabe se esta lucrando ou perdendo</strong>
+            Calcula o preco com base no que o concorrente cobra — e nao tem certeza se o que entra cobre o que sai.
+          </div>
+        </li>
+        <li>
+          <span class="icone">&#128545;</span>
+          <div>
+            <strong>Quando da desconto, sente que esta "jogando dinheiro fora"</strong>
+            Mas nao sabe como negar sem perder a venda. Entao abaixa o preco e reza para compensar no volume.
+          </div>
+        </li>
+        <li>
+          <span class="icone">&#128557;</span>
+          <div>
+            <strong>No fim do mes, a conta nao fecha — mesmo vendendo bastante</strong>
+            O caixa esta sempre apertado. Parece que quanto mais voce vende, mais voce "deve".
+          </div>
+        </li>
+      </ul>
+      <div class="caixa-agitacao">
+        A realidade e brutal: <strong>a maioria dos pequenos empreendedores nao esta trabalhando para si mesma. Esta trabalhando de graca — ou pior, pagando para trabalhar.</strong> Nao por falta de esforco, mas porque ninguem ensinou a precificar do jeito certo.
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- ─── SOLUÇÃO ─── -->
+  <section class="secao-solucao">
+    <div class="container">
+      <span class="tag" style="margin-bottom: 20px; display: inline-block;">A solucao que voce precisava</span>
+      <h2>
+        O metodo que vai te mostrar<br>
+        <span class="destaque">o preco certo do seu produto</span><br>
+        — de uma vez por todas
+      </h2>
+      <p>
+        O <strong>E-book Precificacao Lucrativa</strong> e um guia pratico e direto ao ponto para donos de pequenos negocios aprenderem a precificar seus produtos com base em numeros reais — nao em chute, nao em concorrente, nao em "achismo".
+      </p>
+      <p>
+        Em linguagem simples, sem formula complicada, voce vai descobrir exatamente <strong>quanto cobrar pelo seu produto para cobrir todos os custos, pagar a si mesmo e ainda sobrar lucro de verdade.</strong>
+      </p>
+
+      <!-- MOCKUP CAPA -->
+      <div class="capa-mockup">
+        <span class="capa-icone">&#128218;</span>
+        <div class="capa-titulo">Precificacao Lucrativa</div>
+        <div class="capa-sub">Como precificar seus produtos para lucrar de verdade</div>
+        <div class="capa-autor">por Valter Leite</div>
+      </div>
+
+      <p style="text-align: center; font-size: 14px; color: var(--cinza-texto);">
+        <em>(Substitua pelo arquivo [FOTO_VALTER] ou pela capa real do e-book)</em>
+      </p>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- ─── AUTORIDADE ─── -->
+  <section class="secao-autoridade">
+    <div class="container">
+      <span class="tag" style="margin-bottom: 24px; display: inline-block;">Quem vai te ensinar</span>
+      <div class="card-autoridade">
+        <div class="foto-autoridade">
+          <!-- Substitua pelo caminho real da foto -->
+          <img src="[FOTO_VALTER]" alt="Valter Leite" onerror="this.style.display='none'; this.parentNode.innerHTML='&#128100;'" />
+        </div>
+        <div class="autoridade-texto">
+          <h3>Valter Leite</h3>
+          <div class="cargo">Especialista em Precificacao e Gestao Financeira</div>
+          <p>
+            Ha anos ajudando pequenos empreendedores — de donos de restaurante a revendedoras de cosmeticos — a pararem de trabalhar de graca e comecar a lucrar de verdade. Mais de 205 empreendedores ja aplicaram o metodo e enxergaram uma mudanca real no caixa do negocio.
+          </p>
+          <p style="margin-top: 12px;">
+            Valter ensina em linguagem simples e pratica. <strong>Sem academicismo, sem formula magica. So o que funciona para o pequeno negocio brasileiro.</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- ─── BENEFÍCIOS ─── -->
+  <section class="secao-beneficios">
+    <div class="container">
+      <span class="tag" style="margin-bottom: 20px; display: inline-block;">O que voce vai aprender</span>
+      <h2>Tudo o que voce precisa saber para precificar e lucrar de verdade</h2>
+      <ul class="lista-beneficios">
+        <li>
+          <span class="check">&#10003;</span>
+          <div><strong>Calcule o custo real do seu produto</strong> — inclui materia-prima, embalagem, mao de obra, despesas fixas e o seu proprio salario</div>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <div><strong>Defina sua margem de lucro com seguranca</strong> — saiba exatamente quanto precisa cobrar para o negocio ser sustentavel</div>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <div><strong>Pare de copiar o preco do concorrente</strong> — entenda por que isso e perigoso e como usar a concorrencia a seu favor sem se destruir</div>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <div><strong>Aprenda a dar desconto sem prejuizo</strong> — a tecnica para negociar sem sair no vermelho nunca mais</div>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <div><strong>Identifique quais produtos te drenam dinheiro</strong> — e quais realmente valem a pena manter no seu portfolio</div>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <div><strong>Monte a sua tabela de precos definitiva</strong> — modelo pratico para aplicar imediatamente no seu negocio</div>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <div><strong>Entenda o ponto de equilibrio</strong> — saiba exatamente quantas unidades precisa vender antes de comecar a lucrar</div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CTA MEIO DE PAGINA -->
+  <section style="padding: 40px 20px; text-align: center; background: rgba(255,107,0,0.04); border-top: 1px solid var(--cinza-borda); border-bottom: 1px solid var(--cinza-borda);">
+    <div class="container">
+      <p style="font-size: clamp(18px, 3vw, 22px); font-weight: 800; margin-bottom: 8px; line-height: 1.3;">
+        Pronto para finalmente saber o preco certo dos seus produtos?
+      </p>
+      <p style="font-size: 14px; color: var(--cinza-texto); margin-bottom: 24px;">
+        205 empreendedores ja aplicaram. Agora e a sua vez.
+      </p>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <a href="[LINK_CHECKOUT_BASICO]" class="btn-cta" onclick="fbq('track', 'InitiateCheckout')">
+          QUERO O E-BOOK AGORA — R$27,90
+        </a>
+        <span class="btn-garantia"><span>Acesso imediato</span> apos a confirmacao do pagamento</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- ─── DEPOIMENTOS ─── -->
+  <section class="secao-depoimentos">
+    <div class="container">
+      <span class="tag" style="margin-bottom: 20px; display: inline-block;">Quem ja aplicou</span>
+      <h2>Resultados reais de empreendedores reais</h2>
+      <div class="grid-depoimentos">
+
+        <div class="card-depoimento">
+          <div class="depo-estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <div class="depo-resultado">[DEPOIMENTO_1_RESULTADO]</div>
+          <p class="depo-texto">"[DEPOIMENTO_1_TEXTO]"</p>
+          <div class="depo-nome">— [DEPOIMENTO_1_NOME]</div>
+        </div>
+
+        <div class="card-depoimento">
+          <div class="depo-estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <div class="depo-resultado">[DEPOIMENTO_2_RESULTADO]</div>
+          <p class="depo-texto">"[DEPOIMENTO_2_TEXTO]"</p>
+          <div class="depo-nome">— [DEPOIMENTO_2_NOME]</div>
+        </div>
+
+        <div class="card-depoimento" style="grid-column: 1 / -1;">
+          <div class="depo-estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <div class="depo-resultado">[DEPOIMENTO_3_RESULTADO]</div>
+          <p class="depo-texto">"[DEPOIMENTO_3_TEXTO]"</p>
+          <div class="depo-nome">— [DEPOIMENTO_3_NOME]</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- ─── OFERTA PRINCIPAL ─── -->
+  <section class="secao-oferta">
+    <div class="container">
+      <span class="tag" style="margin-bottom: 24px; display: inline-block;">Sua oferta</span>
+      <div class="card-oferta">
+        <div class="oferta-nome">E-book Digital</div>
+        <div class="oferta-titulo">Precificacao Lucrativa</div>
+        <p style="font-size: 14px; color: var(--cinza-texto); margin-bottom: 20px;">Como Precificar Produtos para Lucrar de Verdade</p>
+        <div class="oferta-preco-antigo">De R$97,00</div>
+        <div class="oferta-preco"><sup>R$</sup>27<small style="font-size: 30px;">,90</small></div>
+        <div class="oferta-parcelas">Pagamento unico — Acesso vitalicio</div>
+
+        <ul class="oferta-inclui">
+          <li><span class="check">&#10003;</span> E-book Precificacao Lucrativa (PDF completo)</li>
+          <li><span class="check">&#10003;</span> Acesso imediato apos pagamento</li>
+          <li><span class="check">&#10003;</span> Leitura em qualquer dispositivo</li>
+          <li><span class="check">&#10003;</span> Garantia incondicional de 7 dias</li>
+        </ul>
+
+        <div class="oferta-garantia">
+          <span class="garantia-icone">&#128737;</span>
+          <div class="garantia-texto">
+            <strong>Garantia de 7 dias — Risco zero para voce</strong>
+            Se em 7 dias voce nao achar que valeu cada centavo, so manda um email e devolvemos 100% do valor. Sem perguntas, sem burocracia.
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <a href="[LINK_CHECKOUT_BASICO]" class="btn-cta pulse" onclick="fbq('track', 'InitiateCheckout')">
+            GARANTIR MEU E-BOOK — R$27,90
+          </a>
+          <span class="btn-garantia">
+            <span>PIX, Cartao ou Boleto</span> — Entrega imediata no seu email
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ORDER BUMP ─── -->
+  <section class="secao-order-bump">
+    <div class="container">
+      <div class="card-bump">
+        <span class="bump-tag">Oferta especial — So para quem esta nessa pagina</span>
+        <h2 class="bump-titulo">
+          Leve tambem o <span class="destaque">Pacote Master</span> —<br>
+          Precificacao + Fluxo de Caixa + DRE
+        </h2>
+        <p class="bump-desc">
+          Alem de saber o preco certo, voce vai ter controle total sobre o dinheiro do seu negocio. O Pacote Master reune os 3 materiais mais importantes para a saude financeira do seu negocio — tudo junto, em acesso imediato.
+        </p>
+        <ul class="bump-inclui">
+          <li><span class="check">&#10003;</span> E-book Precificacao Lucrativa</li>
+          <li><span class="check">&#10003;</span> E-book Fluxo de Caixa — controle entradas e saidas sem complicacao</li>
+          <li><span class="check">&#10003;</span> E-book DRE Simplificado — entenda se seu negocio esta mesmo lucrando</li>
+          <li><span class="check">&#10003;</span> Acesso vitalicio aos 3 materiais</li>
+          <li><span class="check">&#10003;</span> Garantia de 7 dias</li>
+        </ul>
+        <div class="bump-preco-wrapper">
+          <div class="bump-preco-info">
+            <div class="bump-preco-de">Separado custaria R$83,70</div>
+            <div class="bump-preco-por">R$87,90</div>
+            <div class="bump-economia">Voce leva tudo por menos do que o separado</div>
+          </div>
+          <a href="[LINK_CHECKOUT_MASTER]" class="btn-bump" onclick="fbq('track', 'InitiateCheckout')">
+            QUERO O PACOTE MASTER
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- ─── FAQ ─── -->
+  <section class="secao-faq">
+    <div class="container">
+      <span class="tag" style="margin-bottom: 20px; display: inline-block;">Duvidas frequentes</span>
+      <h2>Perguntas que todo mundo faz antes de comprar</h2>
+
+      <div class="faq-item">
+        <div class="faq-pergunta">Como recebo o e-book apos a compra?</div>
+        <div class="faq-resposta">Imediatamente. Assim que o pagamento e confirmado, voce recebe um email com o link de acesso. No caso de PIX, a confirmacao e instantanea. No boleto, leva ate 1 dia util.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-pergunta">Funciona para o meu tipo de negocio?</div>
+        <div class="faq-resposta">Se voce vende produto fisico — seja comida, cosmetico, artesanato, roupa, confeitaria, qualquer coisa — o metodo funciona. O conteudo foi criado especificamente para quem produz ou revende produtos fisicos.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-pergunta">E muito tecnico? Preciso saber contabilidade?</div>
+        <div class="faq-resposta">Nao. O e-book foi escrito em linguagem simples, para quem nao tem formacao em financas. Se voce sabe fazer uma conta de mais e menos, voce consegue aplicar o metodo.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-pergunta">E se eu nao gostar?</div>
+        <div class="faq-resposta">Sem problema. Voce tem 7 dias corridos apos a compra para pedir reembolso integral. Sem burocracia, sem questionamento. E uma garantia real, nao apenas um marketing.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-pergunta">Qual a diferenca entre o e-book basico e o Pacote Master?</div>
+        <div class="faq-resposta">O e-book basico foca exclusivamente em precificacao — como calcular o preco certo dos seus produtos. O Pacote Master inclui mais dois materiais: Fluxo de Caixa (controle do dinheiro entrando e saindo) e DRE Simplificado (para saber se o negocio esta realmente lucrando). Para quem quer uma visao financeira completa, o Pacote e a melhor escolha.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divisor"></div>
+
+  <!-- ─── CTA FINAL ─── -->
+  <section class="secao-cta-final">
+    <div class="container">
+      <span class="tag tag-verde" style="margin-bottom: 20px; display: inline-block;">Decisao final</span>
+      <h2>
+        Voce pode continuar cobrando<br>
+        no chute — ou <span class="destaque">comecar a lucrar<br>
+        de verdade hoje.</span>
+      </h2>
+      <p>
+        Por R$27,90 — menos do que um almoco — voce descobre o preco certo de cada produto que vende e para de trabalhar de graca de uma vez por todas.
+      </p>
+
+      <!-- COUNTDOWN DUPLICADO -->
+      <div class="countdown-wrapper" style="margin: 0 auto 28px;">
+        <span class="countdown-label">Esta oferta expira em</span>
+        <div class="countdown-timer">
+          <div class="countdown-bloco">
+            <span class="countdown-num" id="cd-min2">15</span>
+            <span class="countdown-unit">min</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-bloco">
+            <span class="countdown-num" id="cd-seg2">00</span>
+            <span class="countdown-unit">seg</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 24px;">
+        <a href="[LINK_CHECKOUT_BASICO]" class="btn-cta pulse" onclick="fbq('track', 'InitiateCheckout')">
+          QUERO LUCRAR DE VERDADE — R$27,90
+        </a>
+        <span class="btn-garantia">
+          <span>Garantia de 7 dias.</span> Pagamento seguro. Acesso imediato.
+        </span>
+      </div>
+
+      <p style="font-size: 13px; color: #555; margin-top: 8px;">
+        Ou leve o Pacote Master completo por
+        <a href="[LINK_CHECKOUT_MASTER]" style="color: var(--amarelo); font-weight: 700; text-decoration: none;" onclick="fbq('track', 'InitiateCheckout')">R$87,90 aqui</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── RODAPÉ ─── -->
+  <footer>
+    <p>
+      &copy; 2026 Valter Leite — Todos os direitos reservados<br>
+      Este produto e distribuido digitalmente pela plataforma Eduzz.<br>
+      <a href="#">Politica de Privacidade</a> &nbsp;|&nbsp; <a href="#">Termos de Uso</a> &nbsp;|&nbsp; <a href="mailto:contato@valterleite.com.br">Contato</a>
+    </p>
+    <p style="margin-top: 12px; font-size: 11px; color: #333;">
+      Os resultados mencionados nesta pagina sao reais e verificados, porem nao representam garantia de resultado para todos os compradores. Resultados dependem do esforco, dedicacao e contexto de cada negocio.
+    </p>
+  </footer>
+
+  <!-- ─── SCRIPTS ─── -->
+  <script>
+    // COUNTDOWN TIMER — 15 minutos
+    (function () {
+      var DURACAO = 15 * 60; // segundos
+      var inicio = sessionStorage.getItem('cd_inicio');
+      if (!inicio) {
+        inicio = Date.now();
+        sessionStorage.setItem('cd_inicio', inicio);
+      }
+      inicio = parseInt(inicio, 10);
+
+      function atualizar() {
+        var decorrido = Math.floor((Date.now() - inicio) / 1000);
+        var restante = Math.max(0, DURACAO - decorrido);
+        var min = Math.floor(restante / 60);
+        var seg = restante % 60;
+        var minStr = String(min).padStart(2, '0');
+        var segStr = String(seg).padStart(2, '0');
+
+        var elMin1  = document.getElementById('cd-min');
+        var elSeg1  = document.getElementById('cd-seg');
+        var elMin2  = document.getElementById('cd-min2');
+        var elSeg2  = document.getElementById('cd-seg2');
+
+        if (elMin1)  elMin1.textContent  = minStr;
+        if (elSeg1)  elSeg1.textContent  = segStr;
+        if (elMin2)  elMin2.textContent  = minStr;
+        if (elSeg2)  elSeg2.textContent  = segStr;
+
+        if (restante > 0) {
+          setTimeout(atualizar, 500);
+        }
+      }
+
+      atualizar();
+    })();
+
+    // SCROLL SUAVE para anchors internos
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var alvo = document.querySelector(this.getAttribute('href'));
+        if (alvo) {
+          e.preventDefault();
+          alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
