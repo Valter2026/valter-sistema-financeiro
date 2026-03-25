@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const url   = new URL(req.url)
   const today = new Date()
   const start = url.searchParams.get('start') ?? `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`
   const end   = url.searchParams.get('end')   ?? today.toISOString().split('T')[0]
 
   const [{ data: txs, error: e1 }, { data: accounts, error: e2 }] = await Promise.all([
-    supabaseAdmin
+    supabase
       .from('fin_transactions')
       .select('type,amount,status,date,account_id,to_account_id')
       .gte('date', start)
       .lte('date', end),
-    supabaseAdmin.from('fin_accounts').select('*').eq('active', true),
+    supabase.from('fin_accounts').select('*').eq('active', true),
   ])
 
   if (e1 || e2) return NextResponse.json({ error: e1?.message || e2?.message }, { status: 500 })
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Contas a pagar/receber pendentes (sem filtro de data — todos os pendentes)
-  const { data: pending } = await supabaseAdmin
+  const { data: pending } = await supabase
     .from('fin_transactions')
     .select('type,amount,date,status')
     .in('status', ['pending', 'scheduled'])

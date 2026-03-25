@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 import { runWeeklyScript } from '@/lib/pf-financial-context'
 
 // GET — lê o script salvo; se não existir, gera automaticamente
 export async function GET() {
-  const { data } = await supabaseAdmin
+  const { supabase } = await requireAuth()
+  const { data } = await supabase
     .from('pf_advisor_scripts')
     .select('*')
     .eq('type', 'weekly')
@@ -15,7 +16,7 @@ export async function GET() {
   // Auto-gera se ainda não existir
   try {
     const script = await runWeeklyScript()
-    await supabaseAdmin.from('pf_advisor_scripts').upsert({
+    await supabase.from('pf_advisor_scripts').upsert({
       type: 'weekly', script, generated_at: new Date().toISOString(),
     })
     return NextResponse.json({ type: 'weekly', script, generated_at: new Date().toISOString() })
@@ -26,9 +27,10 @@ export async function GET() {
 
 // POST — força regeneração
 export async function POST() {
+  const { supabase } = await requireAuth()
   try {
     const script = await runWeeklyScript()
-    await supabaseAdmin.from('pf_advisor_scripts').upsert({
+    await supabase.from('pf_advisor_scripts').upsert({
       type: 'weekly', script, generated_at: new Date().toISOString(),
     })
     return NextResponse.json({ ok: true, script })

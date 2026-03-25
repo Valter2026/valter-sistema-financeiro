@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { searchParams } = new URL(req.url)
   const start = searchParams.get('start') ?? new Date().toISOString().slice(0, 7) + '-01'
   const end   = searchParams.get('end')   ?? new Date().toISOString().slice(0, 10)
 
   const [txRes, accRes, goalRes, billsRes] = await Promise.all([
-    supabaseAdmin.from('pf_transactions').select('type,amount,status,date').eq('status', 'confirmed').gte('date', start).lte('date', end),
-    supabaseAdmin.from('pf_accounts').select('id,name,color,opening_balance,active'),
-    supabaseAdmin.from('pf_goals').select('*').eq('status', 'active'),
-    supabaseAdmin.from('pf_transactions').select('id,amount,date,description,status').in('status', ['pending','scheduled']).eq('type', 'expense'),
+    supabase.from('pf_transactions').select('type,amount,status,date').eq('status', 'confirmed').gte('date', start).lte('date', end),
+    supabase.from('pf_accounts').select('id,name,color,opening_balance,active'),
+    supabase.from('pf_goals').select('*').eq('status', 'active'),
+    supabase.from('pf_transactions').select('id,amount,date,description,status').in('status', ['pending','scheduled']).eq('type', 'expense'),
   ])
 
   const txs   = txRes.data ?? []
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
   const resultado = receitas - despesas
 
   // Saldo real por conta = saldo inicial + entradas - saídas confirmadas
-  const { data: allTx } = await supabaseAdmin
+  const { data: allTx } = await supabase
     .from('pf_transactions')
     .select('account_id,type,amount,status')
     .eq('status', 'confirmed')

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 // ─── Parser de números em português ─────────────────────────────────────────
 const ONES: Record<string, number> = {
@@ -214,6 +214,7 @@ export async function POST(req: NextRequest) {
 
 // PUT /api/pf/voice — salva lançamento por voz (auto-confirm)
 export async function PUT(req: NextRequest) {
+  const { user, supabase } = await requireAuth()
   const body = await req.json()
   const { text, account_id } = body
 
@@ -225,7 +226,7 @@ export async function PUT(req: NextRequest) {
   // Resolve categoria — busca existente ou cria
   let categoryId: string | null = null
   if (parsed.suggestedCategoryName) {
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await supabase
       .from('pf_categories')
       .select('id')
       .ilike('name', parsed.suggestedCategoryName)
@@ -237,7 +238,7 @@ export async function PUT(req: NextRequest) {
       // Busca parent
       let parentId: string | null = null
       if (parsed.suggestedParentName) {
-        const { data: parent } = await supabaseAdmin
+        const { data: parent } = await supabase
           .from('pf_categories')
           .select('id')
           .ilike('name', parsed.suggestedParentName)
@@ -245,9 +246,9 @@ export async function PUT(req: NextRequest) {
         parentId = parent?.id ?? null
       }
       // Cria subcategoria automaticamente
-      const { data: newCat } = await supabaseAdmin
+      const { data: newCat } = await supabase
         .from('pf_categories')
-        .insert([{ name: parsed.suggestedCategoryName, type: parsed.type, color: '#6b7280', parent_id: parentId }])
+        .insert([{ name: parsed.suggestedCategoryName, type: parsed.type, color: '#6b7280', parent_id: parentId, user_id: user.id }])
         .select().single()
       categoryId = newCat?.id ?? null
     }
@@ -256,7 +257,7 @@ export async function PUT(req: NextRequest) {
   // Resolve conta
   let resolvedAccountId = account_id || null
   if (!resolvedAccountId && parsed.suggestedAccountType) {
-    const { data: acc } = await supabaseAdmin
+    const { data: acc } = await supabase
       .from('pf_accounts')
       .select('id')
       .eq('type', parsed.suggestedAccountType)
@@ -265,7 +266,7 @@ export async function PUT(req: NextRequest) {
     resolvedAccountId = acc?.id ?? null
   }
   if (!resolvedAccountId) {
-    const { data: firstAcc } = await supabaseAdmin
+    const { data: firstAcc } = await supabase
       .from('pf_accounts')
       .select('id')
       .limit(1)
@@ -274,7 +275,7 @@ export async function PUT(req: NextRequest) {
   }
 
   // Salva lançamento
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('pf_transactions')
     .insert([{
       type:        parsed.type,
@@ -286,6 +287,7 @@ export async function PUT(req: NextRequest) {
       status:      'confirmed',
       recurrence:  'single',
       voice_input: text,
+      user_id:     user.id,
     }])
     .select('*, account:pf_accounts(name), category:pf_categories(name,icon)')
     .single()

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET() {
-  const { data: projects, error } = await supabaseAdmin
+  const { supabase } = await requireAuth()
+  const { data: projects, error } = await supabase
     .from('pf_projects')
     .select('*')
     .order('created_at', { ascending: false })
@@ -11,7 +12,7 @@ export async function GET() {
 
   // Adiciona total gasto por projeto
   const withSpent = await Promise.all((projects ?? []).map(async p => {
-    const { data: txs } = await supabaseAdmin
+    const { data: txs } = await supabase
       .from('pf_transactions')
       .select('amount, type')
       .eq('project_id', p.id)
@@ -29,8 +30,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const { user, supabase } = await requireAuth()
   const body = await req.json()
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('pf_projects')
     .insert([{
       name:        body.name,
@@ -41,6 +43,7 @@ export async function POST(req: NextRequest) {
       start_date:  body.start_date  || null,
       end_date:    body.end_date    || null,
       status:      body.status      || 'active',
+      user_id:     user.id,
     }])
     .select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -48,9 +51,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const body = await req.json()
   const { id, ...rest } = body
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('pf_projects')
     .update(rest)
     .eq('id', id)
@@ -60,10 +64,11 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { id } = await req.json()
   // Desvincula lançamentos antes de deletar
-  await supabaseAdmin.from('pf_transactions').update({ project_id: null }).eq('project_id', id)
-  const { error } = await supabaseAdmin.from('pf_projects').delete().eq('id', id)
+  await supabase.from('pf_transactions').update({ project_id: null }).eq('project_id', id)
+  const { error } = await supabase.from('pf_projects').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

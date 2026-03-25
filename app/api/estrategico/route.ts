@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 // Mapeamento de produto → BU por palavras-chave
 function getBU(nome: string): string {
@@ -39,10 +39,11 @@ export const maxDuration = 30
 
 export async function GET() {
   try {
+    const { supabase } = await requireAuth()
     const hoje = new Date().toISOString().split('T')[0]
 
     // Vendas do ano corrente (2026)
-    const { data: salesRaw, error } = await supabaseAdmin
+    const { data: salesRaw, error } = await supabase
       .from('sales')
       .select('sale_id, content_title, sale_status, price_total, price_net, date_payment, date_create')
       .or('sale_status.eq.3,sale_status.eq.7')

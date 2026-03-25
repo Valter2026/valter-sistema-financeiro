@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 const ACCOUNT_TYPE_LABEL: Record<string, string> = {
   checking:    'Conta Corrente',
@@ -11,8 +11,9 @@ const ACCOUNT_TYPE_LABEL: Record<string, string> = {
 }
 
 export async function GET() {
-  const { data: accs } = await supabaseAdmin.from('pf_accounts').select('*').order('name')
-  const { data: allTx } = await supabaseAdmin.from('pf_transactions').select('account_id,type,amount,status').eq('status', 'confirmed')
+  const { supabase } = await requireAuth()
+  const { data: accs } = await supabase.from('pf_accounts').select('*').order('name')
+  const { data: allTx } = await supabase.from('pf_transactions').select('account_id,type,amount,status').eq('status', 'confirmed')
 
   const accountsWithBalance = (accs ?? []).map(acc => {
     const movements = (allTx ?? []).filter(t => t.account_id === acc.id)

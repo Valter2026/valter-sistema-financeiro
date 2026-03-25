@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export const maxDuration = 30
 
@@ -25,16 +25,16 @@ function getRange(period: string, customStart?: string, customEnd?: string): { s
   return { start: start.toISOString().split('T')[0], end: end.toISOString().split('T')[0] }
 }
 
-async function querySales(start: string, end: string) {
+async function querySales(supabase: any, start: string, end: string) {
   // Vendas com date_payment no período
-  const { data: s1, error: e1 } = await supabaseAdmin
+  const { data: s1, error: e1 } = await supabase
     .from('sales').select('*')
     .gte('date_payment', start)
     .lte('date_payment', end + 'T23:59:59')
   if (e1) throw new Error(e1.message)
 
   // Vendas pagas (status=3) com date_payment nulo mas date_create no período
-  const { data: s2, error: e2 } = await supabaseAdmin
+  const { data: s2, error: e2 } = await supabase
     .from('sales').select('*')
     .eq('sale_status', 3)
     .is('date_payment', null)
@@ -49,13 +49,14 @@ async function querySales(start: string, end: string) {
 
 export async function GET(req: NextRequest) {
   try {
+    const { supabase } = await requireAuth()
     const url         = new URL(req.url)
     const period      = url.searchParams.get('period') ?? 'all'
     const customStart = url.searchParams.get('start') ?? undefined
     const customEnd   = url.searchParams.get('end')   ?? undefined
     const { start, end } = getRange(period, customStart, customEnd)
 
-    const all    = await querySales(start, end)
+    const all    = await querySales(supabase, start, end)
     const pagas  = all.filter((s: any) => s.sale_status === 3)
     const reemb  = all.filter((s: any) => s.sale_status === 7) // reembolsados
 

@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const url   = new URL(req.url)
   const today = new Date()
   const year  = parseInt(url.searchParams.get('year') ?? String(today.getFullYear()))
   const start = `${year}-01-01`
   const end   = `${year}-12-31`
 
-  const { data: txs, error } = await supabaseAdmin
+  const { data: txs, error } = await supabase
     .from('fin_transactions')
     .select('type,amount,status,date,category:fin_categories(id,name,type,parent_id)')
     .gte('date', start)

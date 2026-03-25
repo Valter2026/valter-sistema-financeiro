@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { supabase } = await requireAuth()
+  const { data, error } = await supabase
     .from('fin_categories')
     .select('*')
     .eq('active', true)
@@ -13,10 +14,11 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const { user, supabase } = await requireAuth()
   const body = await req.json()
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('fin_categories')
-    .insert(body)
+    .insert({ ...body, user_id: user.id })
     .select()
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -24,9 +26,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const body = await req.json()
   const { id, ...rest } = body
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('fin_categories')
     .update(rest)
     .eq('id', id)
@@ -37,8 +40,9 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { id } = await req.json()
-  const { error } = await supabaseAdmin
+  const { error } = await supabase
     .from('fin_categories')
     .update({ active: false })
     .eq('id', id)

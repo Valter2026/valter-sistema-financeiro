@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 // GET — lista notificações (não lidas primeiro)
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const limit = Number(new URL(req.url).searchParams.get('limit') ?? '20')
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('pf_notifications')
     .select('*')
     .order('read',       { ascending: true })
@@ -16,17 +17,19 @@ export async function GET(req: NextRequest) {
 
 // PUT — marca como lida (id='all' marca todas)
 export async function PUT(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { id } = await req.json()
   if (id === 'all') {
-    await supabaseAdmin.from('pf_notifications').update({ read: true }).eq('read', false)
+    await supabase.from('pf_notifications').update({ read: true }).eq('read', false)
   } else {
-    await supabaseAdmin.from('pf_notifications').update({ read: true }).eq('id', id)
+    await supabase.from('pf_notifications').update({ read: true }).eq('id', id)
   }
   return NextResponse.json({ ok: true })
 }
 
 // DELETE — apaga notificações já lidas
 export async function DELETE() {
-  await supabaseAdmin.from('pf_notifications').delete().eq('read', true)
+  const { supabase } = await requireAuth()
+  await supabase.from('pf_notifications').delete().eq('read', true)
   return NextResponse.json({ ok: true })
 }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
+  const { user, supabase } = await requireAuth()
   const { rows } = await req.json()
   if (!Array.isArray(rows) || rows.length === 0)
     return NextResponse.json({ error: 'Nenhum lançamento' }, { status: 400 })
@@ -16,9 +17,10 @@ export async function POST(req: NextRequest) {
     status:      'confirmed',
     recurrence:  'single',
     notes:       r.notes || null,
+    user_id:     user.id,
   }))
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('pf_transactions')
     .insert(toInsert)
     .select()

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export const FIN_ADVISOR_SYSTEM_PROMPT = `Você é um Consultor Financeiro Empresarial de elite, especialista em gestão financeira de pequenas e médias empresas brasileiras.
 Apresente-se sempre como "seu Consultor Financeiro Empresarial" — nunca use nomes de pessoas reais.
@@ -58,15 +59,16 @@ Regras:
 - Termine com 3 decisões financeiras prioritárias para o mês
 - Retorne APENAS o texto do script, sem explicações adicionais`
 
-export async function getFinancialContext() {
+export async function getFinancialContext(db?: SupabaseClient) {
+  const sb = db ?? supabaseAdmin
   const now   = new Date()
   const start = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`
   const end   = now.toISOString().split('T')[0]
 
   const [txRes, accRes, catRes] = await Promise.all([
-    supabaseAdmin.from('fin_transactions').select('type,amount,status,date,description,category_id').eq('status','confirmed').gte('date',start).lte('date',end),
-    supabaseAdmin.from('fin_accounts').select('*').eq('active',true),
-    supabaseAdmin.from('fin_categories').select('id,name,type'),
+    sb.from('fin_transactions').select('type,amount,status,date,description,category_id').eq('status','confirmed').gte('date',start).lte('date',end),
+    sb.from('fin_accounts').select('*').eq('active',true),
+    sb.from('fin_categories').select('id,name,type'),
   ])
 
   const txs  = txRes.data  ?? []
@@ -77,7 +79,7 @@ export async function getFinancialContext() {
   const despesas = txs.filter(t => t.type==='expense').reduce((a,t) => a+Number(t.amount), 0)
 
   // Saldo por conta
-  const { data: allTx } = await supabaseAdmin.from('fin_transactions').select('account_id,to_account_id,type,amount').eq('status','confirmed')
+  const { data: allTx } = await sb.from('fin_transactions').select('account_id,to_account_id,type,amount').eq('status','confirmed')
   const accountsWithBalance = accs.map(acc => {
     const mov    = (allTx??[]).filter(t => t.account_id === acc.id)
     const transIn  = (allTx??[]).filter(t => t.to_account_id === acc.id && t.type === 'transfer')
@@ -90,11 +92,11 @@ export async function getFinancialContext() {
   const caixaTotal = accountsWithBalance.reduce((a,acc) => a+acc.balance, 0)
 
   // Contas a pagar (pending/scheduled expenses)
-  const { data: aPagar } = await supabaseAdmin.from('fin_transactions')
+  const { data: aPagar } = await sb.from('fin_transactions')
     .select('id,amount,date,due_date,description,category_id').in('status',['pending','scheduled']).eq('type','expense')
 
   // Contas a receber (pending/scheduled income)
-  const { data: aReceber } = await supabaseAdmin.from('fin_transactions')
+  const { data: aReceber } = await sb.from('fin_transactions')
     .select('id,amount,date,due_date,description,category_id').in('status',['pending','scheduled']).eq('type','income')
 
   const today = end
@@ -124,7 +126,7 @@ export async function getFinancialContext() {
     const d = new Date(now.getFullYear(), now.getMonth()-offset, 1)
     const m = String(d.getMonth()+1).padStart(2,'0')
     const y = d.getFullYear()
-    const { data: ht } = await supabaseAdmin.from('fin_transactions')
+    const { data: ht } = await sb.from('fin_transactions')
       .select('type,amount').eq('status','confirmed').gte('date',`${y}-${m}-01`).lte('date',`${y}-${m}-31`)
     const r = (ht??[]).filter(t=>t.type==='income').reduce((a,t)=>a+Number(t.amount),0)
     const e = (ht??[]).filter(t=>t.type==='expense').reduce((a,t)=>a+Number(t.amount),0)
@@ -198,21 +200,21 @@ async function callAnthropic(system: string, userMsg: string, maxTokens = 2048) 
   return await res.json()
 }
 
-export async function runFinAdvisor(question = ''): Promise<any[]> {
-  const ctx   = await getFinancialContext()
+export async function runFinAdvisor(question = '', db?: SupabaseClient): Promise<any[]> {
+  const ctx   = await getFinancialContext(db)
   const aiRes = await callAnthropic(FIN_ADVISOR_SYSTEM_PROMPT, buildFinUserMessage(ctx, question))
   const text  = aiRes.content?.[0]?.text ?? '[]'
   try { const m = text.match(/\[[\s\S]*\]/); return m ? JSON.parse(m[0]) : [] } catch { return [] }
 }
 
-export async function runFinWeeklyScript(): Promise<string> {
-  const ctx   = await getFinancialContext()
+export async function runFinWeeklyScript(db?: SupabaseClient): Promise<string> {
+  const ctx   = await getFinancialContext(db)
   const aiRes = await callAnthropic(FIN_WEEKLY_PROMPT, buildFinUserMessage(ctx), 1500)
   return aiRes.content?.[0]?.text?.trim() ?? ''
 }
 
-export async function runFinMonthlyScript(): Promise<string> {
-  const ctx   = await getFinancialContext()
+export async function runFinMonthlyScript(db?: SupabaseClient): Promise<string> {
+  const ctx   = await getFinancialContext(db)
   const aiRes = await callAnthropic(FIN_MONTHLY_PROMPT, buildFinUserMessage(ctx), 1500)
   return aiRes.content?.[0]?.text?.trim() ?? ''
 }

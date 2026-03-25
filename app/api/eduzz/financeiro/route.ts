@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export const maxDuration = 30
 
@@ -41,14 +41,14 @@ async function getSaldo() {
   }
 }
 
-async function querySales(start: string, end: string) {
-  const { data: s1, error: e1 } = await supabaseAdmin
+async function querySales(supabase: any, start: string, end: string) {
+  const { data: s1, error: e1 } = await supabase
     .from('sales').select('sale_status,sale_total,sale_amount_win,sale_fee,sale_coop,date_payment,date_create')
     .gte('date_payment', start)
     .lte('date_payment', end + 'T23:59:59')
   if (e1) throw new Error(e1.message)
 
-  const { data: s2, error: e2 } = await supabaseAdmin
+  const { data: s2, error: e2 } = await supabase
     .from('sales').select('sale_status,sale_total,sale_amount_win,sale_fee,sale_coop,date_payment,date_create')
     .eq('sale_status', 3)
     .is('date_payment', null)
@@ -93,6 +93,7 @@ function getRange(period: string, customStart?: string, customEnd?: string) {
 
 export async function GET(req: NextRequest) {
   try {
+    const { supabase } = await requireAuth()
     const url         = new URL(req.url)
     const period      = url.searchParams.get('period')  ?? 'mes'
     const customStart = url.searchParams.get('start')   ?? undefined
@@ -112,9 +113,9 @@ export async function GET(req: NextRequest) {
 
     // Busca todos os dados em paralelo
     const [salesPeriodo, salesMes, salesAnt, saldoData] = await Promise.all([
-      querySales(range.start, range.end),
-      querySales(mesCurrent.start, mesCurrent.end),
-      querySales(mesAnterior.start, mesAnterior.end),
+      querySales(supabase, range.start, range.end),
+      querySales(supabase, mesCurrent.start, mesCurrent.end),
+      querySales(supabase, mesAnterior.start, mesAnterior.end),
       getSaldo(),
     ])
 

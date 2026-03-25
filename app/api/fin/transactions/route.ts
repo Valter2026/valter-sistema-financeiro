@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const url    = new URL(req.url)
   const start  = url.searchParams.get('start')
   const end    = url.searchParams.get('end')
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
   const type   = url.searchParams.get('type')
   const accountId = url.searchParams.get('account_id')
 
-  let q = supabaseAdmin
+  let q = supabase
     .from('fin_transactions')
     .select(`
       *,
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const { user, supabase } = await requireAuth()
   const body = await req.json()
 
   // Lançamentos parcelados — gera N registros
@@ -47,16 +49,17 @@ export async function POST(req: NextRequest) {
         due_date: d.toISOString().split('T')[0],
         recurrence_id,
         installment_num: i + 1,
+        user_id: user.id,
       })
     }
-    const { data, error } = await supabaseAdmin.from('fin_transactions').insert(rows).select()
+    const { data, error } = await supabase.from('fin_transactions').insert(rows).select()
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json(data)
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('fin_transactions')
-    .insert(body)
+    .insert({ ...body, user_id: user.id })
     .select()
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -64,9 +67,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const body = await req.json()
   const { id, ...rest } = body
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('fin_transactions')
     .update(rest)
     .eq('id', id)
@@ -77,8 +81,9 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { id } = await req.json()
-  const { error } = await supabaseAdmin.from('fin_transactions').delete().eq('id', id)
+  const { error } = await supabase.from('fin_transactions').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

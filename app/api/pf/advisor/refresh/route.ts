@@ -1,19 +1,19 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 import { runAdvisor, runWeeklyScript, runMonthlyScript } from '@/lib/pf-financial-context'
 
 const WEEKLY_TTL_MS  = 7  * 24 * 60 * 60 * 1000 // 7 dias
 const MONTHLY_TTL_MS = 28 * 24 * 60 * 60 * 1000 // 28 dias
 
-async function autoGenerateScripts() {
+async function autoGenerateScripts(supabase: any) {
   const now = new Date()
 
-  const { data: scripts } = await supabaseAdmin
+  const { data: scripts } = await supabase
     .from('pf_advisor_scripts')
     .select('type,generated_at')
 
-  const weekly  = scripts?.find(s => s.type === 'weekly')
-  const monthly = scripts?.find(s => s.type === 'monthly')
+  const weekly  = scripts?.find((s: any) => s.type === 'weekly')
+  const monthly = scripts?.find((s: any) => s.type === 'monthly')
 
   const weeklyStale  = !weekly  || (now.getTime() - new Date(weekly.generated_at).getTime()  > WEEKLY_TTL_MS)
   const monthlyStale = !monthly || (now.getTime() - new Date(monthly.generated_at).getTime() > MONTHLY_TTL_MS)
@@ -23,7 +23,7 @@ async function autoGenerateScripts() {
   if (weeklyStale) {
     tasks.push(
       runWeeklyScript().then(script =>
-        supabaseAdmin.from('pf_advisor_scripts').upsert({ type: 'weekly', script, generated_at: now.toISOString() })
+        supabase.from('pf_advisor_scripts').upsert({ type: 'weekly', script, generated_at: now.toISOString() })
       ).catch(() => { /* silencioso — não bloqueia o refresh principal */ })
     )
   }
@@ -31,7 +31,7 @@ async function autoGenerateScripts() {
   if (monthlyStale) {
     tasks.push(
       runMonthlyScript().then(script =>
-        supabaseAdmin.from('pf_advisor_scripts').upsert({ type: 'monthly', script, generated_at: now.toISOString() })
+        supabase.from('pf_advisor_scripts').upsert({ type: 'monthly', script, generated_at: now.toISOString() })
       ).catch(() => {})
     )
   }
@@ -41,9 +41,10 @@ async function autoGenerateScripts() {
 
 // POST — roda o consultor, salva no cache, gera notificações e auto-atualiza scripts
 export async function POST() {
+  const { user, supabase } = await requireAuth()
   try {
     // Verifica preferências do usuário
-    const { data: schedule } = await supabaseAdmin
+    const { data: schedule } = await supabase
       .from('pf_advisor_schedule')
       .select('enabled,receive_messages,receive_audio')
       .eq('id', 1)
@@ -56,10 +57,10 @@ export async function POST() {
 
     const [advices] = await Promise.all([
       runAdvisor(),
-      autoGenerateScripts(),
+      autoGenerateScripts(supabase),
     ])
 
-    await supabaseAdmin.from('pf_advisor_cache').upsert({
+    await supabase.from('pf_advisor_cache').upsert({
       id: 1,
       advices,
       generated_at: new Date().toISOString(),
@@ -69,11 +70,12 @@ export async function POST() {
     if (!schedule || schedule.receive_messages !== false) {
       const urgent = advices.filter((a: any) => a.priority === 'high' || a.type === 'alert')
       for (const advice of urgent.slice(0, 3)) {
-        await supabaseAdmin.from('pf_notifications').insert({
+        await supabase.from('pf_notifications').insert({
           type:        advice.type,
           title:       advice.title,
           message:     advice.message,
           action_text: advice.action,
+          user_id:     user.id,
         })
       }
     }
@@ -86,7 +88,8 @@ export async function POST() {
 
 // GET — lê o cache atual (instantâneo)
 export async function GET() {
-  const { data } = await supabaseAdmin
+  const { supabase } = await requireAuth()
+  const { data } = await supabase
     .from('pf_advisor_cache')
     .select('*')
     .eq('id', 1)

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 import { runAdvisor, getFinancialContext } from '@/lib/pf-financial-context'
 
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada' }, { status: 500 })
   }
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
 
     // Se não for pergunta específica, atualiza o cache também
     if (!question) {
-      await supabaseAdmin.from('pf_advisor_cache').upsert({
+      await supabase.from('pf_advisor_cache').upsert({
         id: 1, advices, generated_at: new Date().toISOString(),
       })
     }

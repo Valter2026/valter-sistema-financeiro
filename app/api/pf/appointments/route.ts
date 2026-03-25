@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { searchParams } = req.nextUrl
   const start = searchParams.get('start')
   const end   = searchParams.get('end')
 
-  let query = supabaseAdmin.from('pf_appointments').select('*').order('date').order('time', { nullsFirst: false })
+  let query = supabase.from('pf_appointments').select('*').order('date').order('time', { nullsFirst: false })
   if (start) query = query.gte('date', start)
   if (end)   query = query.lte('date', end)
 
@@ -16,22 +17,25 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const { user, supabase } = await requireAuth()
   const body = await req.json()
-  const { data, error } = await supabaseAdmin.from('pf_appointments').insert([body]).select().single()
+  const { data, error } = await supabase.from('pf_appointments').insert([{ ...body, user_id: user.id }]).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
 
 export async function PUT(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { id, ...body } = await req.json()
-  const { data, error } = await supabaseAdmin.from('pf_appointments').update(body).eq('id', id).select().single()
+  const { data, error } = await supabase.from('pf_appointments').update(body).eq('id', id).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
 
 export async function DELETE(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { id } = await req.json()
-  const { error } = await supabaseAdmin.from('pf_appointments').delete().eq('id', id)
+  const { error } = await supabase.from('pf_appointments').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

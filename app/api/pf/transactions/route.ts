@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { searchParams } = new URL(req.url)
   const type       = searchParams.get('type')
   const status     = searchParams.get('status')
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
   const tag        = searchParams.get('tag')
   const project_id = searchParams.get('project_id')
 
-  let q = supabaseAdmin
+  let q = supabase
     .from('pf_transactions')
     .select('*, account:pf_accounts(id,name,color), category:pf_categories(id,name,color,icon,type)')
     .order('date', { ascending: false })
@@ -35,6 +36,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const { user, supabase } = await requireAuth()
   const body = await req.json()
 
   if (body.recurrence === 'installment' && body.installment_total > 1) {
@@ -56,14 +58,15 @@ export async function POST(req: NextRequest) {
         group_id:            groupId,
         notes:               body.notes || null,
         voice_input:         body.voice_input || null,
+        user_id:             user.id,
       }
     })
-    const { error } = await supabaseAdmin.from('pf_transactions').insert(rows)
+    const { error } = await supabase.from('pf_transactions').insert(rows)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true, installments: body.installment_total })
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('pf_transactions')
     .insert([{
       type:        body.type,
@@ -76,6 +79,7 @@ export async function POST(req: NextRequest) {
       recurrence:  body.recurrence ?? 'single',
       notes:       body.notes || null,
       voice_input: body.voice_input || null,
+      user_id:     user.id,
     }])
     .select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -83,9 +87,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const body = await req.json()
   const { id, ...rest } = body
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('pf_transactions')
     .update(rest)
     .eq('id', id)
@@ -95,8 +100,9 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { id } = await req.json()
-  const { error } = await supabaseAdmin.from('pf_transactions').delete().eq('id', id)
+  const { error } = await supabase.from('pf_transactions').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

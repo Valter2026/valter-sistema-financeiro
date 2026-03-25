@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export const ADVISOR_SYSTEM_PROMPT = `Você é um Consultor Financeiro Pessoal de elite, especialista em finanças pessoais brasileiras.
 Apresente-se sempre como "seu Consultor Financeiro Pessoal" — nunca use nomes de pessoas reais.
@@ -27,17 +28,18 @@ Regras:
 - Gere entre 4 e 7 orientações, priorizando as mais urgentes primeiro
 - Se houver pergunta do usuário, responda como primeira orientação do tipo "tip" com priority "high"`
 
-export async function getFinancialContext() {
+export async function getFinancialContext(db?: SupabaseClient) {
+  const sb = db ?? supabaseAdmin
   const now   = new Date()
   const start = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`
   const end   = now.toISOString().split('T')[0]
 
   const [txRes, accRes, goalRes, budgetRes, billsRes] = await Promise.all([
-    supabaseAdmin.from('pf_transactions').select('type,amount,status,date,description').eq('status','confirmed').gte('date', start).lte('date', end),
-    supabaseAdmin.from('pf_accounts').select('*'),
-    supabaseAdmin.from('pf_goals').select('*').eq('status','active'),
-    supabaseAdmin.from('pf_budgets').select('*, category:pf_categories(name)').eq('month', now.getMonth()+1).eq('year', now.getFullYear()),
-    supabaseAdmin.from('pf_transactions').select('id,amount,date,description,category:pf_categories(name)').in('status',['pending','scheduled']).eq('type','expense'),
+    sb.from('pf_transactions').select('type,amount,status,date,description').eq('status','confirmed').gte('date', start).lte('date', end),
+    sb.from('pf_accounts').select('*'),
+    sb.from('pf_goals').select('*').eq('status','active'),
+    sb.from('pf_budgets').select('*, category:pf_categories(name)').eq('month', now.getMonth()+1).eq('year', now.getFullYear()),
+    sb.from('pf_transactions').select('id,amount,date,description,category:pf_categories(name)').in('status',['pending','scheduled']).eq('type','expense'),
   ])
 
   const txs   = txRes.data   ?? []
@@ -48,7 +50,7 @@ export async function getFinancialContext() {
   const receitas = txs.filter(t => t.type==='income').reduce((a,t) => a+Number(t.amount), 0)
   const despesas = txs.filter(t => t.type==='expense').reduce((a,t) => a+Number(t.amount), 0)
 
-  const { data: allTx } = await supabaseAdmin.from('pf_transactions').select('account_id,type,amount').eq('status','confirmed')
+  const { data: allTx } = await sb.from('pf_transactions').select('account_id,type,amount').eq('status','confirmed')
   const accountsWithBalance = accs.map(acc => {
     const mov    = (allTx??[]).filter(t => t.account_id === acc.id)
     const inflow = mov.filter(t => t.type==='income').reduce((a,t) => a+Number(t.amount), 0)
@@ -78,7 +80,7 @@ export async function getFinancialContext() {
     const d  = new Date(now.getFullYear(), now.getMonth()-offset, 1)
     const m  = String(d.getMonth()+1).padStart(2,'0')
     const y  = d.getFullYear()
-    const { data: ht } = await supabaseAdmin.from('pf_transactions')
+    const { data: ht } = await sb.from('pf_transactions')
       .select('type,amount').eq('status','confirmed').gte('date',`${y}-${m}-01`).lte('date',`${y}-${m}-31`)
     const r = (ht??[]).filter(t=>t.type==='income').reduce((a,t)=>a+Number(t.amount),0)
     const e = (ht??[]).filter(t=>t.type==='expense').reduce((a,t)=>a+Number(t.amount),0)
@@ -161,10 +163,10 @@ Regras:
 - Termine com 3 decisões financeiras prioritárias, numeradas
 - Retorne APENAS o texto do script, sem explicações adicionais`
 
-export async function runWeeklyScript(): Promise<string> {
+export async function runWeeklyScript(db?: SupabaseClient): Promise<string> {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
   const apiKey = process.env.ANTHROPIC_API_KEY.trim()
-  const ctx = await getFinancialContext()
+  const ctx = await getFinancialContext(db)
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -184,10 +186,10 @@ export async function runWeeklyScript(): Promise<string> {
   return aiRes.content?.[0]?.text?.trim() ?? ''
 }
 
-export async function runMonthlyScript(): Promise<string> {
+export async function runMonthlyScript(db?: SupabaseClient): Promise<string> {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
   const apiKey = process.env.ANTHROPIC_API_KEY.trim()
-  const ctx = await getFinancialContext()
+  const ctx = await getFinancialContext(db)
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -207,10 +209,10 @@ export async function runMonthlyScript(): Promise<string> {
   return aiRes.content?.[0]?.text?.trim() ?? ''
 }
 
-export async function runAdvisor(question = ''): Promise<any[]> {
+export async function runAdvisor(question = '', db?: SupabaseClient): Promise<any[]> {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY não configurada')
   const apiKey = process.env.ANTHROPIC_API_KEY.trim()
-  const ctx = await getFinancialContext()
+  const ctx = await getFinancialContext(db)
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {

@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
+  const { supabase } = await requireAuth()
   const { searchParams } = new URL(req.url)
   const start = searchParams.get('start')
   const end   = searchParams.get('end')
 
   if (!start || !end) return NextResponse.json({ error: 'start e end obrigatórios' }, { status: 400 })
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('pf_transactions')
     .select('date, type, amount, description, category:pf_categories(name,icon)')
     .gte('date', start)
