@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Loader2 } from 'lucide-react'
+import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Loader2, Camera } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import PhotoScanModal, { OcrData } from '@/components/ui/PhotoScanModal'
 
 interface Props {
   open: boolean
@@ -22,6 +23,7 @@ export default function FinTransactionModal({ open, onClose, onSaved, accounts, 
   const [listening, setListening] = useState(false)
   const [voiceText, setVoiceText] = useState('')
   const [toastMsg,  setToastMsg]  = useState<{ type: 'expense'|'income'; amount: number; desc: string } | null>(null)
+  const [scanOpen,  setScanOpen]  = useState(false)
   const recogRef = useRef<any>(null)
 
   useEffect(() => {
@@ -76,6 +78,32 @@ export default function FinTransactionModal({ open, onClose, onSaved, accounts, 
     onSaved()
   }
 
+  // ─── OCR ─────────────────────────────────────────────────────────────────────
+  const handleOcrData = (data: OcrData) => {
+    const txType = (data.transaction_type === 'income' || data.transaction_type === 'expense') ? data.transaction_type : 'expense'
+    setTab(txType)
+    const todayStr = new Date().toISOString().split('T')[0]
+    const useDate = (data.due_date && data.due_date > todayStr) ? data.due_date : (data.date ?? todayStr)
+    const status = (data.due_date && data.due_date > todayStr) ? 'pending' : (data.status ?? 'confirmed')
+    const desc = [data.description, data.seller_or_payer].filter(Boolean).join(' — ')
+    const cat = data.category_suggestion
+      ? categories.find(c => c.type === txType && (
+          c.name.toLowerCase().includes(data.category_suggestion.toLowerCase()) ||
+          data.category_suggestion.toLowerCase().includes(c.name.toLowerCase())
+        ))
+      : null
+    setForm((prev: any) => ({
+      ...prev,
+      type: txType,
+      amount: data.amount > 0 ? data.amount : prev.amount,
+      date: useDate,
+      description: desc || prev.description,
+      status,
+      category_id: cat?.id ?? prev.category_id ?? '',
+    }))
+    setStep('form')
+  }
+
   // ─── VOZ ─────────────────────────────────────────────────────────────────────
   const startVoice = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
@@ -123,6 +151,16 @@ export default function FinTransactionModal({ open, onClose, onSaved, accounts, 
   }
 
   if (!open) return null
+
+  if (scanOpen) {
+    return (
+      <PhotoScanModal
+        open={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onExtracted={(data) => { handleOcrData(data); setScanOpen(false) }}
+      />
+    )
+  }
 
   // ─── SALVANDO ────────────────────────────────────────────────────────────────
   if (step === 'saving') {
@@ -205,9 +243,13 @@ export default function FinTransactionModal({ open, onClose, onSaved, accounts, 
             )}
           </div>
 
-          <div className="border-t border-gray-800 px-5 py-3">
+          <div className="border-t border-gray-800 px-5 py-3 space-y-2">
+            <button onClick={() => setScanOpen(true)}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-950 border border-blue-800 text-blue-400 text-xs font-semibold hover:bg-blue-900 transition-colors">
+              <Camera size={13} /> Tirar foto do comprovante / nota
+            </button>
             <button onClick={() => setStep('form')}
-              className="w-full flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+              className="w-full flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors py-1">
               Preencher manualmente <ChevronRight size={12} />
             </button>
           </div>

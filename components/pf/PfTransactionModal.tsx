@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Edit3, Loader2 } from 'lucide-react'
+import { Mic, MicOff, X, TrendingUp, TrendingDown, ArrowLeftRight, Check, ChevronRight, Edit3, Loader2, Camera } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import PhotoScanModal, { OcrData } from '@/components/ui/PhotoScanModal'
 
 interface Props {
   open: boolean
@@ -23,6 +24,7 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
   const [voiceText, setVoiceText] = useState('')
   const [voiceData, setVoiceData] = useState<any>(null)
   const [toastMsg,  setToastMsg]  = useState<{ type: 'expense'|'income'; amount: number; desc: string } | null>(null)
+  const [scanOpen,  setScanOpen]  = useState(false)
   const recogRef = useRef<any>(null)
 
   useEffect(() => {
@@ -72,6 +74,30 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
     setSaving(false)
     onClose()
     onSaved()
+  }
+
+  // ─── OCR (foto) ──────────────────────────────────────────────────────────────
+  const handleOcrData = (data: OcrData) => {
+    const txType = (data.transaction_type === 'income' || data.transaction_type === 'expense') ? data.transaction_type : 'expense'
+    setTab(txType)
+    const todayStr = new Date().toISOString().split('T')[0]
+    const useDate = (data.due_date && data.due_date > todayStr) ? data.due_date : (data.date ?? todayStr)
+    const status = (data.due_date && data.due_date > todayStr) ? 'pending' : (data.status ?? 'confirmed')
+    const desc = [data.description, data.seller_or_payer].filter(Boolean).join(' — ')
+    const cat = data.category_suggestion ? resolveCategory(data.category_suggestion) : null
+    const account = resolveAccount(null)
+    setForm({
+      type: txType,
+      amount: data.amount > 0 ? data.amount : undefined,
+      date: useDate,
+      description: desc,
+      status,
+      recurrence: 'single',
+      category_id: cat?.id ?? '',
+      account_id: account?.id ?? '',
+    })
+    setVoiceData(data)
+    setStep('confirm')
   }
 
   // ─── VOZ ─────────────────────────────────────────────────────────────────────
@@ -142,6 +168,16 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
 
   if (!open) return null
 
+  if (scanOpen) {
+    return (
+      <PhotoScanModal
+        open={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onExtracted={(data) => { handleOcrData(data); setScanOpen(false) }}
+      />
+    )
+  }
+
   // ─── SALVANDO ────────────────────────────────────────────────────────────────
   if (step === 'saving') {
     return (
@@ -202,6 +238,12 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
             <div className="mx-5 mt-4 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 flex items-start gap-2">
               <span className="text-base">🎤</span>
               <p className="text-xs text-gray-400 italic">"{voiceText}"</p>
+            </div>
+          )}
+          {!voiceText && voiceData && (
+            <div className="mx-5 mt-4 bg-blue-950 border border-blue-800 rounded-xl px-4 py-2.5 flex items-center gap-2">
+              <Camera size={13} className="text-blue-400 flex-shrink-0" />
+              <p className="text-xs text-blue-300">Dados extraídos da foto do documento</p>
             </div>
           )}
 
@@ -311,9 +353,13 @@ export default function PfTransactionModal({ open, onClose, onSaved, accounts, c
             )}
           </div>
 
-          <div className="border-t border-gray-800 px-5 py-3">
+          <div className="border-t border-gray-800 px-5 pt-3 pb-24 space-y-2">
+            <button onClick={() => setScanOpen(true)}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-400 text-sm font-semibold hover:bg-emerald-900 transition-colors">
+              <Camera size={15} /> Tirar foto do comprovante / nota
+            </button>
             <button onClick={() => setStep('form')}
-              className="w-full flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+              className="w-full flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors py-1">
               Preencher manualmente <ChevronRight size={12} />
             </button>
           </div>

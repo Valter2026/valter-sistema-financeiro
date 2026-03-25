@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { X, TrendingUp, TrendingDown, ArrowLeftRight } from 'lucide-react'
+import { X, TrendingUp, TrendingDown, ArrowLeftRight, Camera } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import PhotoScanModal, { OcrData } from '@/components/ui/PhotoScanModal'
 
 type TxType = 'income' | 'expense' | 'transfer'
 
@@ -29,6 +30,7 @@ export default function TransactionModal({ open, onClose, onSaved, accounts, cat
   const [installments,setInstallments]= useState(2)
   const [saving,      setSaving]      = useState(false)
   const [error,       setError]       = useState('')
+  const [scanOpen,    setScanOpen]    = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -49,6 +51,37 @@ export default function TransactionModal({ open, onClose, onSaved, accounts, cat
   const catsFiltradas = categories.filter(c =>
     type === 'transfer' ? false : c.type === type && !c.parent_id
   )
+
+  // Aplica dados extraídos pelo OCR no formulário
+  const handleOcrData = (data: OcrData) => {
+    if (data.transaction_type === 'income' || data.transaction_type === 'expense') {
+      setType(data.transaction_type)
+    }
+    if (data.amount > 0) setAmount(String(data.amount))
+    if (data.date) setDate(data.date)
+    // Status: se due_date futuro → pending; senão usa status do OCR
+    const today = new Date().toISOString().split('T')[0]
+    if (data.due_date && data.due_date > today) {
+      setStatus('pending')
+      setDate(data.due_date)
+    } else if (data.status === 'pending') {
+      setStatus('pending')
+    } else {
+      setStatus('confirmed')
+    }
+    // Descrição
+    const desc = [data.description, data.seller_or_payer].filter(Boolean).join(' — ')
+    if (desc) setDescription(desc)
+    // Tenta encontrar categoria pelo nome sugerido
+    if (data.category_suggestion) {
+      const lower = data.category_suggestion.toLowerCase()
+      const match = categories.find(c =>
+        c.type === (data.transaction_type ?? type) &&
+        (c.name.toLowerCase().includes(lower) || lower.includes(c.name.toLowerCase()))
+      )
+      if (match) setCategoryId(match.id)
+    }
+  }
 
   const handleSave = async () => {
     if (!amount || !accountId) { setError('Preencha valor e conta.'); return }
@@ -88,6 +121,17 @@ export default function TransactionModal({ open, onClose, onSaved, accounts, cat
 
   if (!open) return null
 
+  // Render PhotoScanModal on top when open
+  if (scanOpen) {
+    return (
+      <PhotoScanModal
+        open={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onExtracted={(data) => { handleOcrData(data); setScanOpen(false) }}
+      />
+    )
+  }
+
   const typeConfig = {
     income:   { label: 'Receita',       color: 'bg-green-600',  border: 'border-green-500', active: 'bg-green-600 text-white border-green-600' },
     expense:  { label: 'Despesa',       color: 'bg-red-600',    border: 'border-red-500',   active: 'bg-red-600 text-white border-red-600'   },
@@ -109,9 +153,15 @@ export default function TransactionModal({ open, onClose, onSaved, accounts, cat
               {initial?.id ? 'Editar' : 'Novo'} Lançamento
             </h2>
           </div>
-          <button onClick={onClose} className="text-white/70 hover:text-white transition-colors">
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setScanOpen(true)} title="Ler documento com câmera"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors">
+              <Camera size={13} /> Foto
+            </button>
+            <button onClick={onClose} className="text-white/70 hover:text-white transition-colors">
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         <div className="p-6 space-y-4">
