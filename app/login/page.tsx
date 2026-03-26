@@ -1,19 +1,19 @@
 'use client'
-import { useState, Suspense } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { useState, Suspense, useMemo } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, Loader2, BarChart3 } from 'lucide-react'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 function LoginForm() {
   const router       = useRouter()
   const params       = useSearchParams()
   const next         = params.get('next') ?? '/dashboard'
+
+  const supabase = useMemo(() => createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  ), [])
 
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')

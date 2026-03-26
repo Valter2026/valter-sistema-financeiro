@@ -1,17 +1,16 @@
 'use client'
-import { useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { useState, useMemo } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, Loader2, BarChart3, Check } from 'lucide-react'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
 export default function SignupPage() {
   const router = useRouter()
+  const supabase = useMemo(() => createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  ), [])
 
   const [name,     setName]     = useState('')
   const [email,    setEmail]    = useState('')
