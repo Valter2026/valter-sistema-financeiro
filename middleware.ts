@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 const PUBLIC_PATHS = ['/login', '/signup', '/forgot-password', '/reset-password', '/termos', '/privacidade']
-const API_PUBLIC   = ['/api/webhook']
+const API_PUBLIC   = ['/api/webhook', '/api/sync']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
