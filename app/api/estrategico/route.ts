@@ -116,7 +116,7 @@ export async function GET() {
       bus,
       topProdutos,
       evolucao,
-    })
+    }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }

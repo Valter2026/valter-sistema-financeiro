@@ -3,26 +3,27 @@ import { requireAuth } from '@/lib/auth'
 
 export const maxDuration = 30
 
-const today = () => new Date().toISOString().split('T')[0]
+// Datas em horário de Brasília (UTC-3) para bater com a Eduzz
+function brDate(d: Date): string {
+  return d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+}
+
+function today() { return brDate(new Date()) }
 
 function getRange(period: string, customStart?: string, customEnd?: string): { start: string; end: string } {
-  // Suporte a datas customizadas diretas
   if (customStart && customEnd) return { start: customStart, end: customEnd }
 
-  const end   = new Date()
-  const start = new Date()
+  const now = new Date()
 
   switch (period) {
-    case '7d':   start.setDate(start.getDate() - 7);         break
-    case '30d':  start.setDate(start.getDate() - 30);        break
-    case '90d':  start.setDate(start.getDate() - 90);        break
+    case '7d':   { const s = new Date(now); s.setDate(s.getDate() - 6); return { start: brDate(s), end: brDate(now) } }
+    case '30d':  { const s = new Date(now); s.setDate(s.getDate() - 29); return { start: brDate(s), end: brDate(now) } }
+    case '90d':  { const s = new Date(now); s.setDate(s.getDate() - 89); return { start: brDate(s), end: brDate(now) } }
     case '2024': return { start: '2024-01-01', end: '2024-12-31' }
     case '2025': return { start: '2025-01-01', end: '2025-12-31' }
     case '2026': return { start: '2026-01-01', end: today() }
     default:     return { start: '2024-01-01', end: today() }
   }
-
-  return { start: start.toISOString().split('T')[0], end: end.toISOString().split('T')[0] }
 }
 
 async function querySales(supabase: any, start: string, end: string) {
@@ -156,7 +157,7 @@ export async function GET(req: NextRequest) {
       porStatus: Object.entries(porStatus)
         .sort(([, a], [, b]) => b - a)
         .map(([status, qtd]) => ({ status, qtd })),
-    })
+    }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }

@@ -8,7 +8,10 @@ const EDUZZ_EMAIL  = process.env.EDUZZ_EMAIL!
 const EDUZZ_PUBLIC = process.env.EDUZZ_PUBLIC_KEY!
 const EDUZZ_APIKEY = process.env.EDUZZ_API_KEY!
 
-const today = () => new Date().toISOString().split('T')[0]
+function brDate(d: Date): string {
+  return d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+}
+const today = () => brDate(new Date())
 
 // Cache simples de saldo (5 min)
 let saldoCache: { value: any; at: number } | null = null
@@ -79,14 +82,15 @@ function calc(sales: any[]) {
 
 function getRange(period: string, customStart?: string, customEnd?: string) {
   if (customStart && customEnd) return { start: customStart, end: customEnd }
+  const now = new Date()
   switch (period) {
-    case '7d':  { const d = new Date(); d.setDate(d.getDate()-7);  return { start: d.toISOString().split('T')[0], end: today() } }
-    case '30d': { const d = new Date(); d.setDate(d.getDate()-30); return { start: d.toISOString().split('T')[0], end: today() } }
-    case '90d': { const d = new Date(); d.setDate(d.getDate()-90); return { start: d.toISOString().split('T')[0], end: today() } }
+    case '7d':  { const s = new Date(now); s.setDate(s.getDate()-6);  return { start: brDate(s), end: brDate(now) } }
+    case '30d': { const s = new Date(now); s.setDate(s.getDate()-29); return { start: brDate(s), end: brDate(now) } }
+    case '90d': { const s = new Date(now); s.setDate(s.getDate()-89); return { start: brDate(s), end: brDate(now) } }
     case '2024': return { start: '2024-01-01', end: '2024-12-31' }
     case '2025': return { start: '2025-01-01', end: '2025-12-31' }
-    case '2026': return { start: '2026-01-01', end: today() }
-    default:     return { start: '2024-01-01', end: today() }
+    case '2026': return { start: '2026-01-01', end: brDate(now) }
+    default:     return { start: '2024-01-01', end: brDate(now) }
   }
 }
 
