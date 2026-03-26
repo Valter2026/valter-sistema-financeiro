@@ -45,7 +45,7 @@ export async function GET() {
     // Vendas do ano corrente (2026)
     const { data: salesRaw, error } = await supabase
       .from('sales')
-      .select('sale_id, content_title, sale_status, price_total, price_net, date_payment, date_create')
+      .select('sale_id, content_title, sale_status, sale_total, sale_amount_win, date_payment, date_create')
       .or('sale_status.eq.3,sale_status.eq.7')
       .gte('date_payment', '2026-01-01')
       .lte('date_payment', hoje + 'T23:59:59')
@@ -60,8 +60,8 @@ export async function GET() {
     for (const s of pagas) {
       const bu = getBU(s.content_title ?? '')
       if (!buMap[bu]) buMap[bu] = { bruto: 0, liquido: 0, vendas: 0, produtos: new Set() }
-      buMap[bu].bruto   += Number(s.price_total ?? 0)
-      buMap[bu].liquido += Number(s.price_net   ?? 0)
+      buMap[bu].bruto   += Number(s.sale_total ?? 0)
+      buMap[bu].liquido += Number(s.sale_amount_win   ?? 0)
       buMap[bu].vendas  += 1
       buMap[bu].produtos.add(s.content_title ?? '')
     }
@@ -78,8 +78,8 @@ export async function GET() {
     })).sort((a, b) => b.bruto - a.bruto)
 
     // Totais gerais
-    const totalBruto   = pagas.reduce((s: number, v: any) => s + Number(v.price_total ?? 0), 0)
-    const totalLiquido = pagas.reduce((s: number, v: any) => s + Number(v.price_net   ?? 0), 0)
+    const totalBruto   = pagas.reduce((s: number, v: any) => s + Number(v.sale_total ?? 0), 0)
+    const totalLiquido = pagas.reduce((s: number, v: any) => s + Number(v.sale_amount_win   ?? 0), 0)
     const totalVendas  = pagas.length
 
     // Top produtos por BU
@@ -88,7 +88,7 @@ export async function GET() {
       const k = s.content_title ?? 'Sem nome'
       if (!prodMap[k]) prodMap[k] = { vendas: 0, bruto: 0, bu: getBU(k) }
       prodMap[k].vendas += 1
-      prodMap[k].bruto  += Number(s.price_total ?? 0)
+      prodMap[k].bruto  += Number(s.sale_total ?? 0)
     }
     const topProdutos = Object.entries(prodMap)
       .map(([nome, d]) => ({ nome, ...d, bruto: Math.round(d.bruto * 100) / 100 }))
@@ -101,8 +101,8 @@ export async function GET() {
       const mes = (s.date_payment ?? s.date_create ?? '').substring(0, 7)
       if (!mes) continue
       if (!mensalMap[mes]) mensalMap[mes] = { bruto: 0, liquido: 0 }
-      mensalMap[mes].bruto   += Number(s.price_total ?? 0)
-      mensalMap[mes].liquido += Number(s.price_net   ?? 0)
+      mensalMap[mes].bruto   += Number(s.sale_total ?? 0)
+      mensalMap[mes].liquido += Number(s.sale_amount_win   ?? 0)
     }
     const evolucao = Object.entries(mensalMap)
       .sort(([a], [b]) => a.localeCompare(b))
