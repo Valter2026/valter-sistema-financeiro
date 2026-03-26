@@ -41,6 +41,18 @@ export default function DashboardPage() {
 
   useEffect(() => { load(filter) }, [filter, load])
 
+  // Auto-refresh: sync + recarrega dados a cada 5 minutos
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        await fetch('/api/sync')
+        setLastSync(new Date().toLocaleTimeString('pt-BR'))
+        load(filter)
+      } catch {}
+    }, 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [filter, load])
+
   const handleSync = async () => {
     setSyncing(true)
     try {
