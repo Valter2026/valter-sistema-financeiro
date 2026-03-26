@@ -42,21 +42,18 @@ async function getSaldo() {
 }
 
 async function querySales(supabase: any, start: string, end: string) {
-  const { data: s1, error: e1 } = await supabase
-    .from('sales').select('sale_status,sale_total,sale_amount_win,sale_fee,sale_coop,date_payment,date_create')
-    .gte('date_payment', start)
-    .lte('date_payment', end + 'T23:59:59')
-  if (e1) throw new Error(e1.message)
+  const cols = 'sale_id,sale_status,sale_total,sale_amount_win,sale_fee,sale_coop,date_payment,date_create'
+  const { data, error } = await supabase
+    .from('sales').select(cols)
+    .or(`and(date_payment.gte.${start},date_payment.lte.${end}T23:59:59),and(date_payment.is.null,date_create.gte.${start},date_create.lte.${end}T23:59:59)`)
+  if (error) throw new Error(error.message)
 
-  const { data: s2, error: e2 } = await supabase
-    .from('sales').select('sale_status,sale_total,sale_amount_win,sale_fee,sale_coop,date_payment,date_create')
-    .eq('sale_status', 3)
-    .is('date_payment', null)
-    .gte('date_create', start)
-    .lte('date_create', end + 'T23:59:59')
-  if (e2) throw new Error(e2.message)
-
-  return [...(s1 ?? []), ...(s2 ?? [])]
+  const seen = new Set<number>()
+  return (data ?? []).filter((s: any) => {
+    if (seen.has(s.sale_id)) return false
+    seen.add(s.sale_id)
+    return true
+  })
 }
 
 function calc(sales: any[]) {

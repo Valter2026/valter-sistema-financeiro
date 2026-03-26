@@ -26,25 +26,20 @@ function getRange(period: string, customStart?: string, customEnd?: string): { s
 }
 
 async function querySales(supabase: any, start: string, end: string) {
-  // Vendas com date_payment no período
-  const { data: s1, error: e1 } = await supabase
+  // Busca TODAS as vendas do período para mostrar todos os status
+  // Filtra por date_payment (principal) e date_create como fallback
+  const { data, error } = await supabase
     .from('sales').select('*')
-    .gte('date_payment', start)
-    .lte('date_payment', end + 'T23:59:59')
-  if (e1) throw new Error(e1.message)
+    .or(`and(date_payment.gte.${start},date_payment.lte.${end}T23:59:59),and(date_payment.is.null,date_create.gte.${start},date_create.lte.${end}T23:59:59)`)
+  if (error) throw new Error(error.message)
 
-  // Vendas pagas (status=3) com date_payment nulo mas date_create no período
-  const { data: s2, error: e2 } = await supabase
-    .from('sales').select('*')
-    .eq('sale_status', 3)
-    .is('date_payment', null)
-    .gte('date_create', start)
-    .lte('date_create', end + 'T23:59:59')
-  if (e2) throw new Error(e2.message)
-
-  const merged = [...(s1 ?? []), ...(s2 ?? [])]
-  const seen   = new Set<number>()
-  return merged.filter((s: any) => { if (seen.has(s.sale_id)) return false; seen.add(s.sale_id); return true })
+  // Deduplica por sale_id
+  const seen = new Set<number>()
+  return (data ?? []).filter((s: any) => {
+    if (seen.has(s.sale_id)) return false
+    seen.add(s.sale_id)
+    return true
+  })
 }
 
 export async function GET(req: NextRequest) {
