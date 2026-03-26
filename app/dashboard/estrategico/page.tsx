@@ -393,17 +393,20 @@ export default function EstrategicoPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
               <h3 className="font-semibold text-white mb-4">Faturamento por BU</h3>
-              <ResponsiveContainer width="100%" height={240}>
+              <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie data={d.bus.filter(b => b.bruto > 0)} dataKey="bruto" nameKey="label"
-                    cx="50%" cy="50%" outerRadius={85} label={({ percent }: { percent?: number }) =>
-                      `${((percent ?? 0) * 100).toFixed(0)}%`}>
+                    cx="50%" cy="42%" outerRadius={85}
+                    label={({ name, value, percent }: any) =>
+                      `${name}: ${formatCurrency(value)} (${(percent * 100).toFixed(0)}%)`
+                    }
+                    labelLine={{ stroke: '#4b5563', strokeWidth: 1 }}>
                     {d.bus.filter(b => b.bruto > 0).map((b, i) => (
                       <Cell key={i} fill={BU_CORES[b.bu] ?? '#94a3b8'} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(v: any) => [formatCurrency(Number(v)), 'Bruto']} />
-                  <Legend formatter={(v: any) => v} />
+                  <Legend wrapperStyle={{ paddingTop: 20 }} formatter={(v: any) => v} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -487,12 +490,12 @@ export default function EstrategicoPage() {
                 <Tooltip contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8 }}
                   formatter={(v: any) => [formatCurrency(Number(v))]} />
                 <Legend />
-                <Bar dataKey="empresario" name="Empresario" fill="#3b82f6" stackId="a" />
-                <Bar dataKey="nutricao" name="Nutricao" fill="#10b981" stackId="a" />
-                <Bar dataKey="mid" name="MID/MDV" fill="#8b5cf6" stackId="a" />
-                <Bar dataKey="gastro" name="Gastronomia" fill="#f97316" stackId="a" />
-                <Bar dataKey="beleza" name="Beleza" fill="#ec4899" stackId="a" />
-                <Bar dataKey="eventos" name="Eventos" fill="#f59e0b" stackId="a" />
+                <Bar dataKey="empresario" name="Empresario" fill="#3b82f6" radius={[4,4,0,0]} />
+                <Bar dataKey="nutricao" name="Nutricao" fill="#10b981" radius={[4,4,0,0]} />
+                <Bar dataKey="mid" name="MID/MDV" fill="#8b5cf6" radius={[4,4,0,0]} />
+                <Bar dataKey="gastro" name="Gastronomia" fill="#f97316" radius={[4,4,0,0]} />
+                <Bar dataKey="beleza" name="Beleza" fill="#ec4899" radius={[4,4,0,0]} />
+                <Bar dataKey="eventos" name="Eventos" fill="#f59e0b" radius={[4,4,0,0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -668,39 +671,45 @@ export default function EstrategicoPage() {
             ))}
           </div>
 
-          {/* Funis visuais */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Funis visuais — layout horizontal completo */}
+          <div className="space-y-6">
             {ESTEIRAS.map(e => (
               <div key={e.titulo} className="bg-gray-900 rounded-xl p-6 border border-gray-800"
-                style={{ borderLeft: `4px solid ${e.cor}` }}>
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-bold text-white text-base">{e.emoji} {e.titulo}</h3>
+                style={{ borderTop: `3px solid ${e.cor}` }}>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-bold text-white text-lg">{e.emoji} {e.titulo}</h3>
+                    <div className="text-xs text-gray-400 mt-0.5">{e.desc}</div>
+                  </div>
                   <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
                     e.status === 'ativo' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' :
                     e.status === 'dormente' ? 'bg-red-950 text-red-400 border border-red-800' :
                     'bg-yellow-950 text-yellow-400 border border-yellow-800'
                   }`}>{e.statusLabel}</span>
                 </div>
-                <div className="text-xs text-gray-400 mb-4">{e.desc}</div>
 
-                {/* Funil visual */}
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {e.passos.map((p, i) => (
-                    <div key={i} className="flex items-center gap-1.5">
-                      <div className="rounded-lg px-3 py-2 text-center min-w-[100px]"
-                        style={{
-                          background: p.ativo ? `${p.cor}15` : '#1f293740',
-                          border: `1px solid ${p.ativo ? `${p.cor}40` : '#374151'}`,
-                        }}>
-                        <div className="text-sm font-bold" style={{ color: p.ativo ? p.cor : '#6b7280' }}>{p.label}</div>
-                        <div className="text-xs mt-0.5" style={{ color: p.ativo ? '#9ca3af' : '#4b5563' }}>
-                          {p.sub}
-                          {!p.ativo && <span className="ml-1 text-red-400">OFF</span>}
+                {/* Funil horizontal */}
+                <div className="overflow-x-auto scrollbar-hide">
+                  <div className="flex items-center gap-2 min-w-max py-2">
+                    {e.passos.map((p, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className="rounded-xl px-4 py-3 text-center min-w-[120px]"
+                          style={{
+                            background: p.ativo ? `${p.cor}15` : '#1f293740',
+                            border: `1px solid ${p.ativo ? `${p.cor}50` : '#374151'}`,
+                          }}>
+                          <div className="text-base font-bold" style={{ color: p.ativo ? p.cor : '#6b7280' }}>{p.label}</div>
+                          <div className="text-xs mt-1" style={{ color: p.ativo ? '#d1d5db' : '#4b5563' }}>
+                            {p.sub}
+                          </div>
+                          {!p.ativo && <div className="text-xs text-red-400 font-semibold mt-1">OFF</div>}
                         </div>
+                        {i < e.passos.length - 1 && (
+                          <div className="text-gray-500 text-xl font-bold">→</div>
+                        )}
                       </div>
-                      {i < e.passos.length - 1 && <span className="text-gray-600 text-lg font-light">→</span>}
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
 
                 {/* Insight */}
