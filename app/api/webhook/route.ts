@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       utm_medium:          s.utm_medium  || null,
       utm_content:         s.utm_content || null,
       installments:        s.installments || 1,
+      user_id:             'e44febb8-9d4a-4a8c-9f90-374ad564fa0c',
     }
 
     const { error } = await supabaseAdmin
