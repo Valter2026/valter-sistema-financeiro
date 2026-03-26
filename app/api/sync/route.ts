@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const token = await getToken()
-    const fmt   = (d: Date) => d.toISOString().split('T')[0]
+    const fmt   = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
 
     let totalSynced = 0
 

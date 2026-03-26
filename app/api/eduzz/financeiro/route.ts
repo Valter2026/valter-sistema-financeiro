@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
     const prevDate    = new Date(now.getFullYear(), now.getMonth(), 0)
     const mesAnterior = {
       start: `${prevDate.getFullYear()}-${String(prevDate.getMonth()+1).padStart(2,'0')}-01`,
-      end:   prevDate.toISOString().split('T')[0],
+      end:   brDate(prevDate),
     }
 
     // Busca todos os dados em paralelo
@@ -140,7 +140,7 @@ export async function GET(req: NextRequest) {
     // Mensal breakdown do período selecionado
     const porMes: Record<string, any> = {}
     for (const s of salesPeriodo) {
-      const key = (s.date_payment ?? s.date_create ?? '').substring(0, 7)
+      const key = (s.date_create ?? s.date_payment ?? '').substring(0, 7)
       if (!key) continue
       if (!porMes[key]) porMes[key] = { bruto: 0, liquido: 0, taxas: 0, vendas: 0, reembolso: 0 }
       if (s.sale_status === 3) {
@@ -199,7 +199,7 @@ export async function GET(req: NextRequest) {
         pctReembolsoLiq:   +periodo.pctReembolsoLiq.toFixed(2),
       },
       dreAnual,
-    })
+    }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }

@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
     // Por dia
     const porDia: Record<string, any> = {}
     for (const s of pagas) {
-      const dia = (s.date_payment ?? s.date_create ?? '').substring(0, 10)
+      const dia = (s.date_create ?? s.date_payment ?? '').substring(0, 10)
       if (!dia) continue
       if (!porDia[dia]) porDia[dia] = { bruto: 0, liquido: 0, vendas: 0 }
       porDia[dia].bruto   += s.sale_total      ?? 0
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
     // Por mês
     const porMes: Record<string, any> = {}
     for (const s of pagas) {
-      const mes = (s.date_payment ?? s.date_create ?? '').substring(0, 7)
+      const mes = (s.date_create ?? s.date_payment ?? '').substring(0, 7)
       if (!mes) continue
       if (!porMes[mes]) porMes[mes] = { bruto: 0, liquido: 0, vendas: 0, reembolso: 0 }
       porMes[mes].bruto   += s.sale_total      ?? 0
@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
       porMes[mes].vendas++
     }
     for (const s of reemb) {
-      const mes = (s.date_payment ?? s.date_create ?? '').substring(0, 7)
+      const mes = (s.date_create ?? s.date_payment ?? '').substring(0, 7)
       if (!mes) continue
       if (!porMes[mes]) porMes[mes] = { bruto: 0, liquido: 0, vendas: 0, reembolso: 0 }
       porMes[mes].reembolso += s.sale_total ?? 0

@@ -40,7 +40,7 @@ export const maxDuration = 30
 export async function GET() {
   try {
     const { supabase } = await requireAuth()
-    const hoje = new Date().toISOString().split('T')[0]
+    const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
 
     // Vendas do ano corrente (2026) — filtro por date_create (igual à Eduzz)
     const { data: salesRaw, error } = await supabase
@@ -98,7 +98,7 @@ export async function GET() {
     // Evolução mensal
     const mensalMap: Record<string, { bruto: number; liquido: number }> = {}
     for (const s of pagas) {
-      const mes = (s.date_payment ?? s.date_create ?? '').substring(0, 7)
+      const mes = (s.date_create ?? s.date_payment ?? '').substring(0, 7)
       if (!mes) continue
       if (!mensalMap[mes]) mensalMap[mes] = { bruto: 0, liquido: 0 }
       mensalMap[mes].bruto   += Number(s.sale_total ?? 0)
