@@ -90,9 +90,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const url    = new URL(req.url)
-  const full   = url.searchParams.get('full') === 'true'
-  const userId = url.searchParams.get('user_id')
+  const url         = new URL(req.url)
+  const userId      = url.searchParams.get('user_id')
+  const customStart = url.searchParams.get('start')
+  const customEnd   = url.searchParams.get('end')
 
   try {
     const token = await getToken()
@@ -100,20 +101,9 @@ export async function GET(req: NextRequest) {
 
     let totalSynced = 0
 
-    if (full) {
-      // Sync completo: mês a mês de 2024-01 até hoje
-      const now = new Date()
-      let year = 2024, month = 1
-      while (year < now.getFullYear() || (year === now.getFullYear() && month <= now.getMonth() + 1)) {
-        const start = `${year}-${String(month).padStart(2, '0')}-01`
-        const endDate = new Date(year, month, 0) // último dia do mês
-        const end = fmt(endDate > now ? now : endDate)
-        const count = await syncPeriod(token, start, end)
-        totalSynced += count
-        month++
-        if (month > 12) { month = 1; year++ }
-        await sleep(500) // rate limit entre meses
-      }
+    if (customStart && customEnd) {
+      // Sync de período específico: ?start=2024-01-01&end=2024-06-30
+      totalSynced = await syncPeriod(token, customStart, customEnd)
     } else {
       // Sync incremental: últimos 3 dias
       const end   = new Date()
@@ -127,7 +117,7 @@ export async function GET(req: NextRequest) {
       await supabaseAdmin.from('sales').update({ user_id: userId }).is('user_id', null)
     }
 
-    return NextResponse.json({ ok: true, synced: totalSynced, full })
+    return NextResponse.json({ ok: true, synced: totalSynced, start: customStart, end: customEnd })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
