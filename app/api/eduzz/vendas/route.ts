@@ -26,11 +26,11 @@ function getRange(period: string, customStart?: string, customEnd?: string): { s
 }
 
 async function querySales(supabase: any, start: string, end: string) {
-  // Busca TODAS as vendas do período para mostrar todos os status
-  // Filtra por date_payment (principal) e date_create como fallback
+  // Filtra por date_create (igual à Eduzz) para bater os valores
   const { data, error } = await supabase
     .from('sales').select('*')
-    .or(`and(date_payment.gte.${start},date_payment.lte.${end}T23:59:59),and(date_payment.is.null,date_create.gte.${start},date_create.lte.${end}T23:59:59)`)
+    .gte('date_create', start)
+    .lte('date_create', end + 'T23:59:59')
   if (error) throw new Error(error.message)
 
   // Deduplica por sale_id

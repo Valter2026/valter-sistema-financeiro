@@ -42,13 +42,13 @@ export async function GET() {
     const { supabase } = await requireAuth()
     const hoje = new Date().toISOString().split('T')[0]
 
-    // Vendas do ano corrente (2026)
+    // Vendas do ano corrente (2026) — filtro por date_create (igual à Eduzz)
     const { data: salesRaw, error } = await supabase
       .from('sales')
       .select('sale_id, content_title, sale_status, sale_total, sale_amount_win, date_payment, date_create')
       .or('sale_status.eq.3,sale_status.eq.7')
-      .gte('date_payment', '2026-01-01')
-      .lte('date_payment', hoje + 'T23:59:59')
+      .gte('date_create', '2026-01-01')
+      .lte('date_create', hoje + 'T23:59:59')
 
     if (error) throw new Error(error.message)
 

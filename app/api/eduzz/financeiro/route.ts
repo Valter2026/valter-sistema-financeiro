@@ -43,9 +43,11 @@ async function getSaldo() {
 
 async function querySales(supabase: any, start: string, end: string) {
   const cols = 'sale_id,sale_status,sale_total,sale_amount_win,sale_fee,sale_coop,date_payment,date_create'
+  // Filtra por date_create (igual à Eduzz) para bater os valores
   const { data, error } = await supabase
     .from('sales').select(cols)
-    .or(`and(date_payment.gte.${start},date_payment.lte.${end}T23:59:59),and(date_payment.is.null,date_create.gte.${start},date_create.lte.${end}T23:59:59)`)
+    .gte('date_create', start)
+    .lte('date_create', end + 'T23:59:59')
   if (error) throw new Error(error.message)
 
   const seen = new Set<number>()
